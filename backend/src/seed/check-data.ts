@@ -1,0 +1,11 @@
+import { attractions, destinations, hotels, restaurants, documents } from "./data.js";
+import { slugify } from "../util.js";
+const dup = (xs: string[]) => xs.filter((x, i) => xs.indexOf(x) !== i);
+const dests = new Set(destinations.map((d) => d.slug));
+console.log("dest", destinations.length, "attr", attractions.length, "rest", restaurants.length, "hotels", hotels.length, "docs", documents.length);
+console.log("dup attr slugs", dup(attractions.map((a) => slugify(`${a[0]}-${a[3]}`))));
+console.log("dup rest slugs", dup(restaurants.map((a) => slugify(`${a[0]}-${a[1]}`))));
+console.log("dup hotel slugs", dup(hotels.map((a) => slugify(a[1]))));
+console.log("dup doc slugs", dup(documents.map((d) => d.slug)));
+console.log("bad dest refs", [...attractions.map((a) => a[0]), ...restaurants.map((a) => a[0]), ...hotels.map((a) => a[0])].filter((s) => !dests.has(s)));
+for (const d of destinations) console.log(d.slug.padEnd(16), attractions.filter((a) => a[0] === d.slug).length, restaurants.filter((a) => a[0] === d.slug).length, hotels.filter((a) => a[0] === d.slug).length);

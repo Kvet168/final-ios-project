@@ -8,7 +8,7 @@ import { isLlmConfigured } from "../services/llm.js";
 import {
   PlanRequest, generatePlan, loadItinerary, polishSummary, rebuildDayFromIds, recalcItinerary, regenerateDay, savePlan, understandRequest,
 } from "../services/planner.js";
-import { answerQuestion } from "../services/rag.js";
+import { answerQuestion } from "../services/assistant.js";
 import { audit, notify } from "../services/notify.js";
 import { isUuid } from "../services/search.js";
 import { isIsoDate } from "../util.js";
@@ -80,13 +80,15 @@ aiRoutes.post("/ai/assistant", aiLimiter, h(async (req, res) => {
   const started = Date.now();
   const b = parse(z.object({ question: z.string().trim().min(3).max(500), destination: z.string().max(60).optional() }), req.body);
   const out = await answerQuestion(req.db, b.question, b.destination);
-  await usage(req, "assistant", out.mode, started, out.grounded);
-  if (req.user) {
-    const c = (await req.db.query<any>("INSERT INTO ai_conversations(user_id) VALUES ($1) RETURNING id", [req.user.id])).rows[0];
-    await req.db.query("INSERT INTO ai_messages(conversation_id, role, content) VALUES ($1,'user',$2)", [c.id, b.question]);
-    await req.db.query("INSERT INTO ai_messages(conversation_id, role, content, sources, mode) VALUES ($1,'assistant',$2,$3,$4)",
-      [c.id, out.answer, JSON.stringify(out.sources.map((s) => ({ slug: s.slug, title: s.title }))), out.mode]);
-  }
+  // Logging runs concurrently (the conversation in one statement) so it adds one round trip instead of four.
+  await Promise.all([
+    usage(req, "assistant", out.mode, started, out.grounded),
+    req.user ? req.db.query(
+      `WITH c AS (INSERT INTO ai_conversations(user_id) VALUES ($1) RETURNING id),
+            m AS (INSERT INTO ai_messages(conversation_id, role, content) SELECT id, 'user', $2 FROM c)
+       INSERT INTO ai_messages(conversation_id, role, content, sources, mode) SELECT id, 'assistant', $3, $4, $5 FROM c`,
+      [req.user.id, b.question, out.answer, JSON.stringify(out.sources.map((s) => ({ slug: s.slug, title: s.title }))), out.mode]) : Promise.resolve(),
+  ]);
   res.json(out);
 }));
 

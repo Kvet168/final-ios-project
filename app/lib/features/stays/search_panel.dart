@@ -6,7 +6,39 @@ import '../../core/data/providers.dart';
 import '../../core/theme/theme.dart';
 import '../../core/widgets/widgets.dart';
 
-/// Destination + dates + guests search used on the homepage and the results page.
+/// Opens the stay search as a bottom sheet. [onSearch] receives the query; without it the app navigates to the Stays tab.
+Future<void> showSearchSheet(BuildContext context, {StayQuery initial = const StayQuery(), void Function(StayQuery)? onSearch}) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (c) => Padding(
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(c).bottom),
+      child: SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Find your stay', style: Type.display(28)),
+          const SizedBox(height: 4),
+          Text('Real availability and total prices for your dates.', style: Type.body(14, color: Tokens.inkMuted)),
+          const SizedBox(height: 20),
+          SearchPanel(
+            initial: initial,
+            embedded: true,
+            onSearch: (q) {
+              Navigator.of(c).pop();
+              if (onSearch != null) {
+                onSearch(q);
+              } else {
+                context.go(Uri(path: '/stays', queryParameters: q.toUrlParams()).toString());
+              }
+            },
+          ),
+        ]),
+      ),
+    ),
+  );
+}
+
+/// Destination + dates + guests search.
 class SearchPanel extends ConsumerStatefulWidget {
   const SearchPanel({super.key, this.initial = const StayQuery(), this.onSearch, this.embedded = false});
   final StayQuery initial;
@@ -63,25 +95,25 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     var adults = q.adults, children = q.children, rooms = q.rooms;
     await showModalBottomSheet<void>(
       context: context,
-      showDragHandle: true,
       builder: (c) => StatefulBuilder(builder: (c, set) {
-        Widget row(String label, String sub, int v, int min, int max, void Function(int) on) => ListTile(
-              title: Text(label),
-              subtitle: Text(sub),
-              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton.outlined(tooltip: 'Fewer $label', onPressed: v > min ? () => set(() => on(v - 1)) : null, icon: const Icon(Icons.remove)),
-                SizedBox(width: 36, child: Text('$v', textAlign: TextAlign.center, style: Theme.of(c).textTheme.titleMedium)),
-                IconButton.outlined(tooltip: 'More $label', onPressed: v < max ? () => set(() => on(v + 1)) : null, icon: const Icon(Icons.add)),
+        Widget row(String label, String sub, int v, int min, int max, void Function(int) on) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: Type.body(16, weight: FontWeight.w700)), if (sub.isNotEmpty) Text(sub, style: Type.body(13, color: Tokens.inkMuted))])),
+                _Stepper(onTap: v > min ? () => set(() => on(v - 1)) : null, icon: Icons.remove_rounded, label: 'Fewer $label'),
+                SizedBox(width: 44, child: Text('$v', textAlign: TextAlign.center, style: Type.display(22))),
+                _Stepper(onTap: v < max ? () => set(() => on(v + 1)) : null, icon: Icons.add_rounded, label: 'More $label'),
               ]),
             );
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               row('Adults', 'Age 13 or above', adults, 1, 12, (v) => adults = v),
               row('Children', 'Age 0 to 12', children, 0, 8, (v) => children = v),
               row('Rooms', '', rooms, 1, 6, (v) => rooms = v),
-              Padding(padding: const EdgeInsets.all(8), child: FilledButton(onPressed: () => Navigator.pop(c), child: const Text('Apply'))),
+              const SizedBox(height: 12),
+              SizedBox(width: double.infinity, child: FilledButton(onPressed: () => Navigator.pop(c), child: const Text('Apply'))),
             ]),
           ),
         );
@@ -119,7 +151,6 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
   Widget build(BuildContext context) {
     final dests = (ref.watch(metaProvider).value?['destinations'] as List?) ?? const [];
     ref.listen(metaProvider, (_, next) => _nameFromSlug((next.value?['destinations'] as List?) ?? const []));
-    final wide = isWide(context);
     final dateLabel = q.hasDates ? '${fmtDate(q.checkIn, pattern: 'd MMM')} – ${fmtDate(q.checkOut, pattern: 'd MMM')}  ·  ${nightsBetween(q.checkIn, q.checkOut)} nights' : 'Add dates';
     final guestLabel = '${q.adults} adult${q.adults > 1 ? 's' : ''}${q.children > 0 ? ', ${q.children} child${q.children > 1 ? 'ren' : ''}' : ''} · ${q.rooms} room${q.rooms > 1 ? 's' : ''}';
 
@@ -141,14 +172,15 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
       optionsViewBuilder: (context, onSelected, options) => Align(
         alignment: Alignment.topLeft,
         child: Material(
-          elevation: 4,
-          borderRadius: BorderRadius.circular(Tokens.radius),
+          elevation: 6,
+          color: Tokens.paper,
+          borderRadius: BorderRadius.circular(18),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 260, maxWidth: 420),
             child: ListView(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(vertical: 6),
               shrinkWrap: true,
-              children: [for (final o in options) ListTile(dense: true, leading: const Icon(Icons.place_outlined, size: 20), title: Text(o), onTap: () => onSelected(o))],
+              children: [for (final o in options) ListTile(dense: true, leading: const Icon(Icons.place_outlined, size: 20, color: Tokens.forest), title: Text(o, style: Type.body(15, weight: FontWeight.w600)), onTap: () => onSelected(o))],
             ),
           ),
         ),
@@ -158,53 +190,52 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     Widget tapField(IconData icon, String label, String value, VoidCallback onTap) => Semantics(
           button: true,
           label: '$label: $value',
-          child: InkWell(
-            borderRadius: BorderRadius.circular(Tokens.radius),
+          child: Pressable(
             onTap: onTap,
+            radius: 16,
             child: InputDecorator(
               decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)),
-              child: Text(value, maxLines: 1, overflow: TextOverflow.ellipsis),
+              child: Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(15, weight: FontWeight.w600)),
             ),
           ),
         );
 
-    final fields = [
-      destField,
-      tapField(Icons.calendar_month_outlined, 'Dates', dateLabel, _pickDates),
-      tapField(Icons.people_outline, 'Guests', guestLabel, _pickGuests),
-    ];
-
-    final button = FilledButton.icon(
-      onPressed: () => _submit(dests),
-      icon: const Icon(Icons.search_rounded),
-      label: const Text('Search stays'),
-      style: FilledButton.styleFrom(minimumSize: const Size(0, 56)),
-    );
-
     final content = Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (wide)
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(flex: 4, child: fields[0]),
-          const SizedBox(width: 12),
-          Expanded(flex: 4, child: fields[1]),
-          const SizedBox(width: 12),
-          Expanded(flex: 3, child: fields[2]),
-          const SizedBox(width: 12),
-          SizedBox(width: 170, child: button),
-        ])
-      else ...[
-        fields[0],
-        const SizedBox(height: 12),
-        fields[1],
-        const SizedBox(height: 12),
-        fields[2],
-        const SizedBox(height: 12),
-        button,
-      ],
-      if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Tokens.danger))),
+      destField,
+      const SizedBox(height: 12),
+      tapField(Icons.calendar_month_outlined, 'Dates', dateLabel, _pickDates),
+      const SizedBox(height: 12),
+      tapField(Icons.people_outline, 'Guests', guestLabel, _pickGuests),
+      const SizedBox(height: 16),
+      FilledButton.icon(onPressed: () => _submit(dests), icon: const Icon(Icons.search_rounded), label: const Text('Search stays'), style: FilledButton.styleFrom(minimumSize: const Size(0, 58))),
+      if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: Type.body(13, color: Tokens.danger))),
     ]);
 
     if (widget.embedded) return content;
-    return Card(child: Padding(padding: const EdgeInsets.all(16), child: content));
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(Tokens.radius), border: Border.all(color: Tokens.border)),
+      child: content,
+    );
   }
+}
+
+class _Stepper extends StatelessWidget {
+  const _Stepper({required this.onTap, required this.icon, required this.label});
+  final VoidCallback? onTap;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Pressable(
+        onTap: onTap,
+        radius: 99,
+        semanticLabel: label,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: onTap == null ? Tokens.border : Tokens.forest, width: 1.5)),
+          child: Icon(icon, color: onTap == null ? Tokens.border : Tokens.forest),
+        ),
+      );
 }

@@ -27,4 +27,4 @@ jobs:
         continue-on-error: true   # formatting is advisory until the team adopts it
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
-      - run: flutter build web --release
+      - run: flutter build apk --release --target-platform android-arm64

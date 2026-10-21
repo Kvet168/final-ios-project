@@ -6,7 +6,8 @@ import '../../core/network/api_client.dart';
 class AuthController extends AsyncNotifier<Json?> {
   @override
   Future<Json?> build() async {
-    ref.read(sessionExpiredProvider.notifier).state = () => state = const AsyncData(null);
+    // Registered after the build finishes: a provider may not modify another provider while it is initialising.
+    Future.microtask(() => ref.read(sessionExpiredProvider.notifier).state = () => state = const AsyncData(null));
     final token = await ref.read(tokenStoreProvider).access();
     if (token == null) return null;
     try {

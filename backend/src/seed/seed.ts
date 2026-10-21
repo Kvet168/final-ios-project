@@ -30,6 +30,9 @@ const fileKey = (url: string) => decodeURIComponent(url.split("/").filter(Boolea
 const hCredit = (h: Harvested) => `Photo: ${h.credit} - ${h.page}`;
 const credit = (page?: string) => (page ? `Photo: Wikipedia/Wikimedia Commons (licence on file page) - ${page}` : null);
 
+/** Curated cover choices: destination slug -> index in its harvested gallery (images2.json). */
+const coverPick: Record<string, number> = {};
+
 export interface SeedSummary { [k: string]: number }
 
 export async function runSeed(db: Db, opts: { log?: (m: string) => void } = {}): Promise<SeedSummary> {
@@ -166,7 +169,12 @@ export async function runSeed(db: Db, opts: { log?: (m: string) => void } = {}):
       const pool = (harvested.destinations[d.slug] ?? []).filter((h) => !attractionFiles.has(fileKey(h.url)));
       const cur = (await tx.query<any>("SELECT cover_image, image_credit FROM destinations WHERE slug=$1", [d.slug])).rows[0];
       let cover: string | null = cur.cover_image;
-      if (!cover && pool[0]) {
+      // Hand-picked cover (index into the harvested gallery) where the Wikipedia lead image is a poor representation.
+      const picked = coverPick[d.slug] === undefined ? undefined : pool[coverPick[d.slug]];
+      if (picked) {
+        cover = picked.url;
+        await tx.query("UPDATE destinations SET cover_image=$2, image_credit=$3 WHERE slug=$1", [d.slug, cover, hCredit(picked)]);
+      } else if (!cover && pool[0]) {
         cover = pool[0].url;
         await tx.query("UPDATE destinations SET cover_image=$2, image_credit=$3 WHERE slug=$1", [d.slug, cover, hCredit(pool[0])]);
       }
@@ -306,7 +314,7 @@ export async function runSeed(db: Db, opts: { log?: (m: string) => void } = {}):
     let reviewIdx = 0;
     for (const [ai, a] of accs.entries()) {
       const count = ai < 10 ? 4 : 3;
-      for (let k = 0; k < count && reviewIdx < 100 + 10; k++) {
+      for (let k = 0; k < count; k++) {
         const user = customers[(ai * 3 + k) % customers.length];
         const t = titles[(ai + k) % titles.length];
         const rating = [5, 4, 4, 5, 3, 4, 5][Math.floor(rand() * 7)];
@@ -434,6 +442,20 @@ export async function runSeed(db: Db, opts: { log?: (m: string) => void } = {}):
       ["luang-prabang", 3, ["temples", "relaxed", "nature"], 2, 0, null, "relaxed", "Luang Prabang slow travel"],
       ["chiang-mai", 3, ["temples", "culture", "nature"], 2, 0, null, "balanced", "Chiang Mai temples and mountains"],
       ["phnom-penh", 1, ["photography"], 1, 0, 60, "packed", "Phnom Penh in a day: photographer's route"],
+      ["hoi-an", 3, ["culture", "food", "relaxed"], 2, 0, null, "relaxed", "Hoi An lanterns, tailors and food"],
+      ["da-nang", 3, ["beach", "family", "nature"], 2, 2, null, "balanced", "Da Nang beaches and Ba Na Hills"],
+      ["phuket", 4, ["beach", "family", "relaxed"], 2, 2, null, "relaxed", "Phuket beach family break"],
+      ["krabi", 3, ["beach", "outdoor", "nature"], 2, 0, null, "balanced", "Krabi cliffs and islands"],
+      ["penang", 3, ["food", "culture", "arts"], 2, 0, null, "balanced", "Penang street food and street art"],
+      ["kyoto", 4, ["temples", "culture", "photography"], 2, 0, null, "balanced", "Kyoto temples and lanes"],
+      ["yogyakarta", 3, ["temples", "culture", "history"], 2, 0, null, "balanced", "Yogyakarta temples and palace"],
+      ["vientiane", 2, ["temples", "relaxed", "culture"], 2, 0, null, "relaxed", "Vientiane slow weekend"],
+      ["ratanakiri", 3, ["nature", "outdoor"], 2, 0, null, "balanced", "Ratanakiri waterfalls and lakes"],
+      ["kampong-cham", 2, ["culture", "relaxed"], 2, 0, null, "relaxed", "Kampong Cham river escape"],
+      ["bali", 3, ["culture", "temples", "photography"], 2, 0, null, "balanced", "Ubud temples and markets"],
+      ["tokyo", 4, ["food", "culture", "family"], 2, 2, null, "balanced", "Tokyo with family: parks and food"],
+      ["seoul", 4, ["food", "culture", "shopping"], 2, 0, null, "packed", "Seoul food, palaces and shopping"],
+      ["siem-reap", 5, ["temples", "culture", "photography", "relaxed"], 2, 0, null, "relaxed", "Siem Reap in five days: Angkor at an easy pace"],
     ];
     for (const [dest, days, interests, adults, children, budget, pace, title] of templates) {
       const ex = await tx.query("SELECT 1 FROM itineraries WHERE is_template AND title=$1", [title]);

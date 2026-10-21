@@ -5,6 +5,10 @@ import 'package:intl/intl.dart';
 import '../data/providers.dart';
 import '../network/api_client.dart';
 import '../theme/theme.dart';
+import 'image_catalog.dart';
+import 'ui.dart';
+
+export 'ui.dart';
 
 /* ------------------------------------------------------------------ formatting */
 
@@ -19,7 +23,9 @@ final moneyProvider = Provider<String Function(num usd)>((ref) {
   return (num usd) {
     final v = usd * (row != null ? rate : 1);
     final noDecimals = (rate >= 100 && active != 'USD') || v == v.roundToDouble();
-    final f = NumberFormat.decimalPattern()..minimumFractionDigits = noDecimals ? 0 : 2..maximumFractionDigits = noDecimals ? 0 : 2;
+    final f = NumberFormat.decimalPattern()
+      ..minimumFractionDigits = noDecimals ? 0 : 2
+      ..maximumFractionDigits = noDecimals ? 0 : 2;
     final prefix = active == 'USD' ? r'$' : symbol;
     return '$prefix${f.format(v)}';
   };
@@ -47,8 +53,11 @@ int nightsBetween(String? a, String? b) {
   return y.difference(x).inDays;
 }
 
+String capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
 /* ------------------------------------------------------------------ layout */
 
+/// Centres content and caps its width (keeps tablets and landscape tidy) with phone-friendly gutters.
 class Constrained extends StatelessWidget {
   const Constrained({super.key, required this.child, this.maxWidth = Tokens.maxContent, this.padding});
   final Widget child;
@@ -56,17 +65,13 @@ class Constrained extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.sizeOf(context).width;
-    final gutter = w >= 840 ? 32.0 : 16.0;
-    return Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Padding(padding: padding ?? EdgeInsets.symmetric(horizontal: gutter), child: child),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Padding(padding: padding ?? const EdgeInsets.symmetric(horizontal: 20), child: child),
+        ),
+      );
 }
 
 bool isWide(BuildContext c) => MediaQuery.sizeOf(c).width >= 840;
@@ -74,42 +79,25 @@ bool isWide(BuildContext c) => MediaQuery.sizeOf(c).width >= 840;
 class SectionHeader extends StatelessWidget {
   const SectionHeader(this.title, {super.key, this.subtitle, this.action, this.onAction});
   final String title;
-  final String? subtitle;
-  final String? action;
+  final String? subtitle, action;
   final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 32, bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Semantics(header: true, child: Text(title, style: t.headlineSmall)),
-              if (subtitle != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(subtitle!, style: t.bodyMedium?.copyWith(color: Tokens.inkMuted))),
-            ]),
-          ),
-          if (action != null) TextButton(onPressed: onAction, child: Text(action!)),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => SectionTitle(title, eyebrow: subtitle, action: action, onAction: onAction, padding: const EdgeInsets.only(top: 28, bottom: 12));
 }
 
 /* ------------------------------------------------------------------ imagery */
 
-/// Network photo with a calm tonal fallback (never a broken-image icon).
-/// Mirrored photos are requested as 480px thumbnails unless [full] is set, and decoded at a capped size.
+/// Photo with a calm tonal fallback (never a broken-image icon). Bundled photos load instantly from the app;
+/// anything else is fetched from the network with one retry. Decoded at a capped size to keep memory low.
 class WImage extends StatefulWidget {
-  const WImage(this.url, {super.key, this.height, this.width, this.radius = 0, this.fallbackIcon = Icons.landscape_outlined, this.label, this.full = false});
+  const WImage(this.url, {super.key, this.height, this.width, this.radius = 0, this.fallbackIcon = Icons.landscape_outlined, this.label, this.full = false, this.alignment = Alignment.center});
   final String? url;
   final double? height, width, radius;
   final IconData fallbackIcon;
   final String? label;
   final bool full;
+  final Alignment alignment;
 
   @override
   State<WImage> createState() => _WImageState();
@@ -119,7 +107,7 @@ class _WImageState extends State<WImage> {
   int _attempt = 0;
   bool _retryScheduled = false;
 
-  String? get _src {
+  String? get _netSrc {
     var u = widget.url;
     if (u == null || u.isEmpty) return null;
     if (!widget.full && u.contains('/img/') && !u.contains('/img/t/')) u = u.replaceFirst('/img/', '/img/t/');
@@ -130,9 +118,9 @@ class _WImageState extends State<WImage> {
         height: widget.height,
         width: widget.width,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xFFE6E0D0), Color(0xFFD7DFD6)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(colors: [Color(0xFFE9DFC8), Color(0xFFD3DFD2)], begin: Alignment.topLeft, end: Alignment.bottomRight),
         ),
-        child: Center(child: Icon(widget.fallbackIcon, color: Tokens.forest.withValues(alpha: 0.5), size: 32)),
+        child: Center(child: Icon(widget.fallbackIcon, color: Tokens.forest.withValues(alpha: 0.4), size: 34)),
       );
 
   @override
@@ -144,57 +132,105 @@ class _WImageState extends State<WImage> {
     }
   }
 
+  Widget _fade(BuildContext context, Widget child, int? frame, bool sync) {
+    if (sync) return child;
+    final reduce = MediaQuery.of(context).disableAnimations;
+    return Stack(fit: StackFit.passthrough, children: [
+      Container(height: widget.height, width: widget.width, color: Tokens.sand),
+      AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: reduce ? Duration.zero : const Duration(milliseconds: 260), child: child),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final src = _src;
-    final reduce = MediaQuery.of(context).disableAnimations;
-    final Widget child = src == null
-        ? _fallback()
-        : Image.network(
-            src,
-            key: ValueKey(src),
-            height: widget.height,
-            width: widget.width,
-            fit: BoxFit.cover,
-            gaplessPlayback: true,
-            filterQuality: FilterQuality.medium,
-            // Decode no larger than needed: keeps GPU/texture memory low so photos never turn black on long lists.
-            cacheWidth: widget.full ? 1280 : 560,
-            frameBuilder: (context, child, frame, sync) {
-              if (sync) return child;
-              return Stack(fit: StackFit.passthrough, children: [
-                Container(height: widget.height, width: widget.width, color: Tokens.sand),
-                AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: reduce ? Duration.zero : const Duration(milliseconds: 220), child: child),
-              ]);
-            },
-            errorBuilder: (context, error, stack) {
-              // One automatic retry (transient network errors), then the calm fallback.
-              if (_attempt < 2 && !_retryScheduled) {
-                _retryScheduled = true;
-                Future<void>.delayed(const Duration(milliseconds: 900), () {
-                  if (mounted) setState(() { _attempt++; _retryScheduled = false; });
+    final asset = ImageCatalog.assetFor(widget.url, full: widget.full);
+    final net = _netSrc;
+    final cacheW = widget.full ? 1280 : 640;
+    final Widget child;
+    if (asset != null) {
+      child = Image.asset(
+        asset,
+        height: widget.height,
+        width: widget.width,
+        fit: BoxFit.cover,
+        alignment: widget.alignment,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        cacheWidth: cacheW,
+        frameBuilder: (c, ch, frame, sync) => _fade(c, ch, frame, sync),
+        errorBuilder: (_, _, _) => _fallback(),
+      );
+    } else if (net == null) {
+      child = _fallback();
+    } else {
+      child = Image.network(
+        net,
+        key: ValueKey(net),
+        height: widget.height,
+        width: widget.width,
+        fit: BoxFit.cover,
+        alignment: widget.alignment,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        cacheWidth: cacheW,
+        frameBuilder: (c, ch, frame, sync) => _fade(c, ch, frame, sync),
+        errorBuilder: (context, error, stack) {
+          if (_attempt < 2 && !_retryScheduled) {
+            _retryScheduled = true;
+            Future<void>.delayed(const Duration(milliseconds: 900), () {
+              if (mounted) {
+                setState(() {
+                  _attempt++;
+                  _retryScheduled = false;
                 });
               }
-              return _fallback();
-            },
-          );
+            });
+          }
+          return _fallback();
+        },
+      );
+    }
     return Semantics(image: true, label: widget.label, child: ClipRRect(borderRadius: BorderRadius.circular(widget.radius ?? 0), child: child));
   }
+}
+
+/// Dark scrim for text laid over photography.
+class Scrim extends StatelessWidget {
+  const Scrim({super.key, this.top = false, this.bottom = true, this.strength = 0.72});
+  final bool top, bottom;
+  final double strength;
+
+  @override
+  Widget build(BuildContext context) => Positioned.fill(
+        child: IgnorePointer(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  top ? Colors.black.withValues(alpha: 0.38) : Colors.transparent,
+                  Colors.transparent,
+                  if (bottom) const Color(0xFF0B1511).withValues(alpha: 0.12),
+                  if (bottom) const Color(0xFF0B1511).withValues(alpha: strength),
+                ],
+                stops: bottom ? const [0, 0.35, 0.55, 1] : const [0, 1, 1, 1],
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 /* ------------------------------------------------------------------ states */
 
 class SkeletonBox extends StatelessWidget {
-  const SkeletonBox({super.key, this.height = 16, this.width, this.radius = 8});
+  const SkeletonBox({super.key, this.height = 16, this.width, this.radius = 12});
   final double height;
   final double? width;
   final double radius;
   @override
-  Widget build(BuildContext context) => Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(color: Tokens.sand, borderRadius: BorderRadius.circular(radius)),
-      );
+  Widget build(BuildContext context) => Shimmer(child: Container(height: height, width: width, decoration: BoxDecoration(color: Tokens.sand, borderRadius: BorderRadius.circular(radius))));
 }
 
 class SkeletonList extends StatelessWidget {
@@ -204,9 +240,7 @@ class SkeletonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         label: 'Loading',
-        child: Column(
-          children: [for (var i = 0; i < count; i++) Padding(padding: const EdgeInsets.only(bottom: 16), child: SkeletonBox(height: itemHeight, radius: Tokens.radius))],
-        ),
+        child: Column(children: [for (var i = 0; i < count; i++) Padding(padding: const EdgeInsets.only(bottom: 16), child: SkeletonBox(height: itemHeight, radius: Tokens.radius))]),
       );
 }
 
@@ -226,14 +260,19 @@ class ErrorState extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(network ? Icons.wifi_off_rounded : Icons.error_outline_rounded, size: 40, color: Tokens.terracotta),
-            const SizedBox(height: 12),
-            Text(network ? 'Connection problem' : 'We could not load this', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 6),
-            Text(msg, textAlign: TextAlign.center, style: const TextStyle(color: Tokens.inkMuted)),
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(color: Tokens.terracotta.withValues(alpha: .12), shape: BoxShape.circle),
+              child: Icon(network ? Icons.wifi_off_rounded : Icons.error_outline_rounded, size: 34, color: Tokens.terracotta),
+            ),
+            const SizedBox(height: 18),
+            Text(network ? 'No connection' : "That didn't load", style: Type.display(24), textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(msg, textAlign: TextAlign.center, style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5)),
             if (onRetry != null) ...[
-              const SizedBox(height: 16),
-              OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Try again')),
+              const SizedBox(height: 20),
+              FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Try again')),
             ],
           ]),
         ),
@@ -251,19 +290,24 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 28),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 380),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, size: 44, color: Tokens.inkMuted),
-              const SizedBox(height: 12),
-              Text(title, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
+              Container(
+                width: 84,
+                height: 84,
+                decoration: BoxDecoration(gradient: LinearGradient(colors: [Tokens.mint, Tokens.sand], begin: Alignment.topLeft, end: Alignment.bottomRight), shape: BoxShape.circle),
+                child: Icon(icon, size: 36, color: Tokens.forest),
+              ),
+              const SizedBox(height: 18),
+              Text(title, style: Type.display(23), textAlign: TextAlign.center),
               if (message != null) ...[
-                const SizedBox(height: 6),
-                Text(message!, textAlign: TextAlign.center, style: const TextStyle(color: Tokens.inkMuted)),
+                const SizedBox(height: 8),
+                Text(message!, textAlign: TextAlign.center, style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5)),
               ],
-              if (action != null) ...[const SizedBox(height: 16), action!],
+              if (action != null) ...[const SizedBox(height: 22), action!],
             ]),
           ),
         ),
@@ -289,58 +333,62 @@ class AsyncView<T> extends StatelessWidget {
 /* ------------------------------------------------------------------ small pieces */
 
 class DemoBadge extends StatelessWidget {
-  const DemoBadge({super.key, this.text = 'Demo listing'});
+  const DemoBadge({super.key, this.text = 'Demo listing', this.onImage = false});
   final String text;
+  final bool onImage;
   @override
   Widget build(BuildContext context) => Tooltip(
         message: 'Educational sample data: not a real commercial offer',
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(color: Tokens.amber.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(6)),
-          child: Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7A5517))),
+          decoration: BoxDecoration(color: onImage ? const Color(0xCC14342C) : Tokens.gold.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(8)),
+          child: Text(text, style: Type.body(10.5, weight: FontWeight.w700, color: onImage ? Tokens.gold : const Color(0xFF7A5517))),
         ),
       );
 }
 
 class Pill extends StatelessWidget {
-  const Pill(this.text, {super.key, this.color = Tokens.forest, this.icon});
+  const Pill(this.text, {super.key, this.color = Tokens.forest, this.icon, this.solid = false});
   final String text;
   final Color color;
   final IconData? icon;
+  final bool solid;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(color: solid ? color : color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 14, color: color), const SizedBox(width: 4)],
-          Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+          if (icon != null) ...[Icon(icon, size: 14, color: solid ? Colors.white : color), const SizedBox(width: 4)],
+          Flexible(child: Text(text, style: Type.body(12, weight: FontWeight.w700, color: solid ? Colors.white : color), overflow: TextOverflow.ellipsis)),
         ]),
       );
 }
 
 class RatingBadge extends StatelessWidget {
-  const RatingBadge({super.key, required this.rating, required this.count});
+  const RatingBadge({super.key, required this.rating, required this.count, this.light = false});
   final num rating;
   final int count;
+  final bool light;
   @override
   Widget build(BuildContext context) {
-    if (count == 0) return const Text('No reviews yet', style: TextStyle(fontSize: 12, color: Tokens.inkMuted));
+    if (count == 0) return Text('New', style: Type.body(12, color: light ? Colors.white70 : Tokens.inkMuted, weight: FontWeight.w700));
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.star_rounded, size: 16, color: Tokens.amber),
-      const SizedBox(width: 2),
-      Text(rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w700)),
-      Text(' ($count)', style: const TextStyle(color: Tokens.inkMuted, fontSize: 12)),
+      const Icon(Icons.star_rounded, size: 17, color: Tokens.gold),
+      const SizedBox(width: 3),
+      Text(rating.toStringAsFixed(1), style: Type.body(13.5, weight: FontWeight.w800, color: light ? Colors.white : Tokens.ink)),
+      Text('  ($count)', style: Type.body(12, color: light ? Colors.white70 : Tokens.inkMuted)),
     ]);
   }
 }
 
 class StarRow extends StatelessWidget {
-  const StarRow(this.stars, {super.key});
+  const StarRow(this.stars, {super.key, this.size = 14});
   final int stars;
+  final double size;
   @override
   Widget build(BuildContext context) => Semantics(
         label: '$stars star property',
-        child: Row(mainAxisSize: MainAxisSize.min, children: [for (var i = 0; i < stars; i++) const Icon(Icons.star_rounded, size: 14, color: Tokens.amber)]),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [for (var i = 0; i < stars; i++) Icon(Icons.star_rounded, size: size, color: Tokens.gold)]),
       );
 }
 
@@ -351,17 +399,17 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, color, icon) = switch (status) {
       'CONFIRMED' => ('Confirmed', Tokens.success, Icons.check_circle_outline),
-      'PENDING_CONFIRMATION' => ('Awaiting payment', Tokens.amber, Icons.hourglass_bottom_rounded),
+      'PENDING_CONFIRMATION' => ('Awaiting payment', Tokens.terracotta, Icons.hourglass_bottom_rounded),
       'CHECKED_IN' => ('Checked in', Tokens.forest, Icons.login_rounded),
       'COMPLETED' => ('Completed', Tokens.forest, Icons.task_alt_rounded),
       'CANCELLED' => ('Cancelled', Tokens.danger, Icons.cancel_outlined),
       'EXPIRED' => ('Expired', Tokens.inkMuted, Icons.timer_off_outlined),
-      'REFUND_PENDING' => ('Refund pending', Tokens.amber, Icons.undo_rounded),
+      'REFUND_PENDING' => ('Refund pending', Tokens.terracotta, Icons.undo_rounded),
       'REFUNDED' => ('Refunded', Tokens.inkMuted, Icons.undo_rounded),
       'DRAFT' => ('Draft', Tokens.inkMuted, Icons.edit_outlined),
       'SUCCESS' => ('Paid (simulated)', Tokens.success, Icons.check_circle_outline),
       'FAILED' => ('Payment failed', Tokens.danger, Icons.error_outline),
-      'PENDING' => ('Payment pending', Tokens.amber, Icons.hourglass_bottom_rounded),
+      'PENDING' => ('Payment pending', Tokens.terracotta, Icons.hourglass_bottom_rounded),
       _ => (status, Tokens.inkMuted, Icons.info_outline),
     };
     return Pill(label, color: color, icon: icon);
@@ -374,9 +422,9 @@ class PriceRow extends StatelessWidget {
   final bool bold, muted;
   @override
   Widget build(BuildContext context) {
-    final style = TextStyle(fontWeight: bold ? FontWeight.w700 : FontWeight.w400, fontSize: bold ? 16 : 14, color: muted ? Tokens.inkMuted : Tokens.ink);
+    final style = Type.body(bold ? 16 : 14, weight: bold ? FontWeight.w800 : FontWeight.w500, color: muted ? Tokens.inkMuted : Tokens.ink);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Flexible(child: Text(label, style: style)), Text(value, style: style)]),
     );
   }
@@ -400,11 +448,12 @@ Future<bool> confirm(BuildContext context, {required String title, required Stri
     context: context,
     builder: (c) => AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: Text(message, style: Type.body(14.5, color: Tokens.inkSoft, height: 1.5)),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
         TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Keep')),
         FilledButton(
-          style: destructive ? FilledButton.styleFrom(backgroundColor: Tokens.danger) : null,
+          style: destructive ? FilledButton.styleFrom(backgroundColor: Tokens.danger, minimumSize: const Size(0, 46)) : FilledButton.styleFrom(minimumSize: const Size(0, 46)),
           onPressed: () => Navigator.pop(c, true),
           child: Text(confirmLabel),
         ),

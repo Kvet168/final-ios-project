@@ -1,0 +1,1 @@
+{"llmConfigured":false,"plannerMode":"rules","assistantMode":"retrieval-only","explanation":"No language-model key is configured. Planning uses a deterministic rules engine and answers are extracted from stored guides."}

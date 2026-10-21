@@ -8,3 +8,6 @@
 build/
 .pglite/
 coverage/
+
+app/test/failures/
+dist/

@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/widgets/widgets.dart';
 
 class MapPoint {
   const MapPoint({required this.lat, required this.lng, required this.title, this.subtitle, this.kind = 'place', this.index, this.onTap});
@@ -19,25 +20,25 @@ class MapPoint {
 Color _kindColor(String k) => switch (k) {
       'stay' => Tokens.terracotta,
       'destination' => Tokens.forestDeep,
-      'restaurant' => Tokens.amber,
+      'restaurant' => const Color(0xFFC98A1E),
       'user' => const Color(0xFF2B6CB0),
       _ => Tokens.forest,
     };
 
 IconData _kindIcon(String k) => switch (k) {
-      'stay' => Icons.hotel_rounded,
+      'stay' => Icons.bed_rounded,
       'restaurant' => Icons.restaurant_rounded,
       'destination' => Icons.location_city_rounded,
       'user' => Icons.my_location_rounded,
       _ => Icons.place_rounded,
     };
 
-/// OpenStreetMap-backed map (no API key). Markers, optional day route polyline, and honest attribution.
-/// The polyline is a straight-line connection between stops, not a routed road path.
+/// Map on OpenStreetMap tiles (no API key), markers and an optional route.
+/// The dashed line joins stops in order; it is a straight connection, not a routed road path.
 class PlaceMap extends StatefulWidget {
-  const PlaceMap({super.key, required this.points, this.height = 320, this.drawRoute = false, this.interactive = true, this.showDetail = true});
+  const PlaceMap({super.key, required this.points, this.height = 320, this.drawRoute = false, this.interactive = true, this.showDetail = true, this.radius = Tokens.radius});
   final List<MapPoint> points;
-  final double height;
+  final double height, radius;
   final bool drawRoute;
   final bool interactive;
   final bool showDetail;
@@ -59,7 +60,7 @@ class _PlaceMapState extends State<PlaceMap> {
     final bounds = LatLngBounds.fromPoints(pts.map((p) => p.ll).toList());
     final single = pts.length == 1 || (bounds.north == bounds.south && bounds.east == bounds.west);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(Tokens.radius),
+      borderRadius: BorderRadius.circular(widget.radius),
       child: SizedBox(
         height: widget.height,
         child: Stack(children: [
@@ -68,7 +69,7 @@ class _PlaceMapState extends State<PlaceMap> {
             options: MapOptions(
               initialCenter: single ? pts.first.ll : bounds.center,
               initialZoom: single ? 14 : 12,
-              initialCameraFit: single ? null : CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48), maxZoom: 16),
+              initialCameraFit: single ? null : CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(56), maxZoom: 16),
               interactionOptions: InteractionOptions(flags: widget.interactive ? InteractiveFlag.all & ~InteractiveFlag.rotate : InteractiveFlag.none),
               onTap: (_, _) => setState(() => selected = null),
             ),
@@ -78,27 +79,30 @@ class _PlaceMapState extends State<PlaceMap> {
                 userAgentPackageName: 'com.wayfarer.wayfarer',
               ),
               if (widget.drawRoute && pts.length > 1)
-                PolylineLayer(polylines: [Polyline(points: pts.map((p) => p.ll).toList(), strokeWidth: 3.5, color: Tokens.forest.withValues(alpha: 0.75), pattern: StrokePattern.dashed(segments: const [8, 6]))]),
+                PolylineLayer(polylines: [Polyline(points: pts.map((p) => p.ll).toList(), strokeWidth: 4, color: Tokens.terracotta.withValues(alpha: 0.8), pattern: StrokePattern.dashed(segments: const [9, 7]))]),
               MarkerLayer(markers: [
                 for (final p in pts)
                   Marker(
                     point: p.ll,
-                    width: 40,
-                    height: 40,
+                    width: 44,
+                    height: 44,
                     child: Semantics(
                       button: true,
                       label: p.title,
                       child: GestureDetector(
                         onTap: () {
+                          tick();
                           setState(() => selected = p);
                           p.onTap?.call();
                         },
-                        child: Container(
-                          decoration: BoxDecoration(color: _kindColor(p.kind), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: const [BoxShadow(blurRadius: 4, color: Color(0x33000000))]),
-                          child: Center(
-                            child: p.index != null
-                                ? Text('${p.index}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))
-                                : Icon(_kindIcon(p.kind), color: Colors.white, size: 20),
+                        child: AnimatedScale(
+                          scale: selected == p ? 1.2 : 1,
+                          duration: const Duration(milliseconds: 180),
+                          child: Container(
+                            decoration: BoxDecoration(color: _kindColor(p.kind), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2.5), boxShadow: const [BoxShadow(blurRadius: 8, offset: Offset(0, 3), color: Color(0x40000000))]),
+                            child: Center(
+                              child: p.index != null ? Text('${p.index}', style: Type.body(14, color: Colors.white, weight: FontWeight.w800)) : Icon(_kindIcon(p.kind), color: Colors.white, size: 21),
+                            ),
                           ),
                         ),
                       ),
@@ -106,35 +110,39 @@ class _PlaceMapState extends State<PlaceMap> {
                   ),
               ]),
               RichAttributionWidget(
+                alignment: AttributionAlignment.bottomLeft,
                 attributions: [
                   TextSourceAttribution('© OpenStreetMap contributors', onTap: () => launchUrl(Uri.parse('https://www.openstreetmap.org/copyright'))),
                 ],
               ),
             ],
           ),
-          Positioned(
-            left: 8,
-            top: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(6)),
-              child: const Text('OpenStreetMap · no live traffic', style: TextStyle(fontSize: 11, color: Tokens.inkMuted)),
-            ),
-          ),
           if (widget.showDetail && selected != null)
             Positioned(
               left: 12,
               right: 12,
-              bottom: 24,
-              child: Card(
-                child: ListTile(
-                  title: Text(selected!.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  subtitle: selected!.subtitle == null ? null : Text(selected!.subtitle!, maxLines: 2, overflow: TextOverflow.ellipsis),
-                  trailing: IconButton(
-                    tooltip: 'Open in maps app',
-                    icon: const Icon(Icons.directions_outlined),
-                    onPressed: () => launchUrl(Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${selected!.lat},${selected!.lng}'), mode: LaunchMode.externalApplication),
-                  ),
+              bottom: 28,
+              child: Reveal(
+                dy: 10,
+                duration: const Duration(milliseconds: 260),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                  decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), boxShadow: Tokens.softShadow(0.2)),
+                  child: Row(children: [
+                    Container(width: 40, height: 40, decoration: BoxDecoration(color: _kindColor(selected!.kind).withValues(alpha: .12), shape: BoxShape.circle), child: Icon(_kindIcon(selected!.kind), color: _kindColor(selected!.kind), size: 21)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(selected!.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(15, weight: FontWeight.w800)),
+                        if (selected!.subtitle != null) Text(selected!.subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(12.5, color: Tokens.inkMuted)),
+                      ]),
+                    ),
+                    IconButton.filledTonal(
+                      tooltip: 'Directions in maps app',
+                      icon: const Icon(Icons.directions_rounded),
+                      onPressed: () => launchUrl(Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${selected!.lat},${selected!.lng}'), mode: LaunchMode.externalApplication),
+                    ),
+                  ]),
                 ),
               ),
             ),

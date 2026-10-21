@@ -1,5 +1,4 @@
 import type { Db } from "../db/index.js";
-import { isLlmConfigured, llmComplete } from "./llm.js";
 
 /**
  * Retrieval-augmented answering over approved travel_documents.
@@ -22,6 +21,13 @@ export function toOrQuery(q: string): string {
   const base = q.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((t) => t.length > 2 && !STOP.has(t));
   const expanded = base.flatMap((t) => [t, ...(SYNONYMS[t] ?? [])]).map((t) => t.replace(/[^a-z0-9]/g, ""));
   return [...new Set(expanded.filter(Boolean))].slice(0, 16).join(" | ");
+}
+
+/** Question concepts, each with its synonyms: a sentence matches a concept once however many synonyms it contains. */
+export function queryGroups(q: string, exclude: string[] = []): string[][] {
+  const ex = new Set(exclude.map((e) => e.toLowerCase()));
+  const base = q.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((t) => t.length > 2 && !STOP.has(t) && !ex.has(t));
+  return [...new Set(base)].map((t) => [t, ...(SYNONYMS[t] ?? [])].map((x) => x.replace(/s$/, "")).filter((x) => x.length > 2));
 }
 
 export function chunkText(text: string, target = 480): string[] {
@@ -53,32 +59,4 @@ export async function retrieve(db: Db, question: string, limit = 4, destinationS
       ORDER BY score DESC LIMIT $2`, params);
   return rows.map((r) => ({ documentId: r.document_id, slug: r.slug, title: r.title, source: r.source_label, category: r.category,
     snippet: r.content, score: Number(r.score), isDemo: r.is_demo }));
-}
-
-export interface Answer {
-  answer: string; mode: "retrieval-only" | "llm"; sources: Source[]; grounded: boolean; disclaimer: string;
-}
-
-const DISCLAIMER = "Answers are drawn from WAYFARER's educational demo guides. Verify prices, opening hours, visas and safety advice with official sources before travelling.";
-
-export async function answerQuestion(db: Db, question: string, destinationSlug?: string): Promise<Answer> {
-  const sources = await retrieve(db, question, 4, destinationSlug);
-  if (sources.length === 0) {
-    return { answer: "I couldn't find anything about that in the approved travel guides, so I don't want to guess. Try rephrasing, or ask about a destination, transport, cancellation policy or temple etiquette.",
-      mode: "retrieval-only", sources: [], grounded: false, disclaimer: DISCLAIMER };
-  }
-  if (isLlmConfigured()) {
-    try {
-      const ctx = sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.snippet}`).join("\n\n");
-      const text = await llmComplete(
-        "You are a travel information assistant. Answer ONLY using the numbered context. Cite sources like [1]. If the context does not contain the answer, say you do not have that information. Never invent prices, opening hours or policies. Keep it under 150 words.",
-        `Context:\n${ctx}\n\nQuestion: ${question}`, { maxTokens: 400, timeoutMs: 12_000 });
-      if (text) return { answer: text, mode: "llm", sources, grounded: true, disclaimer: DISCLAIMER };
-    } catch { /* fall back to extractive answer below */ }
-  }
-  const body = sources.slice(0, 3).map((s, i) => `${s.snippet} [${i + 1}]`).join("\n\n");
-  return {
-    answer: `Here is what the approved guides say:\n\n${body}`,
-    mode: "retrieval-only", sources, grounded: true, disclaimer: DISCLAIMER,
-  };
 }

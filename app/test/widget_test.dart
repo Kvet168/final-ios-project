@@ -62,7 +62,7 @@ void main() {
     testWidgets('ErrorState shows a retry action and calls it', (tester) async {
       var retried = 0;
       await tester.pumpWidget(host(ErrorState(error: ApiException('Server unreachable', code: 'NETWORK'), onRetry: () => retried++)));
-      expect(find.text('Connection problem'), findsOneWidget);
+      expect(find.text('No connection'), findsOneWidget);
       expect(find.text('Server unreachable'), findsOneWidget);
       await tester.tap(find.text('Try again'));
       expect(retried, 1);

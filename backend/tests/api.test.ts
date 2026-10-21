@@ -158,7 +158,7 @@ describe("search and discovery", () => {
   it("paginates and reports totals", async () => {
     const p1 = await ctx.api.get("/api/accommodations").query({ pageSize: 10, page: 1 });
     const p2 = await ctx.api.get("/api/accommodations").query({ pageSize: 10, page: 2 });
-    expect(p1.body.total).toBe(30);
+    expect(p1.body.total).toBe(76);
     expect(p1.body.items).toHaveLength(10);
     expect(p2.body.items.map((i: any) => i.id)).not.toEqual(expect.arrayContaining(p1.body.items.map((i: any) => i.id)));
     const empty = await ctx.api.get("/api/accommodations").query({ q: "zzzz-not-a-place" });
@@ -179,7 +179,7 @@ describe("search and discovery", () => {
 
   it("serves destinations with real data and unknown ids as 404", async () => {
     const list = await ctx.api.get("/api/destinations").query({ pageSize: 50 });
-    expect(list.body.total).toBe(20);
+    expect(list.body.total).toBe(30);
     const intl = await ctx.api.get("/api/destinations").query({ international: "true" });
     expect(intl.body.items.every((d: any) => d.country !== "Cambodia")).toBe(true);
     const pp = await ctx.api.get("/api/destinations/phnom-penh");
@@ -324,7 +324,7 @@ describe("administration (scenario 10)", () => {
   it("overview exposes counts and flags revenue as simulated", async () => {
     const admin = await login(ctx.api, "admin");
     const o = await ctx.api.get("/api/admin/overview").set(auth(admin.token));
-    expect(o.body.counts.accommodations).toBe(30);
+    expect(o.body.counts.accommodations).toBe(76);
     expect(o.body.note).toMatch(/simulated/i);
   });
 });

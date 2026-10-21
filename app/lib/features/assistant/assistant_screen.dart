@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/data/providers.dart';
 import '../../core/network/api_client.dart';
@@ -7,16 +10,35 @@ import '../../core/theme/theme.dart';
 import '../../core/widgets/widgets.dart';
 
 class _Msg {
-  _Msg(this.fromUser, this.text, {this.sources = const [], this.mode, this.grounded = true, this.disclaimer});
+  _Msg(this.fromUser, this.text, {this.sources = const [], this.cards = const [], this.followUps = const [], this.mode, this.grounded = true, this.disclaimer, this.intent, this.destination, this.failed = false, this.retry});
   final bool fromUser;
   final String text;
-  final List<Json> sources;
-  final String? mode;
-  final bool grounded;
-  final String? disclaimer;
+  final List<Json> sources, cards;
+  final List<String> followUps;
+  final String? mode, disclaimer, intent;
+  final Json? destination;
+  final bool grounded, failed;
+  final String? retry;
+  bool revealed = false;
 }
 
-/// Travel knowledge assistant (retrieval-augmented). Always shows where an answer came from.
+class _Starter {
+  const _Starter(this.icon, this.title, this.question, this.color);
+  final IconData icon;
+  final String title, question;
+  final Color color;
+}
+
+const _starters = [
+  _Starter(Icons.wb_sunny_rounded, 'Best time to go', 'What is the best time to visit Siem Reap?', Tokens.gold),
+  _Starter(Icons.tram_rounded, 'Getting around', 'How do I get around Phnom Penh?', Tokens.jade),
+  _Starter(Icons.payments_rounded, 'Daily budget', 'How much does a day in Bangkok cost?', Tokens.terracotta),
+  _Starter(Icons.ramen_dining_rounded, 'What to eat', 'What should I eat in Hoi An?', Tokens.lotus),
+  _Starter(Icons.checkroom_rounded, 'Temple etiquette', 'What should I wear when visiting temples?', Color(0xFF5E8FA8)),
+  _Starter(Icons.event_available_rounded, 'Cancellation', 'How does free cancellation work?', Tokens.forest),
+];
+
+/// Travel guide chat. Answers are composed server-side from stored destination data and approved guides, with sources.
 class AssistantScreen extends ConsumerStatefulWidget {
   const AssistantScreen({super.key, this.initialQuestion, this.destination});
   final String? initialQuestion, destination;
@@ -25,125 +47,464 @@ class AssistantScreen extends ConsumerStatefulWidget {
 }
 
 class _AssistantScreenState extends ConsumerState<AssistantScreen> {
+  static final Map<String, Json> _answers = {};
   final _input = TextEditingController();
   final _scroll = ScrollController();
+  final _focus = FocusNode();
   final List<_Msg> msgs = [];
   bool busy = false;
-
-  static const suggestions = [
-    'What should I wear when visiting temples?',
-    'How does free cancellation work?',
-    'How do I get around Phnom Penh?',
-    'How should I plan my Angkor visit?',
-    'What currency should I carry in Cambodia?',
-  ];
+  String? _topic;
 
   @override
   void initState() {
     super.initState();
+    _topic = widget.destination;
     if (widget.initialQuestion != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _ask(widget.initialQuestion!));
     }
   }
 
+  @override
+  void dispose() {
+    _input.dispose();
+    _scroll.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _toBottom({bool animate = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scroll.hasClients) return;
+      final to = _scroll.position.maxScrollExtent;
+      animate ? _scroll.animateTo(to, duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic) : _scroll.jumpTo(to);
+    });
+  }
+
   Future<void> _ask(String q) async {
     q = q.trim();
     if (q.length < 3 || busy) return;
-    setState(() { msgs.add(_Msg(true, q)); busy = true; _input.clear(); });
+    tick();
+    setState(() {
+      msgs.add(_Msg(true, q));
+      busy = true;
+      _input.clear();
+    });
+    _toBottom();
     try {
-      final r = await ref.read(apiProvider).postJson('/ai/assistant', body: {'question': q, if (widget.destination != null) 'destination': widget.destination});
-      msgs.add(_Msg(false, r['answer'] as String, sources: (r['sources'] as List).cast<Json>(), mode: r['mode'] as String?, grounded: r['grounded'] == true, disclaimer: r['disclaimer'] as String?));
+      // Repeated questions (including the starter cards) are answered instantly from this session's cache.
+      final key = '${_topic ?? ''}|${q.toLowerCase()}';
+      final r = _answers[key] ?? await ref.read(apiProvider).postJson('/ai/assistant', body: {'question': q, if (_topic != null) 'destination': _topic}, timeout: const Duration(seconds: 20));
+      _answers[key] = r;
+      final dest = r['destination'] as Json?;
+      if (dest != null) _topic = dest['slug'] as String?;
+      msgs.add(_Msg(
+        false,
+        r['answer'] as String,
+        sources: ((r['sources'] as List?) ?? const []).cast<Json>(),
+        cards: ((r['cards'] as List?) ?? const []).cast<Json>(),
+        followUps: ((r['followUps'] as List?) ?? const []).cast<String>(),
+        mode: r['mode'] as String?,
+        grounded: r['grounded'] == true,
+        disclaimer: r['disclaimer'] as String?,
+        intent: r['intent'] as String?,
+        destination: dest,
+      ));
     } catch (e) {
-      msgs.add(_Msg(false, e is ApiException ? e.message : 'Something went wrong.', grounded: false));
+      msgs.add(_Msg(false, e is ApiException ? e.message : 'Something went wrong.', grounded: false, failed: true, retry: q));
     }
     if (!mounted) return;
     setState(() => busy = false);
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+    _toBottom();
   }
 
   @override
   Widget build(BuildContext context) {
     final status = ref.watch(aiStatusProvider).value;
-    return Column(children: [
-      Expanded(
-        child: ListView(controller: _scroll, children: [
-          Constrained(
-            maxWidth: 820,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Travel guide assistant', style: Theme.of(context).textTheme.headlineMedium),
-                const SizedBox(height: 8),
-                const Text('Ask about destinations, transport, etiquette or booking policies. Answers come from WAYFARER\'s approved guides and always show their sources.', style: TextStyle(color: Tokens.inkMuted, height: 1.4)),
-                if (status != null) Padding(padding: const EdgeInsets.only(top: 12), child: Pill(status['assistantMode'] == 'llm' ? 'Language model + retrieval' : 'Retrieval only: passages quoted from stored guides', icon: Icons.menu_book_outlined, color: Tokens.terracotta)),
-                const SizedBox(height: 16),
-                if (msgs.isEmpty) Wrap(spacing: 8, runSpacing: 8, children: [for (final s in suggestions) ActionChip(label: Text(s), onPressed: () => _ask(s))]),
-                for (final m in msgs) _bubble(context, m),
-                if (busy) const Padding(padding: EdgeInsets.all(12), child: Row(children: [SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 10), Text('Searching the guides…')])),
-              ]),
-            ),
+    final llm = status?['assistantMode'] == 'llm';
+    final kb = MediaQuery.viewInsetsOf(context).bottom;
+    return StatusTone.light(child: Scaffold(
+      backgroundColor: Tokens.ivory,
+      body: Column(children: [
+        _Header(llm: llm, onClear: msgs.isEmpty ? null : () => setState(() { msgs.clear(); _topic = widget.destination; })),
+        Expanded(
+          child: msgs.isEmpty
+              ? _Empty(onAsk: _ask, topic: _topic)
+              : ListView.builder(
+                  controller: _scroll,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                  itemCount: msgs.length + (busy ? 1 : 0),
+                  itemBuilder: (_, i) {
+                    if (i == msgs.length) return const _Typing();
+                    final m = msgs[i];
+                    final latest = i == msgs.length - 1;
+                    return m.fromUser
+                        ? _UserBubble(m.text)
+                        : _AssistantBubble(
+                            key: ObjectKey(m),
+                            m: m,
+                            animate: latest && !m.revealed,
+                            onTick: _toBottom,
+                            onAsk: _ask,
+                            showFollowUps: latest && !busy,
+                          );
+                  },
+                ),
+        ),
+        AnimatedPadding(
+          duration: const Duration(milliseconds: 120),
+          padding: EdgeInsets.only(bottom: kb > 0 ? 0 : MediaQuery.paddingOf(context).bottom),
+          child: _Composer(controller: _input, focus: _focus, busy: busy, onSend: () => _ask(_input.text)),
+        ),
+      ]),
+    ));
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.llm, required this.onClear});
+  final bool llm;
+  final VoidCallback? onClear;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: EdgeInsets.fromLTRB(8, MediaQuery.paddingOf(context).top + 6, 8, 14),
+        decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.vertical(bottom: Radius.circular(28))),
+        child: Row(children: [
+          IconButton(tooltip: 'Close', onPressed: () => context.canPop() ? context.pop() : context.go('/'), icon: const Icon(Icons.arrow_back_rounded, color: Colors.white)),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [Color(0xFFF0B85A), Tokens.terracotta]), boxShadow: [BoxShadow(color: Tokens.terracotta.withValues(alpha: .5), blurRadius: 16)]),
+            child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
           ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Wayfarer Guide', style: Type.display(20, color: Colors.white)),
+              Row(children: [
+                Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF6EE7A8), shape: BoxShape.circle)),
+                const SizedBox(width: 6),
+                Text(llm ? 'AI-written · grounded in our guides' : 'Instant · answers from our guides', style: Type.body(11.5, color: Colors.white70)),
+              ]),
+            ]),
+          ),
+          if (onClear != null) IconButton(tooltip: 'New chat', onPressed: onClear, icon: const Icon(Icons.edit_note_rounded, color: Colors.white)),
         ]),
-      ),
-      Container(
-        decoration: const BoxDecoration(color: Tokens.paper, border: Border(top: BorderSide(color: Tokens.border))),
-        child: SafeArea(
-          top: false,
-          child: Constrained(
-            maxWidth: 820,
-            padding: const EdgeInsets.all(12),
-            child: Row(children: [
-              Expanded(
-                child: TextField(
-                  controller: _input,
-                  maxLength: 500,
-                  buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
-                  textInputAction: TextInputAction.send,
-                  onSubmitted: _ask,
-                  decoration: const InputDecoration(hintText: 'Ask a travel question'),
+      );
+}
+
+class _Empty extends StatelessWidget {
+  const _Empty({required this.onAsk, required this.topic});
+  final ValueChanged<String> onAsk;
+  final String? topic;
+
+  @override
+  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 20), children: [
+        Reveal(child: Text('Ask me anything\nabout your trip.', style: Type.display(34, height: 1.05))),
+        const SizedBox(height: 10),
+        Reveal(delay: const Duration(milliseconds: 80), child: Text('I answer from WAYFARER\'s destination data and approved guides, and always show where it came from.', style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5))),
+        const SizedBox(height: 24),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.35,
+          children: [
+            for (final (i, s) in _starters.indexed)
+              Reveal(
+                delay: Duration(milliseconds: 120 + 60 * i),
+                child: Pressable(
+                  onTap: () => onAsk(s.question),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(width: 38, height: 38, decoration: BoxDecoration(color: s.color.withValues(alpha: .16), borderRadius: BorderRadius.circular(13)), child: Icon(s.icon, size: 21, color: s.color)),
+                      const Spacer(),
+                      Text(s.title, style: Type.body(14.5, weight: FontWeight.w800)),
+                      const SizedBox(height: 2),
+                      Text(s.question, maxLines: 2, overflow: TextOverflow.ellipsis, style: Type.body(11.5, color: Tokens.inkMuted, height: 1.3)),
+                    ]),
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              IconButton.filled(tooltip: 'Send', onPressed: busy ? null : () => _ask(_input.text), icon: const Icon(Icons.arrow_upward)),
+          ],
+        ),
+      ]);
+}
+
+class _UserBubble extends StatelessWidget {
+  const _UserBubble(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerRight,
+        child: Reveal(
+          dy: 10,
+          duration: const Duration(milliseconds: 260),
+          child: Container(
+            margin: const EdgeInsets.only(top: 14, left: 56),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.only(topLeft: Radius.circular(22), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(6))),
+            child: Text(text, style: Type.body(15, color: Colors.white, height: 1.4)),
+          ),
+        ),
+      );
+}
+
+class _Typing extends StatelessWidget {
+  const _Typing();
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(top: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          decoration: BoxDecoration(color: Tokens.paper, borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22)), border: Border.all(color: Tokens.border)),
+          child: const TypingDots(),
+        ),
+      );
+}
+
+class _AssistantBubble extends StatefulWidget {
+  const _AssistantBubble({super.key, required this.m, required this.animate, required this.onTick, required this.onAsk, required this.showFollowUps});
+  final _Msg m;
+  final bool animate, showFollowUps;
+  final VoidCallback onTick;
+  final ValueChanged<String> onAsk;
+
+  @override
+  State<_AssistantBubble> createState() => _AssistantBubbleState();
+}
+
+class _AssistantBubbleState extends State<_AssistantBubble> with SingleTickerProviderStateMixin {
+  late final AnimationController _c;
+  bool _showSources = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final len = widget.m.text.length;
+    // Fast reveal: the answer is already here, this only gives it a natural arrival. Capped at ~1.1s.
+    _c = AnimationController(vsync: this, duration: Duration(milliseconds: (len * 7).clamp(250, 1100)));
+    if (widget.animate && !widget.m.failed) {
+      _c.addListener(widget.onTick);
+      _c.forward().whenComplete(() => widget.m.revealed = true);
+    } else {
+      _c.value = 1;
+      widget.m.revealed = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  List<InlineSpan> _spans(String text, int shown) {
+    final t = text.substring(0, shown.clamp(0, text.length));
+    final out = <InlineSpan>[];
+    final re = RegExp(r'\[(\d+)\]');
+    var last = 0;
+    for (final mt in re.allMatches(t)) {
+      if (mt.start > last) out.add(TextSpan(text: t.substring(last, mt.start)));
+      out.add(WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+          decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .12), borderRadius: BorderRadius.circular(8)),
+          child: Text(mt.group(1)!, style: Type.body(11, weight: FontWeight.w800, color: Tokens.forest)),
+        ),
+      ));
+      last = mt.end;
+    }
+    if (last < t.length) out.add(TextSpan(text: t.substring(last)));
+    return out;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final m = widget.m;
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (_, _) {
+        final done = _c.value >= 1;
+        final shown = (m.text.length * Curves.easeOut.transform(_c.value)).round();
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.only(top: 14, right: 20),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+            decoration: BoxDecoration(
+              color: m.failed ? Tokens.terracotta.withValues(alpha: .08) : Tokens.paper,
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22)),
+              border: Border.all(color: m.failed ? Tokens.terracotta.withValues(alpha: .4) : Tokens.border),
+              boxShadow: Tokens.softShadow(0.04),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              GestureDetector(
+                onTap: () => _c.value = 1,
+                child: Text.rich(TextSpan(style: Type.body(15, height: 1.6, color: Tokens.ink), children: _spans(m.text, done ? m.text.length : shown))),
+              ),
+              if (done) ...[
+                if (m.failed && m.retry != null) Padding(padding: const EdgeInsets.only(top: 12), child: OutlinedButton.icon(onPressed: () => widget.onAsk(m.retry!), icon: const Icon(Icons.refresh_rounded), label: const Text('Try again'))),
+                if (!m.grounded && !m.failed) const Padding(padding: EdgeInsets.only(top: 10), child: Pill('Not in approved guides', color: Tokens.terracotta, icon: Icons.help_outline_rounded)),
+                if (m.cards.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 150,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: m.cards.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 10),
+                      itemBuilder: (_, i) => _CardTile(c: m.cards[i]),
+                    ),
+                  ),
+                ],
+                if (m.intent == 'plan' && m.destination != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: FilledButton.icon(onPressed: () => context.push('/trips/new?destination=${m.destination!['slug']}'), icon: const Icon(Icons.auto_awesome_rounded, size: 18), label: Text('Plan ${m.destination!['name']} with the AI planner')),
+                  ),
+                if (m.sources.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Pressable(
+                    onTap: () => setState(() => _showSources = !_showSources),
+                    radius: 12,
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.menu_book_rounded, size: 15, color: Tokens.inkMuted),
+                      const SizedBox(width: 6),
+                      Text('${m.sources.length} source${m.sources.length == 1 ? '' : 's'}', style: Type.body(12.5, weight: FontWeight.w700, color: Tokens.inkMuted)),
+                      Icon(_showSources ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: Tokens.inkMuted),
+                    ]),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 220),
+                    alignment: Alignment.topCenter,
+                    child: !_showSources
+                        ? const SizedBox(width: double.infinity)
+                        : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            for (final (i, s) in m.sources.indexed)
+                              Padding(padding: const EdgeInsets.only(top: 6), child: Text('[${i + 1}] ${s['title']} · ${s['source']}${s['isDemo'] == true ? ' (demo content)' : ''}', style: Type.body(12, color: Tokens.inkMuted, height: 1.4))),
+                            if (m.disclaimer != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(m.disclaimer!, style: Type.body(11, color: Tokens.inkMuted, height: 1.4))),
+                          ]),
+                  ),
+                ],
+                if (widget.showFollowUps && m.followUps.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Wrap(spacing: 8, runSpacing: 8, children: [for (final f in m.followUps.take(3)) _Suggest(f, widget.onAsk)]),
+                ],
+              ],
+            ]),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Suggest extends StatelessWidget {
+  const _Suggest(this.text, this.onAsk);
+  final String text;
+  final ValueChanged<String> onAsk;
+
+  @override
+  Widget build(BuildContext context) => Pressable(
+        onTap: () => onAsk(text),
+        radius: 99,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .08), borderRadius: BorderRadius.circular(99), border: Border.all(color: Tokens.forest.withValues(alpha: .2))),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.north_east_rounded, size: 14, color: Tokens.forest),
+            const SizedBox(width: 6),
+            Flexible(child: Text(text, style: Type.body(12.5, weight: FontWeight.w700, color: Tokens.forest))),
+          ]),
+        ),
+      );
+}
+
+class _CardTile extends StatelessWidget {
+  const _CardTile({required this.c});
+  final Json c;
+
+  @override
+  Widget build(BuildContext context) => Pressable(
+        onTap: () => context.push(c['route'] as String),
+        child: Container(
+          width: 168,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), boxShadow: Tokens.softShadow(0.1)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Stack(fit: StackFit.expand, children: [
+              WImage(c['image'] as String?, width: double.infinity, height: double.infinity, fallbackIcon: c['type'] == 'stay' ? Icons.bed_outlined : Icons.place_outlined),
+              const Scrim(top: true, strength: 0.88),
+              Positioned(left: 12, top: 10, child: Pill(switch (c['type']) { 'stay' => 'STAY', 'place' => 'PLACE', _ => 'DESTINATION' }, color: Tokens.gold, solid: true)),
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 10,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(c['title'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: Type.display(16, color: Colors.white, height: 1.1)),
+                  const SizedBox(height: 2),
+                  Text(c['subtitle'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(11, color: Colors.white70)),
+                ]),
+              ),
             ]),
           ),
         ),
-      ),
-    ]);
-  }
+      );
+}
 
-  Widget _bubble(BuildContext context, _Msg m) {
-    if (m.fromUser) {
-      return Align(
-        alignment: Alignment.centerRight,
+class _Composer extends StatelessWidget {
+  const _Composer({required this.controller, required this.focus, required this.busy, required this.onSend});
+  final TextEditingController controller;
+  final FocusNode focus;
+  final bool busy;
+  final VoidCallback onSend;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        decoration: const BoxDecoration(color: Tokens.ivory),
         child: Container(
-          margin: const EdgeInsets.only(top: 12, left: 48),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Tokens.forest, borderRadius: BorderRadius.circular(12)),
-          child: Text(m.text, style: const TextStyle(color: Colors.white)),
+          padding: const EdgeInsets.fromLTRB(20, 4, 6, 4),
+          decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(30), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.08)),
+          child: Row(children: [
+            Expanded(
+              child: TextField(
+                controller: controller,
+                focusNode: focus,
+                maxLength: 500,
+                minLines: 1,
+                maxLines: 3,
+                buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.send,
+                textCapitalization: TextCapitalization.sentences,
+                onSubmitted: (_) => onSend(),
+                style: Type.body(15.5),
+                decoration: InputDecoration(hintText: 'Ask about a destination…', hintStyle: Type.body(15.5, color: Tokens.inkMuted), filled: false, border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, contentPadding: const EdgeInsets.symmetric(vertical: 12)),
+              ),
+            ),
+            Pressable(
+              onTap: busy ? null : onSend,
+              radius: 99,
+              semanticLabel: 'Send',
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(shape: BoxShape.circle, gradient: busy ? null : const LinearGradient(colors: [Color(0xFFF0B85A), Tokens.terracotta]), color: busy ? Tokens.sandDeep : null),
+                child: busy ? const Padding(padding: EdgeInsets.all(14), child: CircularProgressIndicator(strokeWidth: 2.2, color: Tokens.forest)) : const Icon(Icons.arrow_upward_rounded, color: Colors.white),
+              ),
+            ),
+          ]),
         ),
       );
-    }
-    return Container(
-      margin: const EdgeInsets.only(top: 12, right: 24),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Tokens.paper, border: Border.all(color: Tokens.border), borderRadius: BorderRadius.circular(12)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SelectableText(m.text, style: const TextStyle(height: 1.5)),
-        if (!m.grounded && m.sources.isEmpty) const Padding(padding: EdgeInsets.only(top: 8), child: Pill('Not in approved guides', color: Tokens.terracotta, icon: Icons.help_outline)),
-        if (m.sources.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          const Text('Sources', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Tokens.inkMuted)),
-          const SizedBox(height: 4),
-          for (final (i, s) in m.sources.indexed)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text('[${i + 1}] ${s['title']} · ${s['source']}${s['isDemo'] == true ? ' (demo content)' : ''}', style: const TextStyle(fontSize: 12, color: Tokens.inkMuted)),
-            ),
-        ],
-        if (m.disclaimer != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(m.disclaimer!, style: const TextStyle(fontSize: 11, color: Tokens.inkMuted))),
-      ]),
-    );
-  }
 }

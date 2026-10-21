@@ -191,8 +191,9 @@ function buildDay(
     const t = prev ? travelMin(prev, b.p) : 0;
     const start = Math.max(startAt, cursor + t);
     if (!fitsHours(b.p, start)) return false;
+    const allDay = b.p.opens_min === 0 && (b.p.closes_min ?? 0) >= 1439;
     const hoursNote = b.p.opens_min != null && b.p.closes_min != null
-      ? `${b.p.hours_verified ? "open" : "typically open"} ${fmtT(b.p.opens_min)}-${fmtT(b.p.closes_min % 1440)}` : "";
+      ? (allDay ? "open access, no fixed hours" : `${b.p.hours_verified ? "open" : "typically open"} ${fmtT(b.p.opens_min)}-${fmtT(b.p.closes_min % 1440)}`) : "";
     items.push({
       attractionId: b.p.id, name: b.p.name, kind: b.p.kind, category: b.p.category, lat: b.p.lat, lng: b.p.lng, image: b.p.image,
       startMin: start, durationMin: b.p.duration_min, travelMinFromPrev: items.length === 0 && !hotel ? 0 : t,

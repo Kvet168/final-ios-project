@@ -168,7 +168,7 @@ class DestQuery {
         'international': international?.toString(),
         'sort': sort,
         'page': page,
-        'pageSize': 12,
+        'pageSize': 40,
       };
   @override
   bool operator ==(Object other) => other is DestQuery && other.toQuery().toString() == toQuery().toString();
@@ -314,3 +314,17 @@ class RecentController extends StateNotifier<List<Map<String, String>>> {
 }
 
 final recentProvider = StateNotifierProvider<RecentController, List<Map<String, String>>>((ref) => RecentController());
+
+/// First-run flag: the welcome carousel is shown once.
+class OnboardedController extends StateNotifier<bool> {
+  OnboardedController(super.initial);
+
+  Future<void> complete() async {
+    state = true;
+    try {
+      await (await SharedPreferences.getInstance()).setBool('onboarded', true);
+    } catch (_) {}
+  }
+}
+
+final onboardedProvider = StateNotifierProvider<OnboardedController, bool>((ref) => OnboardedController(true));
