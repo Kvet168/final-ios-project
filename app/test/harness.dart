@@ -91,8 +91,8 @@ Future<void> loadAssets() async {
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(const MethodChannel('plugins.flutter.io/path_provider'), (call) async => Directory.systemTemp.path);
 
-  await font('Fraunces', 'assets/fonts/Fraunces.ttf');
-  await font('PlusJakartaSans', 'assets/fonts/PlusJakartaSans.ttf');
+  await font('Inter', 'assets/fonts/Inter.ttf');
+  await font('KantumruyPro', 'assets/fonts/KantumruyPro.ttf');
   await font('MaterialIcons', 'C:/dev/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf');
 }
 

@@ -38,30 +38,33 @@ class Tokens {
       ];
 }
 
-/// Typography. Fraunces (variable serif) carries the editorial voice; Plus Jakarta Sans does the work.
+/// Typography. English is set in Inter; Khmer falls back to Kantumruy Pro (both bundled, variable fonts).
+/// Every style names the fallback so Khmer text anywhere in the app uses Kantumruy Pro.
 class Type {
-  static const _display = 'Fraunces';
-  static const _body = 'PlusJakartaSans';
+  static const _en = 'Inter';
+  static const _km = ['KantumruyPro'];
 
-  static TextStyle display(double size, {FontWeight weight = FontWeight.w600, Color color = Tokens.ink, double? height, double? spacing, bool italic = false}) => TextStyle(
-        fontFamily: _display,
+  static TextStyle display(double size, {FontWeight weight = FontWeight.w700, Color color = Tokens.ink, double? height, double? spacing, bool italic = false}) => TextStyle(
+        fontFamily: _en,
+        fontFamilyFallback: _km,
         fontSize: size,
         fontWeight: weight,
         fontStyle: italic ? FontStyle.italic : FontStyle.normal,
         color: color,
-        height: height ?? 1.08,
-        letterSpacing: spacing ?? -size * 0.018,
-        fontVariations: [FontVariation('wght', weight.value.toDouble()), FontVariation('opsz', size.clamp(9, 144).toDouble()), const FontVariation('SOFT', 60)],
+        height: height ?? 1.1,
+        letterSpacing: spacing ?? -size * 0.024,
+        fontVariations: [FontVariation('wght', weight.value.toDouble()), FontVariation('opsz', size.clamp(14, 32).toDouble())],
       );
 
   static TextStyle body(double size, {FontWeight weight = FontWeight.w500, Color color = Tokens.ink, double? height, double? spacing}) => TextStyle(
-        fontFamily: _body,
+        fontFamily: _en,
+        fontFamilyFallback: _km,
         fontSize: size,
         fontWeight: weight,
         color: color,
         height: height ?? 1.4,
         letterSpacing: spacing,
-        fontVariations: [FontVariation('wght', weight.value.toDouble())],
+        fontVariations: [FontVariation('wght', weight.value.toDouble()), FontVariation('opsz', size.clamp(14, 32).toDouble())],
       );
 
   static TextStyle label(double size, {Color color = Tokens.inkMuted, FontWeight weight = FontWeight.w700}) =>
@@ -81,7 +84,7 @@ class WayfarerTheme {
       outline: Tokens.border,
       surfaceContainerHighest: Tokens.sand,
     );
-    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.ivory, fontFamily: 'PlusJakartaSans');
+    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.ivory, fontFamily: 'Inter', fontFamilyFallback: const ['KantumruyPro']);
     final text = base.textTheme.copyWith(
       displayLarge: Type.display(48),
       displayMedium: Type.display(40),

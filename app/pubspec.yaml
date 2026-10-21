@@ -39,11 +39,13 @@ flutter:
     - assets/img/t/
 
   fonts:
-    - family: Fraunces
+    - family: Inter
       fonts:
-        - asset: assets/fonts/Fraunces.ttf
-        - asset: assets/fonts/Fraunces-Italic.ttf
+        - asset: assets/fonts/Inter.ttf
+        - asset: assets/fonts/Inter-Italic.ttf
           style: italic
-    - family: PlusJakartaSans
+    - family: KantumruyPro
       fonts:
-        - asset: assets/fonts/PlusJakartaSans.ttf
+        - asset: assets/fonts/KantumruyPro.ttf
+        - asset: assets/fonts/KantumruyPro-Italic.ttf
+          style: italic
