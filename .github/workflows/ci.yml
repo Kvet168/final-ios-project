@@ -9,11 +9,9 @@ jobs:
     defaults: { run: { working-directory: backend } }
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm, cache-dependency-path: backend/package-lock.json }
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test   # runs against in-process Postgres (PGlite); no secrets needed
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: maven }
+      - run: mvn -B verify   # unit tests; the end-to-end script (scripts/smoke.sh) runs against a started stack
 
   flutter:
     runs-on: ubuntu-latest

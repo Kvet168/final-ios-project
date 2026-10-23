@@ -5,7 +5,7 @@
 2. Copy `app/build/app/outputs/flutter-apk/app-release.apk` to the phone (USB, Drive, or `adb install -r app-release.apk`).
 3. Allow "install unknown apps" for the file manager used, then open **WAYFARER**.
 
-The phone needs internet for accounts, bookings, search and the AI (the API is hosted at `https://wayfarer-api-liart.vercel.app/api`). Photos and fonts are inside the app. If the connection drops, pages you already opened still load from the on-device cache.
+The phone needs to reach the API for accounts, bookings, search and the AI. Build with `--dart-define=API_BASE_URL=http://<your-computer-LAN-IP>:8080/api` (or the Android emulator's `http://10.0.2.2:8080/api`) while `docker compose up` runs the backend. Photos and fonts are inside the app. If the connection drops, pages you already opened still load from the on-device cache.
 
 ## Before presenting
 - Open the app once on the venue Wi-Fi (the launch animation wakes the server and loads the home feed).
@@ -29,9 +29,6 @@ The phone needs internet for accounts, bookings, search and the AI (the API is h
 ## What was verified on an Android emulator (API 34, x86_64)
 Release build installed and driven with touch input against the live API: launch and splash, welcome carousel, Discover, destination page, Stays list and detail with live availability, sign-in (demo account), checkout, simulated payment, ticket, cancellation, AI guide (starter cards and typed questions, cards, follow-ups), AI planner (itinerary, budget split, route map), map with OpenStreetMap tiles. Bugs found this way and fixed: arm64-only APK vs x86 emulator, Carto map tiles requiring an API key, Enter key not sending in the chat box, unreadable status-bar icons on dark headers.
 Not tested: a physical phone, location permission ("Near me") and slow mobile networks.
-
-## Security follow-up (owner action)
-The Neon database password was shared in chat earlier. Rotate it: Neon console -> Roles -> Reset password, then run `powershell -ExecutionPolicy Bypass -File backend\scripts\rotate-database-url.ps1` from the repo root and paste the new connection string (hidden input). The script updates `backend\.env` and the Vercel `DATABASE_URL`, redeploys the API and checks `/api/health`.
 
 ## Honest limitations
 - Hotels, restaurants, reviews, bookings and payments are educational sample data; payments are simulated.

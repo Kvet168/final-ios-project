@@ -3,19 +3,20 @@
 | Control | Implementation |
 |---|---|
 | Passwords | bcrypt (cost 10), min 10 chars with letters + digit |
-| Sessions | 15 min JWT, refresh tokens hashed (SHA-256) and rotated; reuse revokes the family; password reset revokes all |
+| Sessions | 15 min JWT with a unique id; logout adds it to a Redis denylist; refresh tokens hashed (SHA-256) and rotated; reuse revokes the family; password reset and role change revoke all |
 | AuthZ | role re-read from DB per privileged request; ownership checks return 404 for foreign resources; partner scoped by `partners.user_id` |
-| Input | zod validation everywhere; parameterised SQL; LIKE wildcards escaped |
-| Abuse | global + auth + AI rate limits (production), body limit 100 kB |
-| Transport/headers | HTTPS (Vercel), Helmet, CORS allow-list via `CORS_ORIGINS` |
+| Input | Jakarta Bean Validation on every request body; parameterised SQL only; LIKE wildcards escaped |
+| Abuse | Redis rate limits per IP on credential endpoints (30 per 15 min) and AI endpoints (20 per minute) |
+| Transport/headers | TLS terminated by the host, Spring Security default headers, CORS allow-list via `CORS_ORIGINS` |
 | Payments | HMAC verified raw-body webhook, idempotency, amount check, no client-supplied status |
 | Errors | no stack traces/internals in responses |
-| Secrets | `.env` git-ignored; Vercel encrypted env vars; `.env.example` has names only |
+| Secrets | environment variables only; the app refuses development secrets when `WAYFARER_PROD=true` |
 | Audit | `audit_logs` for bookings, payments, admin and inventory changes |
 
 ## Open items
-- **A Neon connection string was pasted into a chat and must be treated as compromised.** Rotate it in the Neon console, then update `DATABASE_URL` in Vercel (`vercel env`) and local `.env`.
-- `CORS_ORIGINS` is `*` in the demo deployment; restrict to the web origin for production.
-- No email delivery, so password reset returns a demo token only outside production (disabled in production).
-- Access tokens are bearer tokens in storage; web uses secure-storage's web fallback (browser storage), which is weaker than mobile keystores.
+- `CORS_ORIGINS` defaults to `*` for local development; restrict it to the web origin in production.
+- No email delivery, so password reset returns a demo token only outside production (disabled in production). OTP and email verification are not implemented.
+- The WebSocket registry is in-memory (single instance).
+- Access tokens are bearer tokens in storage; web uses secure-storage's browser fallback, which is weaker than mobile keystores.
+- A database password for the retired hosted demo was shared in chat earlier and must be treated as compromised: rotate it at the provider and retire that deployment.
 - No dependency scanning or pen-test has been run.

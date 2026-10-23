@@ -510,7 +510,7 @@ class _ContentState extends ConsumerState<_Content> {
               child: const Text('Create destination'),
             ),
             const SizedBox(height: 8),
-            const Text('Hotel, room and inventory management are available through the API (/admin/accommodations, /admin/room-types/:id/inventory) and the partner portal.', style: TextStyle(fontSize: 12, color: Tokens.inkMuted)),
+            const Text('Hotels, rooms, prices and stock are managed by each partner in the web Partner dashboard (/partner). Administrators can browse them in the web Admin console (/admin).', style: TextStyle(fontSize: 12, color: Tokens.inkMuted)),
           ]),
         ),
       ),
@@ -532,7 +532,7 @@ class _PartnerScreenState extends ConsumerState<PartnerScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    if (!(auth.isPartner || auth.role == 'admin')) {
+    if (!auth.isPartner) {
       return const EmptyState(icon: Icons.lock_outline, title: 'Partner access required', message: 'Only partner accounts can manage properties. Access is enforced by the server.');
     }
     final api = ref.watch(apiProvider);

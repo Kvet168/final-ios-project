@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/data/live_updates.dart';
 import '../core/theme/theme.dart';
 import '../core/widgets/widgets.dart';
 
@@ -30,13 +32,21 @@ int _indexFor(String loc) {
 }
 
 /// Tab scaffold: content runs behind a floating glass dock with the AI orb at its centre.
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.location, required this.child});
   final String location;
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(liveUpdatesProvider);
+    ref.listen(liveEventProvider, (_, event) {
+      final data = event?['data'];
+      if (data is! Map) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text('${data['title'] ?? 'Update'}: ${data['body'] ?? ''}', maxLines: 2, overflow: TextOverflow.ellipsis)));
+    });
     final idx = _indexFor(location);
     return Scaffold(
       extendBody: true,

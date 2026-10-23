@@ -1,11 +1,14 @@
 # AI evaluation
 
-Automated checks (in `backend/tests/api.test.ts`):
-- The scenario prompt "three days in Phnom Penh, two adults, $150, food/culture/photography/relaxed" is parsed to `{destination: phnom-penh, days: 3, adults: 2, budgetUsd: 150}`.
-- Every itinerary stop id exists in `attractions`; no duplicates; stops are time-ordered and non-overlapping; totals equal the sum of components.
-- Missing essentials produce questions rather than guesses.
-- RAG returns the etiquette document for a clothing question, returns policy documents for cancellation questions and declines an off-topic question with `grounded=false`.
+Automated checks (unit tests in `backend/src/test/java/com/wayfarer/ai`, end-to-end checks in `backend/scripts/smoke.sh`):
+- The brief's example "three days in Phnom Penh and $150" is parsed to `{destination: phnom-penh, days: 3, budgetUsd: 150}`, and a fuller prompt (two adults, food/culture/photography, relaxed) to the right party, pace and interests.
+- Plans have the requested number of days; no place repeats; stops are time-ordered and do not overlap; stops respect opening hours; pace changes the number of stops; interests and proximity influence the choice; day cost equals the sum of its stops.
+- Missing essentials produce questions rather than guesses (`needs_more_info`).
+- The assistant answers "best time to visit Siem Reap" with `grounded=true`, and declines nonsense with `grounded=false`.
+- Behavioural parity with the retired implementation: for the same prompts and questions both produced identical plans and answers.
 
-Not yet done: human relevance rating, retrieval recall/precision benchmark, LLM-mode evaluation.
+Example result for the brief: 3 days, lodging at a hostel, 14 stops over 3 days (sights plus restaurants), estimated total 120.36 USD within the 150 USD budget.
+
+Not yet done: human relevance rating, retrieval recall/precision benchmark, LLM-mode evaluation, weather-aware optimisation.
 
 Known weaknesses: lexical retrieval misses paraphrases without a synonym entry; the planner has no multi-day transport routing and small pools per destination can repeat categories.

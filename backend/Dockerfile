@@ -1,11 +1,14 @@
-FROM node:22-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY tsconfig.json ./
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /src
+COPY pom.xml .
+RUN mvn -q -B dependency:go-offline
 COPY src ./src
-COPY migrations ./migrations
-ENV NODE_ENV=production PORT=8080
+RUN mvn -q -B -DskipTests package
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+RUN useradd --system --uid 1001 wayfarer
+COPY --from=build /src/target/wayfarer-api-1.0.0.jar app.jar
+USER wayfarer
 EXPOSE 8080
-USER node
-CMD ["npx", "tsx", "src/server.ts"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

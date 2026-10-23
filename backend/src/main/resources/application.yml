@@ -1,0 +1,73 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: wayfarer-api
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/wayfarer}
+    username: ${DATABASE_USER:wayfarer}
+    password: ${DATABASE_PASSWORD:wayfarer_local_only}
+    hikari:
+      maximum-pool-size: 10
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 1s
+  flyway:
+    enabled: true
+    # Attaching to a database the Express backend already created (same schema as V1): treat V1 as applied.
+    baseline-on-migrate: true
+    baseline-version: "1"
+    # `seed` adds sample data and demo users; remove it (SPRING_FLYWAY_LOCATIONS) for a clean production database.
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration,classpath:db/seed}
+    placeholders:
+      demoPassword: ${DEMO_PASSWORD:Wayfarer#Demo2026}
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false
+
+springdoc:
+  swagger-ui:
+    path: /api/docs
+  api-docs:
+    path: /api/openapi
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+wayfarer:
+  prod: ${WAYFARER_PROD:false}
+  hold-minutes: ${BOOKING_HOLD_MINUTES:30}
+  jwt:
+    # Must be at least 32 bytes. The default is for local development only; production must set JWT_ACCESS_SECRET.
+    access-secret: ${JWT_ACCESS_SECRET:dev-only-access-secret-change-me-0123456789}
+    access-ttl-sec: 900
+    refresh-ttl-sec: 2592000
+    issuer: wayfarer
+  payment:
+    mode: ${PAYMENT_PROVIDER_MODE:mock}
+    webhook-secret: ${PAYMENT_WEBHOOK_SECRET:dev-webhook-secret}
+  rate-limit:
+    auth-max: ${AUTH_RATE_LIMIT_MAX:30}
+    window-sec: 900
+  cors-origins: ${CORS_ORIGINS:*}
+  cache-ttl-sec: 300
+  ai:
+    api-key: ${AI_PROVIDER_API_KEY:}
+    model: ${AI_MODEL:claude-sonnet-5-5}
+    requests-per-minute: ${AI_RATE_LIMIT_PER_MINUTE:20}

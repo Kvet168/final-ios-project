@@ -1,4 +1,5 @@
-# Local development only. The public demo runs on Vercel + Neon and does not use this file.
+# Local development stack: PostgreSQL + Redis + the Spring Boot API (http://localhost:8080/api, Swagger at /api/docs).
+# Flyway builds the schema and loads the demo catalogue on first start. Not used for production.
 services:
   db:
     image: postgres:16-alpine
@@ -12,17 +13,24 @@ services:
       test: ["CMD-SHELL", "pg_isready -U wayfarer"]
       interval: 5s
       retries: 10
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
   api:
     build: ./backend
     depends_on:
       db: { condition: service_healthy }
+      redis: { condition: service_healthy }
     environment:
-      NODE_ENV: development
-      DATABASE_URL: postgresql://wayfarer:wayfarer_local_only@db:5432/wayfarer
-      JWT_ACCESS_SECRET: local-dev-access-secret-change-me-0123456789
-      JWT_REFRESH_SECRET: local-dev-refresh-secret-change-me-0123456789
+      DATABASE_URL: jdbc:postgresql://db:5432/wayfarer
+      DATABASE_USER: wayfarer
+      DATABASE_PASSWORD: wayfarer_local_only
+      REDIS_HOST: redis
       PAYMENT_PROVIDER_MODE: mock
     ports: ["8080:8080"]
-    command: sh -c "npx tsx src/db/migrate.ts && npx tsx src/seed/seed.ts && npx tsx src/server.ts"
 volumes:
   pgdata:
