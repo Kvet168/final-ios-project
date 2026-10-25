@@ -49,6 +49,10 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    # Redis is optional (cache, rate limit, token denylist all fail open); don't let it mark the service DOWN.
+    redis:
+      enabled: false
 
 wayfarer:
   prod: ${WAYFARER_PROD:false}
