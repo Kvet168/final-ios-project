@@ -1,9 +1,10 @@
 /// Build-time configuration. Override with --dart-define=API_BASE_URL=https://host/api
 class Env {
-  /// The Spring Boot API. `localhost` works from the iOS Simulator; use http://10.0.2.2:8080/api from the Android emulator.
+  /// The Spring Boot API, deployed on Render. For a local backend pass --dart-define=API_BASE_URL=http://localhost:8080/api
+  /// (iOS Simulator) or http://10.0.2.2:8080/api (Android emulator).
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:8080/api',
+    defaultValue: 'https://final-ios-project.onrender.com/api',
   );
 
   /// WebSocket endpoint for live booking updates. Defaults to the API host's /ws.
