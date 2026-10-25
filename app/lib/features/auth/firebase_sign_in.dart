@@ -69,7 +69,9 @@ class FirebaseSignIn {
       final cred = kIsWeb ? await _auth.signInWithPopup(provider) : await _auth.signInWithProvider(provider);
       return await cred.user?.getIdToken(true);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'canceled' || e.code == 'popup-closed-by-user' || e.code == 'web-context-canceled' || e.code == 'cancelled-popup-request') return null;
+      // Firebase spells "cancelled" both ways depending on the platform.
+      const closed = {'canceled', 'cancelled', 'popup-closed-by-user', 'web-context-canceled', 'web-context-cancelled', 'cancelled-popup-request'};
+      if (closed.contains(e.code)) return null;
       throw AuthMessage(_message(e));
     }
   }
