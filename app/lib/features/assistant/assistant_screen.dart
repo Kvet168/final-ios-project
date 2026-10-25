@@ -32,7 +32,7 @@ class _Starter {
 const _starters = [
   _Starter(Icons.wb_sunny_rounded, 'Best time to go', 'What is the best time to visit Siem Reap?', Tokens.primary),
   _Starter(Icons.tram_rounded, 'Getting around', 'How do I get around Phnom Penh?', Tokens.primary),
-  _Starter(Icons.payments_rounded, 'Daily budget', 'How much does a day in Bangkok cost?', Tokens.primary),
+  _Starter(Icons.payments_rounded, 'Daily budget', 'How much does a day in Phnom Penh cost?', Tokens.primary),
   _Starter(Icons.ramen_dining_rounded, 'What to eat', 'What should I eat in Hoi An?', Tokens.primary),
   _Starter(Icons.checkroom_rounded, 'Temple etiquette', 'What should I wear when visiting temples?', Tokens.primary),
   _Starter(Icons.event_available_rounded, 'Cancellation', 'How does free cancellation work?', Tokens.primary),
