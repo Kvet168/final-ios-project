@@ -69,6 +69,9 @@ wayfarer:
   rate-limit:
     auth-max: ${AUTH_RATE_LIMIT_MAX:30}
     window-sec: 900
+  firebase:
+    # Firebase project id (Project settings in the Firebase console). Empty disables Firebase sign-in.
+    project-id: ${FIREBASE_PROJECT_ID:}
   google:
     # Comma-separated OAuth client IDs (web, iOS, Android) whose Google ID tokens are accepted. Empty disables Google sign-in.
     client-ids: ${GOOGLE_CLIENT_ID:}

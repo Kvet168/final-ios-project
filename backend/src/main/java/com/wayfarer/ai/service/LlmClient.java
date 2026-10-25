@@ -38,12 +38,21 @@ public class LlmClient {
         if (!configured()) throw new IllegalStateException("LLM not configured");
         List<Turn> conversation = normalize(turns);
         if (conversation.isEmpty()) throw new IllegalArgumentException("No messages to send");
-        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
-        factory.setReadTimeout(timeout);
-        if (!cfg.isGemini()) return finish("anthropic", cfg.modelName(), () -> chatAnthropic(factory, system, conversation, maxTokens));
-        // Free-tier Gemini quotas are per model, so when one is exhausted (429), busy (503) or retired (404) the next model is tried.
+        if (!cfg.isGemini()) {
+            JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
+            factory.setReadTimeout(timeout);
+            return finish("anthropic", cfg.modelName(), () -> chatAnthropic(factory, system, conversation, maxTokens));
+        }
+        // Free-tier Gemini quotas are per model, and new models are sometimes overloaded or slow, so when one is exhausted (429), busy (503),
+        // retired (404) or too slow the next model is tried, all within the caller's overall time budget.
+        long deadline = System.nanoTime() + timeout.toNanos();
+        Duration perAttempt = Duration.ofMillis(Math.max(8000, timeout.toMillis() / 2));
         RuntimeException last = null;
         for (String model : geminiModels()) {
+            Duration remaining = Duration.ofNanos(deadline - System.nanoTime());
+            if (last != null && remaining.toMillis() < 3000) break;
+            JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
+            factory.setReadTimeout(last == null ? perAttempt : (remaining.compareTo(perAttempt) < 0 ? remaining : perAttempt));
             try {
                 return finish("gemini", model, () -> chatGemini(factory, model, system, conversation, maxTokens));
             } catch (QuotaOrAvailabilityException e) {
@@ -66,6 +75,10 @@ public class LlmClient {
             String text = call.get();
             if (text.isBlank()) throw new IllegalStateException("empty response (model " + model + ")");
             return text;
+        } catch (org.springframework.web.client.ResourceAccessException e) {
+            // Timeouts and dropped connections: worth trying another model.
+            if ("gemini".equals(provider)) throw new QuotaOrAvailabilityException(provider + " (model " + model + ") did not answer in time: " + e.getMessage(), e);
+            throw new IllegalStateException(provider + " request failed: " + e.getMessage(), e);
         } catch (org.springframework.web.client.RestClientResponseException e) {
             String detail = e.getResponseBodyAsString().replaceAll("\\s+", " ");
             String message = provider + " HTTP " + e.getStatusCode().value() + " (model " + model + "): " + (detail.length() > 300 ? detail.substring(0, 300) : detail);
@@ -78,7 +91,7 @@ public class LlmClient {
     private List<String> geminiModels() {
         List<String> models = new ArrayList<>(List.of(cfg.modelName()));
         // Google retires models quickly (2.0 and 2.5-flash-lite already answer 404), so the current generation comes first.
-        for (String m : List.of("gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash")) if (!models.contains(m)) models.add(m);
+        for (String m : List.of("gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-flash")) if (!models.contains(m)) models.add(m);
         return models;
     }
 

@@ -47,11 +47,12 @@ public class AuthService {
     private final NotificationService notifications;
     private final AuditService audit;
     private final GoogleTokenVerifier google;
+    private final FirebaseTokenVerifier firebase;
     /** A real bcrypt hash compared against for unknown emails, so login timing does not reveal which emails exist. */
     private final String dummyHash;
 
     public AuthService(UserRepository users, RefreshTokenRepository refreshTokens, PasswordResetRepository resets, PasswordEncoder encoder, JwtService jwt,
-                       AppProperties props, TokenDenylist denylist, NotificationService notifications, AuditService audit, GoogleTokenVerifier google) {
+                       AppProperties props, TokenDenylist denylist, NotificationService notifications, AuditService audit, GoogleTokenVerifier google, FirebaseTokenVerifier firebase) {
         this.users = users;
         this.refreshTokens = refreshTokens;
         this.resets = resets;
@@ -62,6 +63,7 @@ public class AuthService {
         this.notifications = notifications;
         this.audit = audit;
         this.google = google;
+        this.firebase = firebase;
         this.dummyHash = encoder.encode("not-a-real-password");
     }
 
@@ -121,8 +123,35 @@ public class AuthService {
         return respond(u);
     }
 
+    /**
+     * Firebase sign-in. The Firebase ID token is verified locally (signature, expiry, issuer, audience). A known Firebase uid signs in; otherwise
+     * an existing account with the same address is linked, or a customer account is created. Linking and creating need a trusted address
+     * (verified by Firebase's email link, or vouched for by Google/Apple), so nobody can take over an account by registering its email unverified.
+     */
+    @Transactional
+    public AuthResponse loginWithFirebase(String idToken) {
+        FirebaseTokenVerifier.FirebaseIdentity f = firebase.verify(idToken);
+        Map<String, Object> u = users.findByIdentity("firebase", f.uid()).orElse(null);
+        if (u == null) {
+            if (!f.trustedEmail()) {
+                throw ApiException.forbidden("EMAIL_NOT_VERIFIED", "Please verify your email address first. We sent you a link; open it, then sign in again.");
+            }
+            u = users.findActiveByEmail(f.email()).orElse(null);
+            if (u == null) {
+                u = users.insertCustomer(f.email(), encoder.encode(randomToken(32)), f.name(), null);
+                UUID id = Rows.uuid(u, "id");
+                notifications.notify(id, "account", "Welcome to WAYFARER", "Your account is ready. Start by searching a destination or asking the AI planner for an itinerary.", Map.of());
+                audit.record(id, "auth.register", "user", id, Map.of("provider", "firebase"));
+            }
+            users.linkIdentity(Rows.uuid(u, "id"), "firebase", f.uid(), f.email());
+        }
+        audit.record(Rows.uuid(u, "id"), "auth.login", "user", Rows.uuid(u, "id"), Map.of("provider", "firebase"));
+        return respond(u);
+    }
+
     public Map<String, Object> providers() {
         Map<String, Object> out = new LinkedHashMap<>();
+        out.put("firebase", firebase.configured() ? Map.of("enabled", true, "projectId", firebase.projectId()) : Map.of("enabled", false));
         out.put("google", google.configured() ? Map.of("enabled", true, "clientId", google.primaryClientId()) : Map.of("enabled", false));
         return out;
     }

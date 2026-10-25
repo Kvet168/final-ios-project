@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/network/api_client.dart';
+import 'firebase_sign_in.dart';
 
 /// Holds the signed-in user (or null). Tokens live in [TokenStore].
 class AuthController extends AsyncNotifier<Json?> {
@@ -24,9 +25,9 @@ class AuthController extends AsyncNotifier<Json?> {
     await _accept(r);
   }
 
-  /// Exchanges a Google ID token for WAYFARER tokens; the server creates the account on first use.
-  Future<void> loginWithGoogle(String idToken) async {
-    final r = await ref.read(apiProvider).postJson('/auth/google', body: {'idToken': idToken});
+  /// Exchanges a Firebase ID token for WAYFARER tokens; the server links or creates the customer account.
+  Future<void> loginWithFirebase(String idToken) async {
+    final r = await ref.read(apiProvider).postJson('/auth/firebase', body: {'idToken': idToken});
     await _accept(r);
   }
 
@@ -49,6 +50,7 @@ class AuthController extends AsyncNotifier<Json?> {
       } catch (_) {}
     }
     await store.clear();
+    await FirebaseSignIn.signOut();
     state = const AsyncData(null);
   }
 

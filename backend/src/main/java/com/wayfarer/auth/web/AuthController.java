@@ -40,6 +40,10 @@ public class AuthController {
     @PostMapping("/google")
     public AuthResponse google(@Valid @RequestBody com.wayfarer.auth.dto.AuthDtos.GoogleLoginRequest r) { return auth.loginWithGoogle(r.idToken()); }
 
+    /** Exchanges a Firebase ID token (email/password or Google sign-in done with Firebase in the app) for WAYFARER tokens. */
+    @PostMapping("/firebase")
+    public AuthResponse firebase(@Valid @RequestBody com.wayfarer.auth.dto.AuthDtos.FirebaseLoginRequest r) { return auth.loginWithFirebase(r.idToken()); }
+
     /** Tells the app which social sign-in options are configured on this server. */
     @org.springframework.web.bind.annotation.GetMapping("/providers")
     public Map<String, Object> providers() { return auth.providers(); }

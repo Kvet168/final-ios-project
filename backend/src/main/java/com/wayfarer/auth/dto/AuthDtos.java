@@ -22,6 +22,9 @@ public final class AuthDtos {
 
     public record GoogleLoginRequest(@NotBlank @Size(max = 4000) String idToken) {}
 
+    /** A Firebase Authentication ID token from the app's Firebase sign-in. */
+    public record FirebaseLoginRequest(@NotBlank @Size(max = 4000) String idToken) {}
+
     public record RefreshRequest(@NotBlank @Size(min = 20, max = 200) String refreshToken) {}
 
     public record ForgotPasswordRequest(@NotBlank @Email String email) {}

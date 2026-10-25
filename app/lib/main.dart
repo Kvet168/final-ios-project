@@ -8,6 +8,7 @@ import 'app/splash.dart';
 import 'core/data/providers.dart';
 import 'core/theme/theme.dart';
 import 'core/widgets/image_catalog.dart';
+import 'features/auth/firebase_sign_in.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,7 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent, systemNavigationBarColor: Colors.transparent, systemNavigationBarDividerColor: Colors.transparent));
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await ImageCatalog.load();
+  await FirebaseSignIn.init(); // no-op until the Firebase settings are filled in (lib/core/config/firebase_config.dart)
   var onboarded = true;
   try {
     onboarded = (await SharedPreferences.getInstance()).getBool('onboarded') ?? false;

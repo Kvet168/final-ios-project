@@ -9,7 +9,7 @@ import '../../core/network/api_client.dart';
 import '../../core/theme/theme.dart';
 import '../../core/widgets/widgets.dart';
 import 'auth_controller.dart';
-import 'google_auth.dart';
+import 'firebase_sign_in.dart';
 
 final _emailRe = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
@@ -50,12 +50,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     setState(() => busy = true);
     try {
       final auth = ref.read(authProvider.notifier);
-      if (widget.register) {
-        await auth.register('${_first.text.trim()} ${_last.text.trim()}'.trim(), _email.text.trim(), _pw.text);
+      final email = _email.text.trim();
+      if (FirebaseSignIn.ready) {
+        if (widget.register) {
+          await FirebaseSignIn.signUp(firstName: _first.text.trim(), lastName: _last.text.trim(), email: email, password: _pw.text);
+          if (mounted) {
+            await showDialog<void>(
+              context: context,
+              builder: (c) => AlertDialog(
+                title: const Text('Check your email'),
+                content: Text('We sent a verification link to $email. Open it, then sign in.'),
+                actions: [FilledButton(style: FilledButton.styleFrom(minimumSize: const Size(0, 46)), onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+              ),
+            );
+            if (mounted) context.go('/login${widget.next == null ? '' : '?next=${Uri.encodeComponent(widget.next!)}'}');
+          }
+          if (mounted) setState(() => busy = false);
+          return;
+        }
+        await auth.loginWithFirebase(await FirebaseSignIn.signIn(email, _pw.text));
+      } else if (widget.register) {
+        await auth.register('${_first.text.trim()} ${_last.text.trim()}'.trim(), email, _pw.text);
       } else {
-        await auth.login(_email.text.trim(), _pw.text);
+        await auth.login(email, _pw.text);
       }
       await _finish();
+    } on AuthMessage catch (e) {
+      if (mounted) showInfo(context, e.message);
     } catch (e) {
       if (mounted) showError(context, e);
     }
@@ -64,14 +85,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   Future<void> _google() async {
     FocusScope.of(context).unfocus();
+    if (!FirebaseSignIn.ready) {
+      showInfo(context, 'Google sign-in is not set up yet. Use your email and password for now.');
+      return;
+    }
     setState(() => busy = true);
     try {
-      final token = await GoogleAuth.idToken(ref.read(apiProvider));
+      final token = await FirebaseSignIn.signInWithGoogle();
       if (token != null) {
-        await ref.read(authProvider.notifier).loginWithGoogle(token);
+        await ref.read(authProvider.notifier).loginWithFirebase(token);
         await _finish();
       }
-    } on SocialAuthException catch (e) {
+    } on AuthMessage catch (e) {
       if (mounted) showInfo(context, e.message);
     } catch (e) {
       if (mounted) showError(context, e);
@@ -215,6 +240,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   Future<void> _forgot(BuildContext context) async {
     final email = TextEditingController(text: _email.text);
+    final firebase = FirebaseSignIn.ready;
     String? message;
     await showDialog<void>(
       context: context,
@@ -231,6 +257,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               style: FilledButton.styleFrom(minimumSize: const Size(0, 46)),
               onPressed: () async {
                 try {
+                  if (firebase) {
+                    await FirebaseSignIn.sendPasswordReset(email.text.trim());
+                    set(() => message = 'If an account exists for ${email.text.trim()}, a reset link is on its way.');
+                    return;
+                  }
                   final r = await ref.read(apiProvider).postJson('/auth/forgot-password', body: {'email': email.text.trim()});
                   set(() => message = '${r['message']}${r['demoResetToken'] != null ? '\n\nDemo mode (no email provider): use token ${r['demoResetToken']} via the API /auth/reset-password.' : ''}');
                 } catch (e) {
