@@ -129,7 +129,7 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
             padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 14, 20, 18),
             decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.vertical(bottom: Radius.circular(32))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('STAYS', style: Type.label(11, color: Tokens.onDarkAccent)),
+              Text('STAYS', style: Type.label(11, color: Colors.white)),
               const SizedBox(height: 6),
               Text('Find a place\nto rest', style: Type.display(36, color: Colors.white, height: 1.02)),
               const SizedBox(height: 18),

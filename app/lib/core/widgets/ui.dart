@@ -202,10 +202,10 @@ class WChip extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
         decoration: BoxDecoration(
-          color: selected ? Tokens.charcoal : Tokens.surface,
+          color: selected ? Tokens.primaryText : Tokens.surface,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? Tokens.charcoal : Tokens.border),
-          boxShadow: selected ? [BoxShadow(color: Tokens.charcoal.withValues(alpha: .20), blurRadius: 14, offset: const Offset(0, 6))] : null,
+          border: Border.all(color: selected ? Tokens.primaryText : Tokens.border),
+          boxShadow: selected ? [BoxShadow(color: Tokens.primaryText.withValues(alpha: .28), blurRadius: 14, offset: const Offset(0, 6))] : null,
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           if (icon != null) ...[Icon(icon, size: 17, color: selected ? Colors.white : Tokens.primary), const SizedBox(width: 7)],

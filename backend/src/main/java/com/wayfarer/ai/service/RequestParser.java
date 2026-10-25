@@ -119,7 +119,7 @@ public class RequestParser {
                 boolean rangeOk = (r.days() == null || (r.days() >= 1 && r.days() <= 14)) && r.adults() >= 1 && r.adults() <= 12 && r.children() >= 0 && r.children() <= 12;
                 if (slugOk && rangeOk) return new Parsed(r, "llm", null);
             } catch (Exception e) {
-                log.debug("LLM request parsing failed, using rules: {}", e.getMessage());
+                log.warn("LLM request parsing failed, using rules: {}", e.getMessage());
             }
         }
         return new Parsed(parseWithRules(text, destinations), "rules",

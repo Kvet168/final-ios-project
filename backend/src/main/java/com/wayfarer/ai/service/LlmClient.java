@@ -29,7 +29,16 @@ public class LlmClient {
         if (!configured()) throw new IllegalStateException("LLM not configured");
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
         factory.setReadTimeout(timeout);
-        return cfg.isGemini() ? completeGemini(factory, system, user, maxTokens) : completeAnthropic(factory, system, user, maxTokens);
+        String provider = cfg.isGemini() ? "gemini" : "anthropic";
+        try {
+            String text = cfg.isGemini() ? completeGemini(factory, system, user, maxTokens) : completeAnthropic(factory, system, user, maxTokens);
+            if (text.isBlank()) throw new IllegalStateException("empty response (model " + cfg.modelName() + ")");
+            return text;
+        } catch (org.springframework.web.client.RestClientResponseException e) {
+            String detail = e.getResponseBodyAsString();
+            throw new IllegalStateException(provider + " HTTP " + e.getStatusCode().value() + " (model " + cfg.modelName() + "): "
+                + (detail.length() > 300 ? detail.substring(0, 300) : detail), e);
+        }
     }
 
     private String completeAnthropic(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
@@ -45,6 +54,15 @@ public class LlmClient {
         return out.toString().trim();
     }
 
+    /** Gemini 2.5 models "think" before answering and count that against maxOutputTokens, which can leave the answer empty. */
+    private Map<String, Object> generationConfig(int maxTokens) {
+        Map<String, Object> g = new java.util.HashMap<>();
+        g.put("maxOutputTokens", maxTokens);
+        String m = cfg.modelName();
+        if (m.startsWith("gemini-2.5") && !m.contains("pro")) g.put("thinkingConfig", Map.of("thinkingBudget", 0));
+        return g;
+    }
+
     private String completeGemini(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://generativelanguage.googleapis.com").build().post()
             .uri("/v1beta/models/{model}:generateContent", cfg.modelName())
@@ -53,7 +71,7 @@ public class LlmClient {
             .body(Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", system))),
                 "contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", user)))),
-                "generationConfig", Map.of("maxOutputTokens", maxTokens)))
+                "generationConfig", generationConfig(maxTokens)))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
         if (body != null) {

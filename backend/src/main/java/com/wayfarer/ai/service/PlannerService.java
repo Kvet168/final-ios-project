@@ -150,7 +150,7 @@ public class PlannerService {
                 plan.title() + "\n" + stops, 200, Duration.ofSeconds(8));
             if (!text.isBlank()) return plan.withSummary(text, "llm", "Structure and costs come from stored database records; the summary text was written by a language model.");
         } catch (Exception e) {
-            log.debug("LLM summary failed, keeping rules summary: {}", e.getMessage());
+            log.warn("LLM summary failed, keeping rules summary: {}", e.getMessage());
         }
         return plan;
     }

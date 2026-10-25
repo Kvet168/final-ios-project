@@ -112,7 +112,7 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
           expandedHeight: 360,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           automaticallyImplyLeading: false,
-          backgroundColor: Tokens.charcoal,
+          backgroundColor: Tokens.primaryText,
           surfaceTintColor: Colors.transparent,
           toolbarHeight: 64,
           leading: Padding(padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8), child: GlassIconButton(icon: Icons.arrow_back_rounded, tooltip: 'Back', onTap: () => context.canPop() ? context.pop() : context.go('/stays'))),

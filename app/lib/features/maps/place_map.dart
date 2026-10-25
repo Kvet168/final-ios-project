@@ -19,7 +19,7 @@ class MapPoint {
 
 Color _kindColor(String k) => switch (k) {
       'stay' => Tokens.accent,
-      'destination' => Tokens.charcoal,
+      'destination' => Tokens.primaryText,
       'restaurant' => Tokens.accentDeep,
       'user' => Tokens.primary,
       _ => Tokens.primary,

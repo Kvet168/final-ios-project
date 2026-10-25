@@ -34,7 +34,7 @@ class TripsScreen extends ConsumerWidget {
             padding: EdgeInsets.fromLTRB(20, top + 16, 20, 24),
             decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.vertical(bottom: Radius.circular(32))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('TRIPS', style: Type.label(11, color: Tokens.onDarkAccent)),
+              Text('TRIPS', style: Type.label(11, color: Colors.white)),
               const SizedBox(height: 6),
               Text('Tell us where.\nWe build the days.', style: Type.display(34, color: Colors.white, height: 1.04)),
               const SizedBox(height: 20),
@@ -219,7 +219,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('AI TRIP PLANNER', style: Type.label(11, color: Tokens.onDarkAccent)),
+                Text('AI TRIP PLANNER', style: Type.label(11, color: Colors.white)),
                 const SizedBox(height: 6),
                 Text('Describe the trip\nyou want.', style: Type.display(34, color: Colors.white, height: 1.04)),
                 if (status != null) ...[
@@ -656,7 +656,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                   right: 22,
                   bottom: 22,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${it['destination_name']} · ${it['num_days']} DAYS'.toUpperCase(), style: Type.label(11, color: Tokens.onDarkAccent)),
+                    Text('${it['destination_name']} · ${it['num_days']} DAYS'.toUpperCase(), style: Type.label(11, color: Colors.white)),
                     const SizedBox(height: 6),
                     Text(it['title'] as String, style: Type.display(28, color: Colors.white, height: 1.06), maxLines: 3, overflow: TextOverflow.ellipsis),
                   ]),

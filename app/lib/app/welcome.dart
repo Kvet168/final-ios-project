@@ -43,7 +43,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   Widget build(BuildContext context) {
     final last = _i == _slides.length - 1;
     return StatusTone.light(child: Scaffold(
-      backgroundColor: Tokens.charcoal,
+      backgroundColor: Tokens.deepRed,
       body: Stack(fit: StackFit.expand, children: [
         PageView.builder(
           controller: _page,

@@ -76,7 +76,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               bottom: 70,
               right: 26,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [const Icon(Icons.explore_rounded, color: Tokens.onDarkAccent, size: 22), const SizedBox(width: 8), Text('WAYFARER', style: Type.display(15, color: Colors.white, spacing: 3))]),
+                Row(children: [const Icon(Icons.explore_rounded, color: Colors.white, size: 22), const SizedBox(width: 8), Text('WAYFARER', style: Type.display(15, color: Colors.white, spacing: 3))]),
                 const SizedBox(height: 14),
                 Text(reg ? 'Begin your\nnext journey.' : 'Welcome\nback, traveller.', style: Type.display(38, color: Colors.white, height: 1.02)),
               ]),
@@ -216,7 +216,7 @@ class AccountScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(26),
             decoration: BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.circular(30)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.explore_rounded, color: Tokens.onDarkAccent, size: 34),
+              const Icon(Icons.explore_rounded, color: Colors.white, size: 34),
               const SizedBox(height: 18),
               Text('Your travel\nlife, in one place.', style: Type.display(32, color: Colors.white, height: 1.05)),
               const SizedBox(height: 10),
@@ -283,8 +283,8 @@ class AccountScreen extends ConsumerWidget {
           tile(Icons.favorite_border_rounded, 'Wishlist', 'Saved destinations and stays', '/wishlist', color: Tokens.heart),
           tile(Icons.notifications_none_rounded, 'Notifications', 'Booking and payment updates', '/notifications', color: Tokens.primary),
           tile(Icons.map_outlined, 'Explore map', 'Destinations and stays near you', '/map', color: Tokens.primary),
-          if (auth.isStaff) tile(Icons.admin_panel_settings_outlined, 'Administration', 'Overview, bookings, payments, reviews, audit log', '/admin', color: Tokens.charcoal),
-          if (auth.isPartner) tile(Icons.storefront_outlined, 'Partner portal', 'Your properties, bookings and availability', '/partner', color: Tokens.charcoal),
+          if (auth.isStaff) tile(Icons.admin_panel_settings_outlined, 'Administration', 'Overview, bookings, payments, reviews, audit log', '/admin', color: Tokens.primary),
+          if (auth.isPartner) tile(Icons.storefront_outlined, 'Partner portal', 'Your properties, bookings and availability', '/partner', color: Tokens.primary),
         ]),
       ),
       currencySection(),

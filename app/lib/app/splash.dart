@@ -74,11 +74,11 @@ class CompassPainter extends CustomPainter {
         ..lineTo(nw, 0)
         ..lineTo(-nw, 0)
         ..close(),
-      Paint()..color = Tokens.charcoal,
+      Paint()..color = Tokens.deepRed,
     );
     canvas.restore();
     canvas.drawCircle(c, r * 0.05, Paint()..color = Colors.white);
-    canvas.drawCircle(c, r * 0.022, Paint()..color = Tokens.charcoal);
+    canvas.drawCircle(c, r * 0.022, Paint()..color = Tokens.deepRed);
   }
 
   @override
@@ -123,7 +123,7 @@ class _OceanPainter extends CustomPainter {
       }
       path.lineTo(w, h);
       path.close();
-      canvas.drawPath(path, Paint()..color = (l.navy ? Tokens.charcoal : Colors.white).withValues(alpha: l.alpha * reveal));
+      canvas.drawPath(path, Paint()..color = (l.navy ? Tokens.deepRed : Colors.white).withValues(alpha: l.alpha * reveal));
     }
   }
 
@@ -200,7 +200,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFFD63A50), Color(0xFFB02E44), Tokens.charcoal],
+                  colors: [Color(0xFFD63A50), Color(0xFFB02E44), Tokens.deepRed],
                   stops: [0, 0.55, 1],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

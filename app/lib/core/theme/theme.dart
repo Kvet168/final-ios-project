@@ -36,6 +36,8 @@ class Tokens {
   static const ink = Color(0xFF292B2E);
   static const inkSoft = Color(0xFF3E4044);
   static const inkMuted = Color(0xFF56575A);
+  /// Deep red for the darkest brand surfaces (launch screen, onboarding backdrop).
+  static const deepRed = Color(0xFF7F1F2E);
   /// Charcoal used for dark bands, overlays, scrims and shadows.
   static const charcoal = Color(0xFF292B2E);
   /// Disabled controls.
@@ -48,7 +50,7 @@ class Tokens {
   /// Soft amber wash for promos and notices (pair with [warning] text).
   static const promo = Color(0xFFFFEAC0);
   /// Secondary text on charcoal bands and scrims.
-  static const onDarkMuted = Color(0xFFD9DCE2);
+  static const onDarkMuted = Color(0xFFFFE8EB);
 
   // Semantic
   static const danger = Color(0xFF841C05);
@@ -62,8 +64,8 @@ class Tokens {
   static const radiusLg = 28.0;
   static const maxContent = 720.0;
 
-  /// Charcoal header/hero fill behind photos and on header bands. White text and light-coral labels keep 4.5:1 on it.
-  static const dusk = LinearGradient(colors: [Color(0xFF34373B), Color(0xFF292B2E)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+  /// Brand-red header/hero fill behind photos and on header bands. White text keeps 4.5:1 or better on it.
+  static const dusk = LinearGradient(colors: [Color(0xFFC7364B), Color(0xFFA82C40)], begin: Alignment.topLeft, end: Alignment.bottomRight);
   static const sunrise = LinearGradient(colors: [Color(0xFFE6485C), Color(0xFFC7364B)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
   static List<BoxShadow> softShadow([double a = 0.10]) => [
@@ -235,7 +237,7 @@ class WayfarerTheme {
       tabBarTheme: TabBarThemeData(labelColor: Tokens.primaryText, unselectedLabelColor: Tokens.inkMuted, indicatorColor: Tokens.primary, dividerColor: Tokens.border),
       chipTheme: base.chipTheme.copyWith(
         backgroundColor: Tokens.surface,
-        selectedColor: Tokens.charcoal,
+        selectedColor: Tokens.primaryText,
         checkmarkColor: Colors.white,
         side: const BorderSide(color: Tokens.border),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),

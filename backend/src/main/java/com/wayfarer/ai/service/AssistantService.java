@@ -288,7 +288,7 @@ public class AssistantService {
                     "Context:\n" + ctx + "\n\nQuestion: " + q, 350, Duration.ofSeconds(9));
                 if (!text.isBlank()) return new Answer(text, "llm", allSources, true, DISCLAIMER, intent.id(), destRef, cards, followUps(intent, dest));
             } catch (Exception e) {
-                log.debug("LLM answer failed, using extractive answer: {}", e.getMessage());
+                log.warn("LLM answer failed, using extractive answer: {}", e.getMessage());
             }
         }
         List<String> parts = new ArrayList<>();
