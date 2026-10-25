@@ -24,6 +24,12 @@ class AuthController extends AsyncNotifier<Json?> {
     await _accept(r);
   }
 
+  /// Exchanges a Google ID token for WAYFARER tokens; the server creates the account on first use.
+  Future<void> loginWithGoogle(String idToken) async {
+    final r = await ref.read(apiProvider).postJson('/auth/google', body: {'idToken': idToken});
+    await _accept(r);
+  }
+
   Future<void> register(String name, String email, String password) async {
     final r = await ref.read(apiProvider).postJson('/auth/register', body: {'name': name, 'email': email, 'password': password});
     await _accept(r);
