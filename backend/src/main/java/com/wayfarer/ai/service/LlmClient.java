@@ -44,7 +44,7 @@ public class LlmClient {
     private String completeAnthropic(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://api.anthropic.com").build().post().uri("/v1/messages")
             .contentType(MediaType.APPLICATION_JSON)
-            .header("x-api-key", cfg.apiKey()).header("anthropic-version", "2023-06-01")
+            .header("x-api-key", cfg.key()).header("anthropic-version", "2023-06-01")
             .body(Map.of("model", cfg.modelName(), "max_tokens", maxTokens, "system", system, "messages", List.of(Map.of("role", "user", "content", user))))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
@@ -67,7 +67,7 @@ public class LlmClient {
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://generativelanguage.googleapis.com").build().post()
             .uri("/v1beta/models/{model}:generateContent", cfg.modelName())
             .contentType(MediaType.APPLICATION_JSON)
-            .header("x-goog-api-key", cfg.apiKey())
+            .header("x-goog-api-key", cfg.key())
             .body(Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", system))),
                 "contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", user)))),

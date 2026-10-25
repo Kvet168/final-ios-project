@@ -26,6 +26,16 @@ public class UserRepository {
     /** Used on every authenticated request so role changes and account deletion apply immediately. */
     public Optional<Map<String, Object>> findAuthInfo(UUID id) { return db.one("SELECT email, role FROM users WHERE id = :id AND deleted_at IS NULL", Map.of("id", id)); }
 
+    public Optional<Map<String, Object>> findByIdentity(String provider, String subject) {
+        return db.one("SELECT u.* FROM user_identities i JOIN users u ON u.id = i.user_id WHERE i.provider = :p AND i.subject = :s AND u.deleted_at IS NULL",
+            Map.of("p", provider, "s", subject));
+    }
+
+    public void linkIdentity(UUID userId, String provider, String subject, String email) {
+        db.update("INSERT INTO user_identities(user_id, provider, subject, email) VALUES (:u, :p, :s, :e) ON CONFLICT (provider, subject) DO NOTHING",
+            Db.params().addValue("u", userId).addValue("p", provider).addValue("s", subject).addValue("e", email));
+    }
+
     public boolean emailTaken(String email) { return findActiveByEmail(email).isPresent(); }
 
     public Map<String, Object> insertCustomer(String email, String passwordHash, String name, String phone) {

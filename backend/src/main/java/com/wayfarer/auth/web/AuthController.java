@@ -36,6 +36,14 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest r) { return auth.register(r); }
 
+    /** Exchanges a Google ID token (from the app's Google sign-in) for WAYFARER tokens, creating the customer account on first use. */
+    @PostMapping("/google")
+    public AuthResponse google(@Valid @RequestBody com.wayfarer.auth.dto.AuthDtos.GoogleLoginRequest r) { return auth.loginWithGoogle(r.idToken()); }
+
+    /** Tells the app which social sign-in options are configured on this server. */
+    @org.springframework.web.bind.annotation.GetMapping("/providers")
+    public Map<String, Object> providers() { return auth.providers(); }
+
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest r) { return auth.login(r); }
 

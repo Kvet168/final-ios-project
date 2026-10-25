@@ -8,15 +8,18 @@ public record AppProperties(boolean prod, int holdMinutes, Jwt jwt, Payment paym
 
     /**
      * Optional language model. With no key the planner and assistant run on deterministic rules and stored guides.
-     * {@code provider} is "anthropic", "gemini" or "auto" (a key starting with "AIza" is a Gemini key, anything else Anthropic).
+     * {@code provider} is "anthropic", "gemini" or "auto" (an Anthropic key always starts with "sk-ant-"; any other key is treated as Gemini).
      */
     public record Ai(String apiKey, String model, int requestsPerMinute, String provider) {
         public boolean configured() { return apiKey != null && !apiKey.isBlank(); }
 
+        /** The key without stray whitespace or quotes from copy and paste. */
+        public String key() { return apiKey == null ? "" : apiKey.strip().replaceAll("^[\"']|[\"']$", ""); }
+
         public boolean isGemini() {
             if ("gemini".equalsIgnoreCase(provider)) return true;
             if ("anthropic".equalsIgnoreCase(provider)) return false;
-            return configured() && apiKey.startsWith("AIza");
+            return configured() && !key().startsWith("sk-ant-");
         }
 
         /** The configured model, or the provider's default when AI_MODEL is unset or belongs to the other provider. */

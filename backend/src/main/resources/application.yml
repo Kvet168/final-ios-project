@@ -69,11 +69,14 @@ wayfarer:
   rate-limit:
     auth-max: ${AUTH_RATE_LIMIT_MAX:30}
     window-sec: 900
+  google:
+    # Comma-separated OAuth client IDs (web, iOS, Android) whose Google ID tokens are accepted. Empty disables Google sign-in.
+    client-ids: ${GOOGLE_CLIENT_ID:}
   cors-origins: ${CORS_ORIGINS:*}
   cache-ttl-sec: 300
   ai:
     api-key: ${AI_PROVIDER_API_KEY:}
-    # anthropic | gemini | auto (auto picks Gemini for keys starting with AIza). Leave AI_MODEL empty for the provider's default.
+    # anthropic | gemini | auto (auto uses Anthropic for keys starting with sk-ant- and Gemini for any other key). Leave AI_MODEL empty for the provider's default.
     provider: ${AI_PROVIDER:auto}
     model: ${AI_MODEL:}
     requests-per-minute: ${AI_RATE_LIMIT_PER_MINUTE:20}

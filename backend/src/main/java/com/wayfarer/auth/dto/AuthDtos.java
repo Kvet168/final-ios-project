@@ -20,6 +20,8 @@ public final class AuthDtos {
 
     public record LoginRequest(@NotBlank @Email String email, @NotBlank @Size(max = 128) String password) {}
 
+    public record GoogleLoginRequest(@NotBlank @Size(max = 4000) String idToken) {}
+
     public record RefreshRequest(@NotBlank @Size(min = 20, max = 200) String refreshToken) {}
 
     public record ForgotPasswordRequest(@NotBlank @Email String email) {}

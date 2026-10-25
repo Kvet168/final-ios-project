@@ -46,11 +46,12 @@ public class AuthService {
     private final TokenDenylist denylist;
     private final NotificationService notifications;
     private final AuditService audit;
+    private final GoogleTokenVerifier google;
     /** A real bcrypt hash compared against for unknown emails, so login timing does not reveal which emails exist. */
     private final String dummyHash;
 
     public AuthService(UserRepository users, RefreshTokenRepository refreshTokens, PasswordResetRepository resets, PasswordEncoder encoder, JwtService jwt,
-                       AppProperties props, TokenDenylist denylist, NotificationService notifications, AuditService audit) {
+                       AppProperties props, TokenDenylist denylist, NotificationService notifications, AuditService audit, GoogleTokenVerifier google) {
         this.users = users;
         this.refreshTokens = refreshTokens;
         this.resets = resets;
@@ -60,6 +61,7 @@ public class AuthService {
         this.denylist = denylist;
         this.notifications = notifications;
         this.audit = audit;
+        this.google = google;
         this.dummyHash = encoder.encode("not-a-real-password");
     }
 
@@ -94,6 +96,35 @@ public class AuthService {
         boolean ok = encoder.matches(r.password(), found.map(u -> Rows.str(u, "password_hash")).orElse(dummyHash)) && found.isPresent();
         if (!ok) throw ApiException.unauthorized("INVALID_CREDENTIALS", "Email or password is incorrect");
         return respond(found.get());
+    }
+
+    /**
+     * Google sign-in. The ID token is verified against Google's published keys (signature, expiry, issuer, audience, verified email).
+     * A known Google identity or an existing account with the same verified email signs in; otherwise a customer account is created.
+     * Accounts created this way get a random password nobody knows, so they can only be entered through Google until the user resets it.
+     */
+    @Transactional
+    public AuthResponse loginWithGoogle(String idToken) {
+        GoogleTokenVerifier.GoogleIdentity g = google.verify(idToken);
+        Map<String, Object> u = users.findByIdentity("google", g.subject()).orElse(null);
+        if (u == null) {
+            u = users.findActiveByEmail(g.email()).orElse(null);
+            if (u == null) {
+                u = users.insertCustomer(g.email(), encoder.encode(randomToken(32)), g.name(), null);
+                UUID id = Rows.uuid(u, "id");
+                notifications.notify(id, "account", "Welcome to WAYFARER", "Your account is ready. Start by searching a destination or asking the AI planner for an itinerary.", Map.of());
+                audit.record(id, "auth.register", "user", id, Map.of("provider", "google"));
+            }
+            users.linkIdentity(Rows.uuid(u, "id"), "google", g.subject(), g.email());
+        }
+        audit.record(Rows.uuid(u, "id"), "auth.login", "user", Rows.uuid(u, "id"), Map.of("provider", "google"));
+        return respond(u);
+    }
+
+    public Map<String, Object> providers() {
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("google", google.configured() ? Map.of("enabled", true, "clientId", google.primaryClientId()) : Map.of("enabled", false));
+        return out;
     }
 
     private AuthResponse respond(Map<String, Object> u) {
