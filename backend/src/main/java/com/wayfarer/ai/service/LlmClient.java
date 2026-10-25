@@ -40,16 +40,45 @@ public class LlmClient {
         if (conversation.isEmpty()) throw new IllegalArgumentException("No messages to send");
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
         factory.setReadTimeout(timeout);
-        String provider = cfg.isGemini() ? "gemini" : "anthropic";
+        if (!cfg.isGemini()) return finish("anthropic", cfg.modelName(), () -> chatAnthropic(factory, system, conversation, maxTokens));
+        // Free-tier Gemini quotas are per model, so when one is exhausted (429), busy (503) or retired (404) the next model is tried.
+        RuntimeException last = null;
+        for (String model : geminiModels()) {
+            try {
+                return finish("gemini", model, () -> chatGemini(factory, model, system, conversation, maxTokens));
+            } catch (QuotaOrAvailabilityException e) {
+                last = e;
+                log.warn("Gemini model {} unavailable, trying the next one: {}", model, e.getMessage());
+            }
+        }
+        throw last;
+    }
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LlmClient.class);
+
+    /** A failure worth retrying on another model (rate limit, overload, unknown model). */
+    private static final class QuotaOrAvailabilityException extends IllegalStateException {
+        QuotaOrAvailabilityException(String message, Throwable cause) { super(message, cause); }
+    }
+
+    private String finish(String provider, String model, java.util.function.Supplier<String> call) {
         try {
-            String text = cfg.isGemini() ? chatGemini(factory, system, conversation, maxTokens) : chatAnthropic(factory, system, conversation, maxTokens);
-            if (text.isBlank()) throw new IllegalStateException("empty response (model " + cfg.modelName() + ")");
+            String text = call.get();
+            if (text.isBlank()) throw new IllegalStateException("empty response (model " + model + ")");
             return text;
         } catch (org.springframework.web.client.RestClientResponseException e) {
-            String detail = e.getResponseBodyAsString();
-            throw new IllegalStateException(provider + " HTTP " + e.getStatusCode().value() + " (model " + cfg.modelName() + "): "
-                + (detail.length() > 300 ? detail.substring(0, 300) : detail), e);
+            String detail = e.getResponseBodyAsString().replaceAll("\\s+", " ");
+            String message = provider + " HTTP " + e.getStatusCode().value() + " (model " + model + "): " + (detail.length() > 300 ? detail.substring(0, 300) : detail);
+            int code = e.getStatusCode().value();
+            if ("gemini".equals(provider) && (code == 429 || code == 503 || code == 500 || code == 404)) throw new QuotaOrAvailabilityException(message, e);
+            throw new IllegalStateException(message, e);
         }
+    }
+
+    private List<String> geminiModels() {
+        List<String> models = new ArrayList<>(List.of(cfg.modelName()));
+        for (String m : List.of("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash")) if (!models.contains(m)) models.add(m);
+        return models;
     }
 
     /** Both providers want alternating roles that start with the user: drop blanks, merge neighbours with the same role, skip a leading assistant turn. */
@@ -84,25 +113,24 @@ public class LlmClient {
     }
 
     /** Gemini 2.5 models "think" before answering and count that against maxOutputTokens, which can leave the answer empty. */
-    private Map<String, Object> generationConfig(int maxTokens) {
+    private static Map<String, Object> generationConfig(String m, int maxTokens) {
         Map<String, Object> g = new java.util.HashMap<>();
         g.put("maxOutputTokens", maxTokens);
-        String m = cfg.modelName();
         if (m.startsWith("gemini-2.5") && !m.contains("pro")) g.put("thinkingConfig", Map.of("thinkingBudget", 0));
         return g;
     }
 
-    private String chatGemini(JdkClientHttpRequestFactory factory, String system, List<Turn> turns, int maxTokens) {
+    private String chatGemini(JdkClientHttpRequestFactory factory, String model, String system, List<Turn> turns, int maxTokens) {
         List<Map<String, Object>> contents = turns.stream()
             .map(t -> Map.<String, Object>of("role", "assistant".equals(t.role()) ? "model" : "user", "parts", List.of(Map.of("text", t.text())))).toList();
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://generativelanguage.googleapis.com").build().post()
-            .uri("/v1beta/models/{model}:generateContent", cfg.modelName())
+            .uri("/v1beta/models/{model}:generateContent", model)
             .contentType(MediaType.APPLICATION_JSON)
             .header("x-goog-api-key", cfg.key())
             .body(Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", system))),
                 "contents", contents,
-                "generationConfig", generationConfig(maxTokens)))
+                "generationConfig", generationConfig(model, maxTokens)))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
         if (body != null) {
