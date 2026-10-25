@@ -24,6 +24,7 @@ dependencies:
   intl: ^0.20.3
   url_launcher: ^6.3.3
   geolocator: ^14.1.1
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
@@ -33,17 +34,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Every photo and both typefaces ship inside the app, so the UI never waits on (or breaks without) a web host.
+  # Every photo and both typefaces (Space Grotesk, with Kantumruy Pro for Khmer) ship inside the app, so the UI never waits on (or breaks without) a web host.
   assets:
     - assets/img/
     - assets/img/t/
 
   fonts:
-    - family: Inter
+    - family: SpaceGrotesk
       fonts:
-        - asset: assets/fonts/Inter.ttf
-        - asset: assets/fonts/Inter-Italic.ttf
-          style: italic
+        - asset: assets/fonts/SpaceGrotesk.ttf
     - family: KantumruyPro
       fonts:
         - asset: assets/fonts/KantumruyPro.ttf

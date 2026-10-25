@@ -74,10 +74,10 @@ class Tokens {
       ];
 }
 
-/// Typography. English is set in Inter; Khmer falls back to Kantumruy Pro (both bundled, variable fonts).
+/// Typography. English is set in Space Grotesk; Khmer falls back to Kantumruy Pro (both bundled, variable fonts).
 /// Every style names the fallback so Khmer text anywhere in the app uses Kantumruy Pro.
 class Type {
-  static const _en = 'Inter';
+  static const _en = 'SpaceGrotesk';
   static const _km = ['KantumruyPro'];
 
   static TextStyle display(double size, {FontWeight weight = FontWeight.w700, Color color = Tokens.ink, double? height, double? spacing, bool italic = false}) => TextStyle(
@@ -123,7 +123,7 @@ class WayfarerTheme {
       surfaceContainerHighest: Tokens.neutralTint,
       surfaceTint: Colors.transparent,
     );
-    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.pageBg, fontFamily: 'Inter', fontFamilyFallback: const ['KantumruyPro']);
+    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.pageBg, fontFamily: 'SpaceGrotesk', fontFamilyFallback: const ['KantumruyPro']);
     final text = base.textTheme.copyWith(
       displayLarge: Type.display(48),
       displayMedium: Type.display(40),

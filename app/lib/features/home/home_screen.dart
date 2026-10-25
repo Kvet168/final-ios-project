@@ -140,7 +140,7 @@ class _HeroState extends ConsumerState<_Hero> {
                 bottom: 78,
                 child: Reveal(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.name != null ? '${_greeting()}, ${widget.name}'.toUpperCase() : _greeting().toUpperCase(), style: Type.label(11.5, color: Tokens.onDarkAccent)),
+                    Text(widget.name != null ? '${_greeting()}, ${widget.name}'.toUpperCase() : _greeting().toUpperCase(), style: Type.label(11.5, color: Colors.white)),
                     const SizedBox(height: 12),
                     Text('Where will you', style: Type.display(42, color: Colors.white, height: 1.0)),
                     Text('wander next?', style: Type.display(42, color: Tokens.onDarkAccent, height: 1.05, italic: true, weight: FontWeight.w500)),
