@@ -6,9 +6,26 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record AppProperties(boolean prod, int holdMinutes, Jwt jwt, Payment payment, RateLimit rateLimit,
                             String corsOrigins, int cacheTtlSec, Ai ai) {
 
-    /** Optional language model. With no key the planner and assistant run on deterministic rules and stored guides. */
-    public record Ai(String apiKey, String model, int requestsPerMinute) {
+    /**
+     * Optional language model. With no key the planner and assistant run on deterministic rules and stored guides.
+     * {@code provider} is "anthropic", "gemini" or "auto" (a key starting with "AIza" is a Gemini key, anything else Anthropic).
+     */
+    public record Ai(String apiKey, String model, int requestsPerMinute, String provider) {
         public boolean configured() { return apiKey != null && !apiKey.isBlank(); }
+
+        public boolean isGemini() {
+            if ("gemini".equalsIgnoreCase(provider)) return true;
+            if ("anthropic".equalsIgnoreCase(provider)) return false;
+            return configured() && apiKey.startsWith("AIza");
+        }
+
+        /** The configured model, or the provider's default when AI_MODEL is unset or belongs to the other provider. */
+        public String modelName() {
+            boolean gemini = isGemini();
+            if (model == null || model.isBlank()) return gemini ? "gemini-2.5-flash" : "claude-sonnet-5-5";
+            if (gemini && !model.startsWith("gemini")) return "gemini-2.5-flash";
+            return model;
+        }
     }
 
     public record Jwt(String accessSecret, long accessTtlSec, long refreshTtlSec, String issuer) {}

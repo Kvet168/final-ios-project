@@ -12,8 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 /**
- * Provider abstraction over the Anthropic Messages API. When no key is configured {@link #configured()} is false and every caller
- * must use its deterministic fallback and report mode "rules" / "retrieval-only" to the user.
+ * Provider abstraction over the Anthropic Messages API and the Google Gemini generateContent API. When no key is configured
+ * {@link #configured()} is false and every caller must use its deterministic fallback and report mode "rules" / "retrieval-only"
+ * to the user.
  */
 @Component
 public class LlmClient {
@@ -28,14 +29,37 @@ public class LlmClient {
         if (!configured()) throw new IllegalStateException("LLM not configured");
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
         factory.setReadTimeout(timeout);
+        return cfg.isGemini() ? completeGemini(factory, system, user, maxTokens) : completeAnthropic(factory, system, user, maxTokens);
+    }
+
+    private String completeAnthropic(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://api.anthropic.com").build().post().uri("/v1/messages")
             .contentType(MediaType.APPLICATION_JSON)
             .header("x-api-key", cfg.apiKey()).header("anthropic-version", "2023-06-01")
-            .body(Map.of("model", cfg.model(), "max_tokens", maxTokens, "system", system, "messages", List.of(Map.of("role", "user", "content", user))))
+            .body(Map.of("model", cfg.modelName(), "max_tokens", maxTokens, "system", system, "messages", List.of(Map.of("role", "user", "content", user))))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
         if (body != null && body.has("content")) {
             for (JsonNode part : body.get("content")) if ("text".equals(part.path("type").asText())) out.append(part.path("text").asText()).append('\n');
+        }
+        return out.toString().trim();
+    }
+
+    private String completeGemini(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
+        JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://generativelanguage.googleapis.com").build().post()
+            .uri("/v1beta/models/{model}:generateContent", cfg.modelName())
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("x-goog-api-key", cfg.apiKey())
+            .body(Map.of(
+                "systemInstruction", Map.of("parts", List.of(Map.of("text", system))),
+                "contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", user)))),
+                "generationConfig", Map.of("maxOutputTokens", maxTokens)))
+            .retrieve().body(JsonNode.class);
+        StringBuilder out = new StringBuilder();
+        if (body != null) {
+            for (JsonNode part : body.path("candidates").path(0).path("content").path("parts")) {
+                if (part.has("text")) out.append(part.path("text").asText()).append('\n');
+            }
         }
         return out.toString().trim();
     }

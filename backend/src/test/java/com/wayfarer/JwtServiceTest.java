@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class JwtServiceTest {
     private static JwtService service(String secret, long ttl) {
         return new JwtService(new AppProperties(false, 30, new AppProperties.Jwt(secret, ttl, 3600, "wayfarer"),
-            new AppProperties.Payment("mock", "s"), new AppProperties.RateLimit(30, 900), "*", 300, new AppProperties.Ai("", "m", 20)));
+            new AppProperties.Payment("mock", "s"), new AppProperties.RateLimit(30, 900), "*", 300, new AppProperties.Ai("", "m", 20, "auto")));
     }
 
     private static final String SECRET = "unit-test-secret-unit-test-secret-0123456789";

@@ -17,7 +17,7 @@ class RequestParserTest {
 
     private static RequestParser parser() {
         AppProperties props = new AppProperties(false, 30, new AppProperties.Jwt("x".repeat(40), 900, 3600, "wayfarer"), new AppProperties.Payment("mock", "s"),
-            new AppProperties.RateLimit(30, 900), "*", 300, new AppProperties.Ai("", "m", 20));
+            new AppProperties.RateLimit(30, 900), "*", 300, new AppProperties.Ai("", "m", 20, "auto"));
         return new RequestParser(new LlmClient(props), new ObjectMapper());
     }
 

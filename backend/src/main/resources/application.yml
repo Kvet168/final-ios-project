@@ -73,5 +73,7 @@ wayfarer:
   cache-ttl-sec: 300
   ai:
     api-key: ${AI_PROVIDER_API_KEY:}
-    model: ${AI_MODEL:claude-sonnet-5-5}
+    # anthropic | gemini | auto (auto picks Gemini for keys starting with AIza). Leave AI_MODEL empty for the provider's default.
+    provider: ${AI_PROVIDER:auto}
+    model: ${AI_MODEL:}
     requests-per-minute: ${AI_RATE_LIMIT_PER_MINUTE:20}
