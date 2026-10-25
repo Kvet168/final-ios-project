@@ -29,20 +29,33 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <meta name="theme-color" content="#2F5D50">
+  <meta name="theme-color" content="#E6485C">
   <title>WAYFARER – Travel, hotels and trip planning</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <style>
-    html,body{margin:0;background:#FAF7F0}
-    #splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#FAF7F0;color:#1E2421;font-family:Georgia,serif;letter-spacing:.25em;transition:opacity .3s}
-    #splash .bar{margin-top:18px;width:120px;height:2px;background:#E2DCCD;overflow:hidden;border-radius:2px}
-    #splash .bar i{display:block;width:40%;height:100%;background:#2F5D50;animation:wf 1.1s ease-in-out infinite}
-    @keyframes wf{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+    html,body{margin:0;background:#B02E44}
+    #splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#D63A50 0%,#B02E44 58%,#292B2E 100%);color:#fff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;transition:opacity .3s}
+    #splash:before{content:"";position:absolute;left:50%;top:74%;width:124vmax;height:124vmax;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,136,150,.38) 0%,rgba(255,136,150,.12) 28%,rgba(255,136,150,0) 62%);pointer-events:none}
+    #splash svg{position:relative;width:132px;height:132px;filter:drop-shadow(0 0 34px rgba(255,255,255,.16))}
+    #splash .name{position:relative;margin-top:30px;font-size:32px;font-weight:600;letter-spacing:.28em;text-indent:.28em}
+    #splash .tag{position:relative;margin-top:10px;font-size:14px;font-weight:500;letter-spacing:.04em;color:rgba(255,255,255,.92)}
+    #splash .bar{position:relative;margin-top:34px;width:168px;height:3px;background:rgba(255,255,255,.18);overflow:hidden;border-radius:3px}
+    #splash .bar i{display:block;width:38%;height:100%;background:#48EC86;border-radius:3px;animation:wf 1.1s ease-in-out infinite}
+    @keyframes wf{0%{transform:translateX(-100%)}100%{transform:translateX(280%)}}
     @media (prefers-reduced-motion:reduce){#splash .bar i{animation:none;width:100%}}
   </style>
-  <div id="splash" role="status" aria-label="Loading WAYFARER"><div>WAYFARER</div><div class="bar"><i></i></div></div>
+  <div id="splash" role="status" aria-label="Loading WAYFARER">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#F8FAFC" stroke-opacity=".92" stroke-width="2.2"/>
+      <path d="M50 11 57 50 50 89 43 50Z M11 50 50 43 89 50 50 57Z" fill="#F8FAFC" transform="scale(.78) translate(14.1 14.1)"/>
+      <g transform="rotate(45 50 50)"><path d="M50 22 55.5 50H44.5Z" fill="#48EC86"/><path d="M50 78 55.5 50H44.5Z" fill="#292B2E"/></g>
+      <circle cx="50" cy="50" r="2.6" fill="#FFFFFF"/><circle cx="50" cy="50" r="1.1" fill="#292B2E"/>
+    </svg>
+    <div class="name">WAYFARER</div><div class="tag">Travel, planned beautifully</div>
+    <div class="bar"><i></i></div>
+  </div>
   <script>window.addEventListener('flutter-first-frame',function(){var e=document.getElementById('splash');if(e){e.style.opacity=0;setTimeout(function(){e.remove()},320)}});</script>
   <!--
     You can customize the "flutter_bootstrap.js" script.

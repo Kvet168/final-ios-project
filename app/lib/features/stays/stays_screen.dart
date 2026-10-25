@@ -129,7 +129,7 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
             padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 14, 20, 18),
             decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.vertical(bottom: Radius.circular(32))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('STAYS', style: Type.label(11, color: Tokens.gold)),
+              Text('STAYS', style: Type.label(11, color: Tokens.onDarkAccent)),
               const SizedBox(height: 6),
               Text('Find a place\nto rest', style: Type.display(36, color: Colors.white, height: 1.02)),
               const SizedBox(height: 18),
@@ -140,9 +140,9 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
                 radius: 22,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22)),
+                  decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22)),
                   child: Row(children: [
-                    const Icon(Icons.search_rounded, color: Tokens.forest),
+                    const Icon(Icons.search_rounded, color: Tokens.primary),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -174,7 +174,7 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
               ),
               const Spacer(),
               Container(
-                decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(99), border: Border.all(color: Tokens.border)),
+                decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(99), border: Border.all(color: Tokens.border)),
                 child: Row(children: [
                   _toggle(Icons.view_agenda_outlined, !showMap, () => setState(() => showMap = false), 'List view'),
                   _toggle(Icons.map_outlined, showMap, () => setState(() => showMap = true), 'Map view'),
@@ -238,7 +238,7 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: on ? Tokens.forest : Colors.transparent, borderRadius: BorderRadius.circular(99)),
+          decoration: BoxDecoration(color: on ? Tokens.primary : Colors.transparent, borderRadius: BorderRadius.circular(99)),
           child: Icon(i, size: 20, color: on ? Colors.white : Tokens.inkMuted),
         ),
       );
@@ -265,7 +265,7 @@ class _Filters extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 26),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: Type.body(15, weight: FontWeight.w800)), const SizedBox(height: 12), child]),
         );
-    Widget sw(String label, bool v, ValueChanged<bool> f) => SwitchListTile(contentPadding: EdgeInsets.zero, dense: true, activeThumbColor: Tokens.forest, title: Text(label, style: Type.body(14.5, weight: FontWeight.w600)), value: v, onChanged: f);
+    Widget sw(String label, bool v, ValueChanged<bool> f) => SwitchListTile(contentPadding: EdgeInsets.zero, dense: true, activeThumbColor: Tokens.primary, title: Text(label, style: Type.body(14.5, weight: FontWeight.w600)), value: v, onChanged: f);
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
@@ -281,7 +281,7 @@ class _Filters extends ConsumerWidget {
           min: 0,
           max: 300,
           divisions: 30,
-          activeColor: Tokens.forest,
+          activeColor: Tokens.primary,
           labels: RangeLabels(money(range.start), money(range.end)),
           onChanged: (v) => onChanged(q.copyWith(minPrice: v.start <= 0 ? null : v.start, maxPrice: v.end >= 300 ? null : v.end)),
         ),

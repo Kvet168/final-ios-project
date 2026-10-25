@@ -30,12 +30,12 @@ class _Starter {
 }
 
 const _starters = [
-  _Starter(Icons.wb_sunny_rounded, 'Best time to go', 'What is the best time to visit Siem Reap?', Tokens.gold),
-  _Starter(Icons.tram_rounded, 'Getting around', 'How do I get around Phnom Penh?', Tokens.jade),
-  _Starter(Icons.payments_rounded, 'Daily budget', 'How much does a day in Bangkok cost?', Tokens.terracotta),
-  _Starter(Icons.ramen_dining_rounded, 'What to eat', 'What should I eat in Hoi An?', Tokens.lotus),
-  _Starter(Icons.checkroom_rounded, 'Temple etiquette', 'What should I wear when visiting temples?', Color(0xFF5E8FA8)),
-  _Starter(Icons.event_available_rounded, 'Cancellation', 'How does free cancellation work?', Tokens.forest),
+  _Starter(Icons.wb_sunny_rounded, 'Best time to go', 'What is the best time to visit Siem Reap?', Tokens.primary),
+  _Starter(Icons.tram_rounded, 'Getting around', 'How do I get around Phnom Penh?', Tokens.primary),
+  _Starter(Icons.payments_rounded, 'Daily budget', 'How much does a day in Bangkok cost?', Tokens.primary),
+  _Starter(Icons.ramen_dining_rounded, 'What to eat', 'What should I eat in Hoi An?', Tokens.primary),
+  _Starter(Icons.checkroom_rounded, 'Temple etiquette', 'What should I wear when visiting temples?', Tokens.primary),
+  _Starter(Icons.event_available_rounded, 'Cancellation', 'How does free cancellation work?', Tokens.primary),
 ];
 
 /// Travel guide chat. Answers are composed server-side from stored destination data and approved guides, with sources.
@@ -123,7 +123,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     final llm = status?['assistantMode'] == 'llm';
     final kb = MediaQuery.viewInsetsOf(context).bottom;
     return StatusTone.light(child: Scaffold(
-      backgroundColor: Tokens.ivory,
+      backgroundColor: Tokens.pageBg,
       body: Column(children: [
         _Header(llm: llm, onClear: msgs.isEmpty ? null : () => setState(() { msgs.clear(); _topic = widget.destination; })),
         Expanded(
@@ -174,8 +174,8 @@ class _Header extends StatelessWidget {
           Container(
             width: 44,
             height: 44,
-            decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [Color(0xFFF0B85A), Tokens.terracotta]), boxShadow: [BoxShadow(color: Tokens.terracotta.withValues(alpha: .5), blurRadius: 16)]),
-            child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
+            decoration: BoxDecoration(shape: BoxShape.circle, gradient: Tokens.sunrise, boxShadow: [BoxShadow(color: Tokens.accent.withValues(alpha: .5), blurRadius: 16)]),
+            child: const Icon(Icons.auto_awesome_rounded, color: Tokens.onAccent, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -184,7 +184,7 @@ class _Header extends StatelessWidget {
               Row(children: [
                 Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF6EE7A8), shape: BoxShape.circle)),
                 const SizedBox(width: 6),
-                Text(llm ? 'AI-written · grounded in our guides' : 'Instant · answers from our guides', style: Type.body(11.5, color: Colors.white70)),
+                Text(llm ? 'AI-written · grounded in our guides' : 'Instant · answers from our guides', style: Type.body(11.5, color: Tokens.onDarkMuted)),
               ]),
             ]),
           ),
@@ -219,7 +219,7 @@ class _Empty extends StatelessWidget {
                   onTap: () => onAsk(s.question),
                   child: Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+                    decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Container(width: 38, height: 38, decoration: BoxDecoration(color: s.color.withValues(alpha: .16), borderRadius: BorderRadius.circular(13)), child: Icon(s.icon, size: 21, color: s.color)),
                       const Spacer(),
@@ -263,7 +263,7 @@ class _Typing extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.only(top: 14),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          decoration: BoxDecoration(color: Tokens.paper, borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22)), border: Border.all(color: Tokens.border)),
+          decoration: BoxDecoration(color: Tokens.surface, borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22)), border: Border.all(color: Tokens.border)),
           child: const TypingDots(),
         ),
       );
@@ -317,8 +317,8 @@ class _AssistantBubbleState extends State<_AssistantBubble> with SingleTickerPro
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 2),
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-          decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .12), borderRadius: BorderRadius.circular(8)),
-          child: Text(mt.group(1)!, style: Type.body(11, weight: FontWeight.w800, color: Tokens.forest)),
+          decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: .12), borderRadius: BorderRadius.circular(8)),
+          child: Text(mt.group(1)!, style: Type.body(11, weight: FontWeight.w800, color: Tokens.primaryText)),
         ),
       ));
       last = mt.end;
@@ -341,9 +341,9 @@ class _AssistantBubbleState extends State<_AssistantBubble> with SingleTickerPro
             margin: const EdgeInsets.only(top: 14, right: 20),
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
             decoration: BoxDecoration(
-              color: m.failed ? Tokens.terracotta.withValues(alpha: .08) : Tokens.paper,
+              color: m.failed ? Tokens.warning.withValues(alpha: .08) : Tokens.surface,
               borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(22), bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22)),
-              border: Border.all(color: m.failed ? Tokens.terracotta.withValues(alpha: .4) : Tokens.border),
+              border: Border.all(color: m.failed ? Tokens.warning.withValues(alpha: .4) : Tokens.border),
               boxShadow: Tokens.softShadow(0.04),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -353,7 +353,7 @@ class _AssistantBubbleState extends State<_AssistantBubble> with SingleTickerPro
               ),
               if (done) ...[
                 if (m.failed && m.retry != null) Padding(padding: const EdgeInsets.only(top: 12), child: OutlinedButton.icon(onPressed: () => widget.onAsk(m.retry!), icon: const Icon(Icons.refresh_rounded), label: const Text('Try again'))),
-                if (!m.grounded && !m.failed) const Padding(padding: EdgeInsets.only(top: 10), child: Pill('Not in approved guides', color: Tokens.terracotta, icon: Icons.help_outline_rounded)),
+                if (!m.grounded && !m.failed) const Padding(padding: EdgeInsets.only(top: 10), child: Pill('Not in approved guides', color: Tokens.warning, icon: Icons.help_outline_rounded)),
                 if (m.cards.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   SizedBox(
@@ -419,11 +419,11 @@ class _Suggest extends StatelessWidget {
         radius: 99,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .08), borderRadius: BorderRadius.circular(99), border: Border.all(color: Tokens.forest.withValues(alpha: .2))),
+          decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: .08), borderRadius: BorderRadius.circular(99), border: Border.all(color: Tokens.primary.withValues(alpha: .2))),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.north_east_rounded, size: 14, color: Tokens.forest),
+            const Icon(Icons.north_east_rounded, size: 14, color: Tokens.primary),
             const SizedBox(width: 6),
-            Flexible(child: Text(text, style: Type.body(12.5, weight: FontWeight.w700, color: Tokens.forest))),
+            Flexible(child: Text(text, style: Type.body(12.5, weight: FontWeight.w700, color: Tokens.primaryText))),
           ]),
         ),
       );
@@ -444,7 +444,7 @@ class _CardTile extends StatelessWidget {
             child: Stack(fit: StackFit.expand, children: [
               WImage(c['image'] as String?, width: double.infinity, height: double.infinity, fallbackIcon: c['type'] == 'stay' ? Icons.bed_outlined : Icons.place_outlined),
               const Scrim(top: true, strength: 0.88),
-              Positioned(left: 12, top: 10, child: Pill(switch (c['type']) { 'stay' => 'STAY', 'place' => 'PLACE', _ => 'DESTINATION' }, color: Tokens.gold, solid: true)),
+              Positioned(left: 12, top: 10, child: Pill(switch (c['type']) { 'stay' => 'STAY', 'place' => 'PLACE', _ => 'DESTINATION' }, color: Tokens.accent, solid: true)),
               Positioned(
                 left: 12,
                 right: 12,
@@ -452,7 +452,7 @@ class _CardTile extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(c['title'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: Type.display(16, color: Colors.white, height: 1.1)),
                   const SizedBox(height: 2),
-                  Text(c['subtitle'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(11, color: Colors.white70)),
+                  Text(c['subtitle'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: Type.body(11, color: Tokens.onDarkMuted)),
                 ]),
               ),
             ]),
@@ -471,10 +471,10 @@ class _Composer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-        decoration: const BoxDecoration(color: Tokens.ivory),
+        decoration: const BoxDecoration(color: Tokens.pageBg),
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 4, 6, 4),
-          decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(30), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.08)),
+          decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(30), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.08)),
           child: Row(children: [
             Expanded(
               child: TextField(
@@ -500,8 +500,8 @@ class _Composer extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 width: 46,
                 height: 46,
-                decoration: BoxDecoration(shape: BoxShape.circle, gradient: busy ? null : const LinearGradient(colors: [Color(0xFFF0B85A), Tokens.terracotta]), color: busy ? Tokens.sandDeep : null),
-                child: busy ? const Padding(padding: EdgeInsets.all(14), child: CircularProgressIndicator(strokeWidth: 2.2, color: Tokens.forest)) : const Icon(Icons.arrow_upward_rounded, color: Colors.white),
+                decoration: BoxDecoration(shape: BoxShape.circle, gradient: busy ? null : Tokens.sunrise, color: busy ? Tokens.border : null),
+                child: busy ? const Padding(padding: EdgeInsets.all(14), child: CircularProgressIndicator(strokeWidth: 2.2, color: Tokens.primary)) : const Icon(Icons.arrow_upward_rounded, color: Tokens.onAccent),
               ),
             ),
           ]),

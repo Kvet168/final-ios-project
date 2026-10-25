@@ -140,7 +140,7 @@ class GlassIconButton extends StatelessWidget {
           radius: size,
           child: Glass(
             radius: size,
-            tint: const Color(0x40101A16),
+            tint: const Color(0x400F172A),
             child: SizedBox(width: size, height: size, child: Icon(icon, color: color, size: 22)),
           ),
         ),
@@ -173,7 +173,7 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
           shaderCallback: (r) => LinearGradient(
             begin: Alignment(-1.4 + 2.8 * _c.value, -0.3),
             end: Alignment(-0.4 + 2.8 * _c.value, 0.3),
-            colors: const [Tokens.sand, Color(0xFFFBF7EE), Tokens.sand],
+            colors: const [Tokens.neutralTint, Colors.white, Tokens.neutralTint],
             stops: const [0.25, 0.5, 0.75],
           ).createShader(r),
           child: child,
@@ -202,15 +202,15 @@ class WChip extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
         decoration: BoxDecoration(
-          color: selected ? Tokens.forest : Tokens.paper,
+          color: selected ? Tokens.charcoal : Tokens.surface,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? Tokens.forest : Tokens.border),
-          boxShadow: selected ? [BoxShadow(color: Tokens.forest.withValues(alpha: .28), blurRadius: 14, offset: const Offset(0, 6))] : null,
+          border: Border.all(color: selected ? Tokens.charcoal : Tokens.border),
+          boxShadow: selected ? [BoxShadow(color: Tokens.charcoal.withValues(alpha: .20), blurRadius: 14, offset: const Offset(0, 6))] : null,
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 17, color: selected ? Tokens.gold : Tokens.forest), const SizedBox(width: 7)],
+          if (icon != null) ...[Icon(icon, size: 17, color: selected ? Colors.white : Tokens.primary), const SizedBox(width: 7)],
           Text(label, style: Type.body(13.5, weight: FontWeight.w700, color: fg)),
-          if (count != null) ...[const SizedBox(width: 6), Text('$count', style: Type.body(12, weight: FontWeight.w600, color: selected ? Colors.white70 : Tokens.inkMuted))],
+          if (count != null) ...[const SizedBox(width: 6), Text('$count', style: Type.body(12, weight: FontWeight.w600, color: selected ? Tokens.onDarkMuted : Tokens.inkMuted))],
         ]),
       ),
     );
@@ -231,7 +231,7 @@ class SectionTitle extends StatelessWidget {
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if (eyebrow != null) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(eyebrow!.toUpperCase(), style: Type.label(11, color: Tokens.terracotta))),
+              if (eyebrow != null) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(eyebrow!.toUpperCase(), style: Type.label(11, color: Tokens.primaryText))),
               Semantics(header: true, child: Text(title, style: Type.display(25))),
             ]),
           ),
@@ -242,9 +242,9 @@ class SectionTitle extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(action!, style: Type.body(13.5, weight: FontWeight.w700, color: Tokens.forest)),
+                  Text(action!, style: Type.body(13.5, weight: FontWeight.w700, color: Tokens.primaryText)),
                   const SizedBox(width: 2),
-                  const Icon(Icons.arrow_forward_rounded, size: 16, color: Tokens.forest),
+                  const Icon(Icons.arrow_forward_rounded, size: 16, color: Tokens.primary),
                 ]),
               ),
             ),
@@ -269,7 +269,7 @@ class HeartButton extends StatelessWidget {
         semanticLabel: active ? 'Remove from wishlist' : 'Save to wishlist',
         child: Glass(
           radius: size,
-          tint: const Color(0x40101A16),
+          tint: const Color(0x400F172A),
           child: SizedBox(
             width: size,
             height: size,
@@ -278,7 +278,7 @@ class HeartButton extends StatelessWidget {
               tween: Tween(begin: active ? 0.6 : 1.0, end: 1.0),
               duration: const Duration(milliseconds: 380),
               curve: Curves.elasticOut,
-              builder: (_, v, _) => Transform.scale(scale: v, child: Icon(active ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: active ? Tokens.lotus : Colors.white, size: 22)),
+              builder: (_, v, _) => Transform.scale(scale: v, child: Icon(active ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: active ? Tokens.heart : Colors.white, size: 22)),
             ),
           ),
         ),
@@ -328,7 +328,7 @@ class _TypingDotsState extends State<TypingDots> with SingleTickerProviderStateM
                 margin: const EdgeInsets.symmetric(horizontal: 2.5),
                 width: 7,
                 height: 7 + 5 * w,
-                decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: 0.3 + 0.55 * w), borderRadius: BorderRadius.circular(6)),
+                decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: 0.3 + 0.55 * w), borderRadius: BorderRadius.circular(6)),
               );
             }),
         ]),

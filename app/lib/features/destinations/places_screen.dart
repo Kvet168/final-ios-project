@@ -25,7 +25,7 @@ void showPlaceSheet(BuildContext context, WidgetRef ref, Json p) {
             child: SizedBox(height: 210, child: Stack(fit: StackFit.expand, children: [
               WImage(p['image'] as String?, full: true, height: 210, width: double.infinity, label: 'Photo of ${p['name']}'),
               const Scrim(strength: 0.4),
-              Positioned(left: 14, bottom: 14, child: Pill(capitalize((p['category'] ?? p['kind'] ?? '') as String), icon: categoryIcon(p['category'] as String?), color: Tokens.gold, solid: true)),
+              Positioned(left: 14, bottom: 14, child: Pill(capitalize((p['category'] ?? p['kind'] ?? '') as String), icon: categoryIcon(p['category'] as String?), color: Tokens.accent, solid: true)),
             ])),
           ),
           if (p['image_credit'] != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(p['image_credit'] as String, style: Type.body(10.5, color: Tokens.inkMuted), maxLines: 2, overflow: TextOverflow.ellipsis)),
@@ -38,8 +38,8 @@ void showPlaceSheet(BuildContext context, WidgetRef ref, Json p) {
           if (p['price_usd'] != null) Pill((p['price_usd'] as num) == 0 ? 'Free entry' : money(p['price_usd'] as num), icon: Icons.payments_outlined),
           if (p['duration_min'] != null) Pill('${p['duration_min']} min', icon: Icons.schedule_rounded),
           if (p['opens_min'] != null)
-            Pill('${fmtMinutes(p['opens_min'] as int)} – ${fmtMinutes((p['closes_min'] as int) % 1440)}${p['hours_verified'] == true ? '' : ' (indicative)'}', icon: Icons.access_time_rounded, color: Tokens.terracotta),
-          if (p['family_friendly'] == true) const Pill('Family friendly', icon: Icons.family_restroom_outlined, color: Tokens.jade),
+            Pill('${fmtMinutes(p['opens_min'] as int)} – ${fmtMinutes((p['closes_min'] as int) % 1440)}${p['hours_verified'] == true ? '' : ' (indicative)'}', icon: Icons.access_time_rounded, color: Tokens.primary),
+          if (p['family_friendly'] == true) const Pill('Family friendly', icon: Icons.family_restroom_outlined, color: Tokens.primary),
           if (p['is_demo'] == true) const DemoBadge(),
         ]),
         const SizedBox(height: 16),
@@ -150,7 +150,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
           SliverAppBar(
             pinned: true,
             expandedHeight: 120,
-            backgroundColor: Tokens.ivory,
+            backgroundColor: Tokens.pageBg,
             surfaceTintColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14),

@@ -137,25 +137,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _card(Widget child, {EdgeInsets padding = const EdgeInsets.all(18)}) => Container(
         width: double.infinity,
         padding: padding,
-        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.05)),
+        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.05)),
         child: child,
       );
 
   Widget _step(int n, String label, bool on, bool done) => Expanded(
         child: Column(children: [
           Row(children: [
-            Expanded(child: Container(height: 3, color: n == 1 ? Colors.transparent : (on || done ? Tokens.forest : Tokens.border))),
+            Expanded(child: Container(height: 3, color: n == 1 ? Colors.transparent : (on || done ? Tokens.primary : Tokens.border))),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               width: 30,
               height: 30,
-              decoration: BoxDecoration(color: on || done ? Tokens.forest : Tokens.paper, shape: BoxShape.circle, border: Border.all(color: on || done ? Tokens.forest : Tokens.border, width: 1.6)),
+              decoration: BoxDecoration(color: on || done ? Tokens.primary : Tokens.surface, shape: BoxShape.circle, border: Border.all(color: on || done ? Tokens.primary : Tokens.border, width: 1.6)),
               child: Center(child: done ? const Icon(Icons.check_rounded, size: 17, color: Colors.white) : Text('$n', style: Type.body(13, weight: FontWeight.w800, color: on ? Colors.white : Tokens.inkMuted))),
             ),
-            Expanded(child: Container(height: 3, color: n == 3 ? Colors.transparent : (done ? Tokens.forest : Tokens.border))),
+            Expanded(child: Container(height: 3, color: n == 3 ? Colors.transparent : (done ? Tokens.primary : Tokens.border))),
           ]),
           const SizedBox(height: 6),
-          Text(label, style: Type.body(11.5, weight: on ? FontWeight.w800 : FontWeight.w600, color: on || done ? Tokens.forest : Tokens.inkMuted)),
+          Text(label, style: Type.body(11.5, weight: on ? FontWeight.w800 : FontWeight.w600, color: on || done ? Tokens.primaryText : Tokens.inkMuted)),
         ]),
       );
 
@@ -182,7 +182,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (quote == null) return ErrorState(error: error ?? 'Unknown error', onRetry: _load);
       final q = quote!;
       return _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('YOUR STAY', style: Type.label(10.5, color: Tokens.terracotta)),
+        Text('YOUR STAY', style: Type.label(10.5, color: Tokens.warning)),
         const SizedBox(height: 8),
         Text(q['accommodationName'] as String, style: Type.display(24, height: 1.1)),
         const SizedBox(height: 2),
@@ -195,7 +195,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ]),
         const SizedBox(height: 12),
         Row(children: [
-          const Icon(Icons.people_outline, size: 18, color: Tokens.forest),
+          const Icon(Icons.people_outline, size: 18, color: Tokens.primary),
           const SizedBox(width: 8),
           Text('$adults adult${adults > 1 ? 's' : ''}${children > 0 ? ', $children child${children > 1 ? 'ren' : ''}' : ''} · $rooms room${rooms > 1 ? 's' : ''}', style: Type.body(13.5, weight: FontWeight.w600)),
         ]),
@@ -246,13 +246,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       return _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Payment', style: Type.display(24)),
         const SizedBox(height: 12),
-        Pill(expired ? 'Hold expired' : 'Room held for $mm:$ss', color: expired ? Tokens.danger : Tokens.terracotta, icon: Icons.timer_outlined),
+        Pill(expired ? 'Hold expired' : 'Room held for $mm:$ss', color: expired ? Tokens.danger : Tokens.warning, icon: Icons.timer_outlined),
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Tokens.gold.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: Tokens.promo, borderRadius: BorderRadius.circular(16)),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.science_outlined, size: 20, color: Color(0xFF7A5517)),
+            const Icon(Icons.science_outlined, size: 20, color: Tokens.warning),
             const SizedBox(width: 10),
             Expanded(child: Text('Simulated payment. This demo uses a mock payment provider: no card is charged and no real money moves. Choose an outcome to test how the booking reacts.', style: Type.body(13, height: 1.5))),
           ]),

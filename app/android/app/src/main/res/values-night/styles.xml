@@ -2,10 +2,10 @@
 <resources>
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:statusBarColor">@color/wf_forest_deep</item>
-        <item name="android:navigationBarColor">@color/wf_forest_deep</item>
+        <item name="android:statusBarColor">@color/wf_primary_deep</item>
+        <item name="android:navigationBarColor">@color/wf_primary_deep</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
-        <item name="android:windowBackground">@color/wf_ivory</item>
+        <item name="android:windowBackground">@color/wf_page</item>
     </style>
 </resources>

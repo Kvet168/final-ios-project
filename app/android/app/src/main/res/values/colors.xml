@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="wf_forest">#1F4A3F</color>
-    <color name="wf_forest_deep">#14342C</color>
-    <color name="wf_ivory">#FAF4E4</color>
+    <color name="wf_primary">#E6485C</color>
+    <color name="wf_primary_deep">#C7364B</color>
+    <color name="wf_page">#F8F8FB</color>
 </resources>

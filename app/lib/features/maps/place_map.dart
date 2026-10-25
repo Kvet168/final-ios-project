@@ -18,11 +18,11 @@ class MapPoint {
 }
 
 Color _kindColor(String k) => switch (k) {
-      'stay' => Tokens.terracotta,
-      'destination' => Tokens.forestDeep,
-      'restaurant' => const Color(0xFFC98A1E),
-      'user' => const Color(0xFF2B6CB0),
-      _ => Tokens.forest,
+      'stay' => Tokens.accent,
+      'destination' => Tokens.charcoal,
+      'restaurant' => Tokens.accentDeep,
+      'user' => Tokens.primary,
+      _ => Tokens.primary,
     };
 
 IconData _kindIcon(String k) => switch (k) {
@@ -79,7 +79,7 @@ class _PlaceMapState extends State<PlaceMap> {
                 userAgentPackageName: 'com.wayfarer.wayfarer',
               ),
               if (widget.drawRoute && pts.length > 1)
-                PolylineLayer(polylines: [Polyline(points: pts.map((p) => p.ll).toList(), strokeWidth: 4, color: Tokens.terracotta.withValues(alpha: 0.8), pattern: StrokePattern.dashed(segments: const [9, 7]))]),
+                PolylineLayer(polylines: [Polyline(points: pts.map((p) => p.ll).toList(), strokeWidth: 4, color: Tokens.primary.withValues(alpha: 0.8), pattern: StrokePattern.dashed(segments: const [9, 7]))]),
               MarkerLayer(markers: [
                 for (final p in pts)
                   Marker(
@@ -127,7 +127,7 @@ class _PlaceMapState extends State<PlaceMap> {
                 duration: const Duration(milliseconds: 260),
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-                  decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), boxShadow: Tokens.softShadow(0.2)),
+                  decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(20), boxShadow: Tokens.softShadow(0.2)),
                   child: Row(children: [
                     Container(width: 40, height: 40, decoration: BoxDecoration(color: _kindColor(selected!.kind).withValues(alpha: .12), shape: BoxShape.circle), child: Icon(_kindIcon(selected!.kind), color: _kindColor(selected!.kind), size: 21)),
                     const SizedBox(width: 12),

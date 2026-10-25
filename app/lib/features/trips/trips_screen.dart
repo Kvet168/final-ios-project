@@ -34,7 +34,7 @@ class TripsScreen extends ConsumerWidget {
             padding: EdgeInsets.fromLTRB(20, top + 16, 20, 24),
             decoration: const BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.vertical(bottom: Radius.circular(32))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('TRIPS', style: Type.label(11, color: Tokens.gold)),
+              Text('TRIPS', style: Type.label(11, color: Tokens.onDarkAccent)),
               const SizedBox(height: 6),
               Text('Tell us where.\nWe build the days.', style: Type.display(34, color: Colors.white, height: 1.04)),
               const SizedBox(height: 20),
@@ -43,9 +43,9 @@ class TripsScreen extends ConsumerWidget {
                 radius: 24,
                 child: Container(
                   padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), boxShadow: Tokens.softShadow(0.25)),
+                  decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), boxShadow: Tokens.softShadow(0.25)),
                   child: Row(children: [
-                    Container(width: 52, height: 52, decoration: const BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [Color(0xFFF0B85A), Tokens.terracotta])), child: const Icon(Icons.auto_awesome_rounded, color: Colors.white)),
+                    Container(width: 52, height: 52, decoration: const BoxDecoration(shape: BoxShape.circle, gradient: Tokens.sunrise), child: const Icon(Icons.auto_awesome_rounded, color: Tokens.onAccent)),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -54,7 +54,7 @@ class TripsScreen extends ConsumerWidget {
                         Text('"3 days in Kampot, relaxed, two kids"', style: Type.body(12.5, color: Tokens.inkMuted, height: 1.3), maxLines: 2),
                       ]),
                     ),
-                    const Icon(Icons.arrow_forward_rounded, color: Tokens.forest),
+                    const Icon(Icons.arrow_forward_rounded, color: Tokens.primary),
                   ]),
                 ),
               ),
@@ -68,9 +68,9 @@ class TripsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border)),
+                    decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border)),
                     child: Row(children: [
-                      const Icon(Icons.lock_outline_rounded, color: Tokens.forest),
+                      const Icon(Icons.lock_outline_rounded, color: Tokens.primary),
                       const SizedBox(width: 14),
                       Expanded(child: Text('Sign in to save itineraries and edit them any time.', style: Type.body(14, color: Tokens.inkSoft, height: 1.4))),
                       const SizedBox(width: 8),
@@ -121,14 +121,14 @@ class _TripRow extends StatelessWidget {
         onTap: () => context.push('/trips/${trip['id']}'),
         child: Container(
           height: 118,
-          decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
+          decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
           child: Row(children: [
             ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(24)), child: SizedBox(width: 112, height: 118, child: WImage(trip['cover_image'] as String?, width: 112, height: 118))),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 14, 12),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text('${trip['destination_name']} · ${trip['num_days']} DAY${trip['num_days'] == 1 ? '' : 'S'}'.toUpperCase(), style: Type.label(10, color: Tokens.terracotta)),
+                  Text('${trip['destination_name']} · ${trip['num_days']} DAY${trip['num_days'] == 1 ? '' : 'S'}'.toUpperCase(), style: Type.label(10, color: Tokens.primaryText)),
                   const SizedBox(height: 5),
                   Text(trip['title'] as String, style: Type.display(18, height: 1.12), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 6),
@@ -219,15 +219,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('AI TRIP PLANNER', style: Type.label(11, color: Tokens.gold)),
+                Text('AI TRIP PLANNER', style: Type.label(11, color: Tokens.onDarkAccent)),
                 const SizedBox(height: 6),
                 Text('Describe the trip\nyou want.', style: Type.display(34, color: Colors.white, height: 1.04)),
                 if (status != null) ...[
                   const SizedBox(height: 12),
                   Row(children: [
-                    Icon(status['llmConfigured'] == true ? Icons.auto_awesome_rounded : Icons.rule_rounded, size: 15, color: Colors.white70),
+                    Icon(status['llmConfigured'] == true ? Icons.auto_awesome_rounded : Icons.rule_rounded, size: 15, color: Tokens.onDarkMuted),
                     const SizedBox(width: 6),
-                    Expanded(child: Text(status['llmConfigured'] == true ? 'Language-model assisted, grounded in stored places' : 'Built on stored places by a rules engine. Fast and never invents.', style: Type.body(12, color: Colors.white70))),
+                    Expanded(child: Text(status['llmConfigured'] == true ? 'Language-model assisted, grounded in stored places' : 'Built on stored places by a rules engine. Fast and never invents.', style: Type.body(12, color: Tokens.onDarkMuted))),
                   ]),
                 ],
               ]),
@@ -239,7 +239,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
               padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-              decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
+              decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
               child: TextField(
                 controller: _prompt,
                 minLines: 3,
@@ -265,7 +265,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: busy ? null : _generate,
-                style: FilledButton.styleFrom(minimumSize: const Size(0, 60), backgroundColor: Tokens.terracotta),
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 60)),
                 icon: busy ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white)) : const Icon(Icons.auto_awesome_rounded),
                 label: Text(busy ? 'Planning your days…' : 'Create itinerary'),
               ),
@@ -307,7 +307,7 @@ class _ResultView extends StatelessWidget {
       final dests = (result['availableDestinations'] as List).cast<Json>();
       return Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border)),
+        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('A little more detail, please', style: Type.display(22)),
           const SizedBox(height: 10),
@@ -315,7 +315,7 @@ class _ResultView extends StatelessWidget {
           const SizedBox(height: 14),
           Text('DESTINATIONS I CAN PLAN', style: Type.label(10.5)),
           const SizedBox(height: 8),
-          Wrap(spacing: 6, runSpacing: 6, children: [for (final d in dests) Pill(d['name'] as String, color: Tokens.forest)]),
+          Wrap(spacing: 6, runSpacing: 6, children: [for (final d in dests) Pill(d['name'] as String, color: Tokens.primary)]),
         ]),
       );
     }
@@ -324,13 +324,13 @@ class _ResultView extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Tokens.sand, borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(color: Tokens.tint, borderRadius: BorderRadius.circular(20)),
         child: Wrap(spacing: 8, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
           Text('I understood', style: Type.body(13, weight: FontWeight.w800)),
           Pill('${understood['days']} days', icon: Icons.calendar_today_outlined),
           Pill('${understood['adults']} adults${(understood['children'] as int) > 0 ? ', ${understood['children']} children' : ''}', icon: Icons.people_outline),
           if (understood['budgetUsd'] != null) Pill('\$${understood['budgetUsd']} ${understood['budgetIsPerDay'] == true ? 'per day' : 'total'}', icon: Icons.payments_outlined),
-          for (final i in (understood['interests'] as List).cast<String>()) Pill(i, color: Tokens.terracotta),
+          for (final i in (understood['interests'] as List).cast<String>()) Pill(i, color: Tokens.primary),
         ]),
       ),
       if (result['parserNote'] != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(result['parserNote'] as String, style: Type.body(12, color: Tokens.inkMuted))),
@@ -378,15 +378,15 @@ class _PlanViewState extends ConsumerState<PlanView> {
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(plan['mode'] == 'llm' ? Icons.auto_awesome_rounded : Icons.rule_rounded, size: 15, color: Tokens.terracotta),
+            Icon(plan['mode'] == 'llm' ? Icons.auto_awesome_rounded : Icons.rule_rounded, size: 15, color: Tokens.primary),
             const SizedBox(width: 6),
-            Expanded(child: Text(plan['modeNote'] as String, style: Type.body(11.5, color: Tokens.terracotta, height: 1.4))),
+            Expanded(child: Text(plan['modeNote'] as String, style: Type.body(11.5, color: Tokens.primaryText, height: 1.4))),
           ]),
         ),
       for (final w in warnings)
         Padding(
           padding: const EdgeInsets.only(top: 10),
-          child: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Tokens.gold.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(16)), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [const Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF7A5517)), const SizedBox(width: 10), Expanded(child: Text(w, style: Type.body(12.5, height: 1.45)))])),
+          child: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Tokens.promo, borderRadius: BorderRadius.circular(16)), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [const Icon(Icons.info_outline_rounded, size: 18, color: Tokens.warning), const SizedBox(width: 10), Expanded(child: Text(w, style: Type.body(12.5, height: 1.45)))])),
         ),
       if (budget != null) ...[const SizedBox(height: 18), _BudgetCard(plan: plan, budget: budget, assumptions: assumptions, money: money)],
       if (days.isNotEmpty) ...[
@@ -444,16 +444,16 @@ class _BudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parts = [
-      ('Stay', (budget['lodgingUsd'] as num).toDouble(), Tokens.forest),
-      ('Activities', (budget['activitiesUsd'] as num).toDouble(), Tokens.terracotta),
-      ('Food', (budget['foodUsd'] as num).toDouble(), Tokens.gold),
-      ('Transport', (budget['transportUsd'] as num).toDouble(), Tokens.jade),
+      ('Stay', (budget['lodgingUsd'] as num).toDouble(), Tokens.primary),
+      ('Activities', (budget['activitiesUsd'] as num).toDouble(), Tokens.inkSoft),
+      ('Food', (budget['foodUsd'] as num).toDouble(), Tokens.star),
+      ('Transport', (budget['transportUsd'] as num).toDouble(), Tokens.sky),
     ].where((p) => p.$2 > 0).toList();
     final total = (budget['totalUsd'] as num).toDouble();
     final within = budget['withinBudget'];
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(26), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
+      decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(26), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('ESTIMATED TOTAL', style: Type.label(10.5)),
         const SizedBox(height: 4),
@@ -486,7 +486,7 @@ class _BudgetCard extends StatelessWidget {
         ],
         if (plan['lodging'] != null) ...[
           const SizedBox(height: 14),
-          Row(children: [const Icon(Icons.bed_outlined, size: 17, color: Tokens.forest), const SizedBox(width: 8), Expanded(child: Text('${plan['lodging']['name']} · ${plan['lodging']['nights']} night${plan['lodging']['nights'] == 1 ? '' : 's'}', style: Type.body(13, weight: FontWeight.w600)))]),
+          Row(children: [const Icon(Icons.bed_outlined, size: 17, color: Tokens.primary), const SizedBox(width: 8), Expanded(child: Text('${plan['lodging']['name']} · ${plan['lodging']['nights']} night${plan['lodging']['nights'] == 1 ? '' : 's'}', style: Type.body(13, weight: FontWeight.w600)))]),
         ],
         if (assumptions.isNotEmpty)
           Material(
@@ -539,7 +539,7 @@ class _Stop extends StatelessWidget {
               decoration: const BoxDecoration(gradient: Tokens.dusk, shape: BoxShape.circle),
               child: Center(child: Text('${index + 1}', style: Type.body(12.5, color: Colors.white, weight: FontWeight.w800))),
             ),
-            if (!last) Expanded(child: Container(width: 2, margin: const EdgeInsets.symmetric(vertical: 4), color: Tokens.sandDeep)),
+            if (!last) Expanded(child: Container(width: 2, margin: const EdgeInsets.symmetric(vertical: 4), color: Tokens.border)),
           ]),
           const SizedBox(width: 12),
           Expanded(
@@ -553,17 +553,17 @@ class _Stop extends StatelessWidget {
                   ),
                 Container(
                   clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
+                  decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     if (item['image'] != null) SizedBox(height: 110, width: double.infinity, child: WImage(item['image'] as String?, width: double.infinity, height: 110)),
                     Padding(
                       padding: const EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Row(children: [
-                          Icon(categoryIcon(item['category'] as String?), size: 16, color: Tokens.jade),
+                          Icon(categoryIcon(item['category'] as String?), size: 16, color: Tokens.primary),
                           const SizedBox(width: 6),
                           Expanded(child: Text(item['name'] as String, style: Type.body(15, weight: FontWeight.w800, height: 1.25))),
-                          Text(cost == 0 ? 'Free' : money(cost), style: Type.body(13, weight: FontWeight.w800, color: Tokens.forest)),
+                          Text(cost == 0 ? 'Free' : money(cost), style: Type.body(13, weight: FontWeight.w800, color: Tokens.primaryText)),
                         ]),
                         if ((item['reason'] as String?)?.isNotEmpty ?? false) Padding(padding: const EdgeInsets.only(top: 6), child: Text(item['reason'] as String, style: Type.body(12.5, color: Tokens.inkMuted, height: 1.45))),
                         if (item['isDemo'] == true || item['is_demo'] == true) const Padding(padding: EdgeInsets.only(top: 8), child: DemoBadge()),
@@ -656,7 +656,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                   right: 22,
                   bottom: 22,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${it['destination_name']} · ${it['num_days']} DAYS'.toUpperCase(), style: Type.label(11, color: Tokens.gold)),
+                    Text('${it['destination_name']} · ${it['num_days']} DAYS'.toUpperCase(), style: Type.label(11, color: Tokens.onDarkAccent)),
                     const SizedBox(height: 6),
                     Text(it['title'] as String, style: Type.display(28, color: Colors.white, height: 1.06), maxLines: 3, overflow: TextOverflow.ellipsis),
                   ]),
@@ -796,7 +796,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                                 ? const Pill('In trip')
                                 : IconButton(
                                     tooltip: 'Add to day $day',
-                                    icon: const Icon(Icons.add_circle_rounded, color: Tokens.forest),
+                                    icon: const Icon(Icons.add_circle_rounded, color: Tokens.primary),
                                     onPressed: () {
                                       Navigator.pop(c);
                                       final ids = (days[day - 1]['items'] as List).map((x) => (x as Json)['attractionId'] as String).toList()..add(pl['id'] as String);

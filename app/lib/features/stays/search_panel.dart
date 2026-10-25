@@ -173,14 +173,14 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
         alignment: Alignment.topLeft,
         child: Material(
           elevation: 6,
-          color: Tokens.paper,
+          color: Tokens.surface,
           borderRadius: BorderRadius.circular(18),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 260, maxWidth: 420),
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 6),
               shrinkWrap: true,
-              children: [for (final o in options) ListTile(dense: true, leading: const Icon(Icons.place_outlined, size: 20, color: Tokens.forest), title: Text(o, style: Type.body(15, weight: FontWeight.w600)), onTap: () => onSelected(o))],
+              children: [for (final o in options) ListTile(dense: true, leading: const Icon(Icons.place_outlined, size: 20, color: Tokens.primary), title: Text(o, style: Type.body(15, weight: FontWeight.w600)), onTap: () => onSelected(o))],
             ),
           ),
         ),
@@ -214,7 +214,7 @@ class _SearchPanelState extends ConsumerState<SearchPanel> {
     if (widget.embedded) return content;
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(Tokens.radius), border: Border.all(color: Tokens.border)),
+      decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(Tokens.radius), border: Border.all(color: Tokens.border)),
       child: content,
     );
   }
@@ -234,8 +234,8 @@ class _Stepper extends StatelessWidget {
         child: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: onTap == null ? Tokens.border : Tokens.forest, width: 1.5)),
-          child: Icon(icon, color: onTap == null ? Tokens.border : Tokens.forest),
+          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: onTap == null ? Tokens.border : Tokens.primary, width: 1.5)),
+          child: Icon(icon, color: onTap == null ? Tokens.border : Tokens.primary),
         ),
       );
 }

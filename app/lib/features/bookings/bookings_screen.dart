@@ -30,7 +30,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
           SliverAppBar(
             pinned: true,
             expandedHeight: 120,
-            backgroundColor: Tokens.ivory,
+            backgroundColor: Tokens.pageBg,
             surfaceTintColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14), title: Text('My bookings', style: Type.display(26))),
           ),
@@ -86,7 +86,7 @@ class _TicketCard extends StatelessWidget {
         child: ClipPath(
           clipper: const TicketShape(notchY: 0.64, radius: 24),
           child: Container(
-            color: Tokens.paper,
+            color: Tokens.surface,
             child: Column(children: [
               SizedBox(
                 height: 122,
@@ -197,7 +197,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
         builder: (c) => SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('RECEIPT', style: Type.label(11, color: Tokens.terracotta)),
+            Text('RECEIPT', style: Type.label(11, color: Tokens.primaryText)),
             const SizedBox(height: 6),
             Text('${r['receiptNumber']}', style: Type.display(28)),
             const SizedBox(height: 14),
@@ -205,7 +205,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.only(bottom: 14),
-                decoration: BoxDecoration(color: Tokens.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: Tokens.promo, borderRadius: BorderRadius.circular(14)),
                 child: Text(r['notice'] as String, style: Type.body(13, weight: FontWeight.w700)),
               ),
             Text('${r['property']} · ${r['room']}', style: Type.body(15, weight: FontWeight.w700)),
@@ -251,7 +251,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                 child: ClipPath(
                   clipper: const TicketShape(notchY: 0.66),
                   child: Container(
-                    color: Tokens.paper,
+                    color: Tokens.surface,
                     child: Column(children: [
                       SizedBox(
                         height: 170,
@@ -264,7 +264,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                             right: 22,
                             bottom: 16,
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('${b['destination_name']}'.toUpperCase(), style: Type.label(10.5, color: Colors.white70)),
+                              Text('${b['destination_name']}'.toUpperCase(), style: Type.label(10.5, color: Tokens.onDarkMuted)),
                               const SizedBox(height: 4),
                               GestureDetector(onTap: () => context.push('/stays/${b['accommodation_slug']}'), child: Text(b['accommodation_name'] as String, style: Type.display(26, color: Colors.white, height: 1.05))),
                             ]),
@@ -329,7 +329,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                   Text('Cancellation policy', style: Type.body(15, weight: FontWeight.w800)),
                   const SizedBox(height: 6),
                   Text(b['cancellation_policy'] as String, style: Type.body(13.5, color: Tokens.inkSoft, height: 1.5)),
-                  if (b['free_cancel_until'] != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text('Free cancellation until ${fmtDate(b['free_cancel_until'] as String, pattern: 'EEE d MMM, HH:mm')}', style: Type.body(13.5, weight: FontWeight.w800, color: Tokens.forest))),
+                  if (b['free_cancel_until'] != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text('Free cancellation until ${fmtDate(b['free_cancel_until'] as String, pattern: 'EEE d MMM, HH:mm')}', style: Type.body(13.5, weight: FontWeight.w800, color: Tokens.primaryText))),
                 ]),
               ),
               const SizedBox(height: 14),
@@ -341,7 +341,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                     IntrinsicHeight(
                       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                         Column(children: [
-                          Container(width: 12, height: 12, margin: const EdgeInsets.only(top: 3), decoration: BoxDecoration(color: i == events.length - 1 ? Tokens.forest : Tokens.sandDeep, shape: BoxShape.circle)),
+                          Container(width: 12, height: 12, margin: const EdgeInsets.only(top: 3), decoration: BoxDecoration(color: i == events.length - 1 ? Tokens.primary : Tokens.border, shape: BoxShape.circle)),
                           if (i != events.length - 1) Expanded(child: Container(width: 2, color: Tokens.border)),
                         ]),
                         const SizedBox(width: 14),
@@ -387,7 +387,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
     );
   }
 
-  Widget _panel(Widget child) => Container(width: double.infinity, padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)), child: child);
+  Widget _panel(Widget child) => Container(width: double.infinity, padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)), child: child);
 
   Widget _f(String l, String v, {bool end = false, bool big = false}) => Column(
         crossAxisAlignment: end ? CrossAxisAlignment.end : CrossAxisAlignment.start,

@@ -36,7 +36,7 @@ class DestinationCard extends ConsumerWidget {
               right: 16,
               bottom: 16,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text('${d['country']}'.toUpperCase(), style: Type.label(10.5, color: Colors.white70)),
+                Text('${d['country']}'.toUpperCase(), style: Type.label(10.5, color: Tokens.onDarkMuted)),
                 const SizedBox(height: 4),
                 Text(d['name'] as String, style: Type.display(24, color: Colors.white, height: 1.05), maxLines: 2, overflow: TextOverflow.ellipsis),
                 if (budget != null) ...[
@@ -81,7 +81,7 @@ class StayCard extends ConsumerWidget {
       child: Stack(fit: StackFit.expand, children: [
         heroTag == null ? photo : Hero(tag: heroTag!, child: photo),
         const Scrim(top: true, strength: 0.25),
-        Positioned(left: 12, top: 12, child: Glass(radius: 99, tint: const Color(0x66101A16), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), child: RatingBadge(rating: (s['rating_avg'] ?? 0) as num, count: (s['review_count'] ?? 0) as int, light: true))),
+        Positioned(left: 12, top: 12, child: Glass(radius: 99, tint: const Color(0x660F172A), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), child: RatingBadge(rating: (s['rating_avg'] ?? 0) as num, count: (s['review_count'] ?? 0) as int, light: true))),
         if (s['id'] != null) Positioned(right: 10, top: 10, child: SaveHeart(kind: 'accommodation', id: s['id'] as String, size: 38)),
         if (s['is_demo'] == true) const Positioned(left: 12, bottom: 10, child: DemoBadge(onImage: true)),
       ]),
@@ -106,7 +106,7 @@ class StayCard extends ConsumerWidget {
         if (!compact && perks.isNotEmpty) ...[
           const SizedBox(height: 10),
           Wrap(spacing: 12, runSpacing: 4, children: [
-            for (final (i, l) in perks) Row(mainAxisSize: MainAxisSize.min, children: [Icon(i, size: 14, color: Tokens.jade), const SizedBox(width: 4), Text(l, style: Type.body(11.5, color: Tokens.inkSoft, weight: FontWeight.w600))]),
+            for (final (i, l) in perks) Row(mainAxisSize: MainAxisSize.min, children: [Icon(i, size: 14, color: Tokens.primary), const SizedBox(width: 4), Text(l, style: Type.body(11.5, color: Tokens.inkSoft, weight: FontWeight.w600))]),
           ]),
         ],
         const SizedBox(height: 12),
@@ -123,7 +123,7 @@ class StayCard extends ConsumerWidget {
             Container(
               width: 34,
               height: 34,
-              decoration: const BoxDecoration(color: Tokens.forest, shape: BoxShape.circle),
+              decoration: const BoxDecoration(color: Tokens.primary, shape: BoxShape.circle),
               child: const Icon(Icons.arrow_outward_rounded, size: 18, color: Colors.white),
             ),
           ]),
@@ -131,7 +131,7 @@ class StayCard extends ConsumerWidget {
     );
 
     final card = Container(
-      decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(Tokens.radius), boxShadow: Tokens.softShadow(0.08), border: Border.all(color: Tokens.border)),
+      decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(Tokens.radius), boxShadow: Tokens.softShadow(0.08), border: Border.all(color: Tokens.border)),
       child: ClipRRect(borderRadius: BorderRadius.circular(Tokens.radius), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [media, info])),
     );
     return Pressable(
@@ -187,14 +187,14 @@ class PlaceTile extends ConsumerWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(Tokens.radius), border: Border.all(color: Tokens.border)),
+        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(Tokens.radius), border: Border.all(color: Tokens.border)),
         child: Row(children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: SizedBox(
               width: 80,
               height: 80,
-              child: p['image'] != null ? WImage(p['image'] as String?, width: 80, height: 80, fallbackIcon: categoryIcon(cat)) : Container(color: Tokens.sand, child: Icon(categoryIcon(cat), color: Tokens.forest)),
+              child: p['image'] != null ? WImage(p['image'] as String?, width: 80, height: 80, fallbackIcon: categoryIcon(cat)) : Container(color: Tokens.neutralTint, child: Icon(categoryIcon(cat), color: Tokens.primary)),
             ),
           ),
           const SizedBox(width: 14),
@@ -203,7 +203,7 @@ class PlaceTile extends ConsumerWidget {
               Text(p['name'] as String, style: Type.body(15, weight: FontWeight.w700, height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 5),
               Row(children: [
-                Icon(categoryIcon(cat), size: 14, color: Tokens.jade),
+                Icon(categoryIcon(cat), size: 14, color: Tokens.primary),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(

@@ -43,7 +43,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   Widget build(BuildContext context) {
     final last = _i == _slides.length - 1;
     return StatusTone.light(child: Scaffold(
-      backgroundColor: Tokens.forestDeep,
+      backgroundColor: Tokens.charcoal,
       body: Stack(fit: StackFit.expand, children: [
         PageView.builder(
           controller: _page,
@@ -67,10 +67,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       child: Transform.translate(
                         offset: Offset(p * 80, 0),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(s.eyebrow.toUpperCase(), style: Type.label(12, color: Tokens.gold)),
+                          Text(s.eyebrow.toUpperCase(), style: Type.label(12, color: Tokens.onDarkAccent)),
                           const SizedBox(height: 12),
                           Text(s.title, style: Type.display(46, color: Colors.white, height: 1.0)),
-                          Text(s.italic, style: Type.display(46, color: Tokens.gold, height: 1.05, italic: true, weight: FontWeight.w500)),
+                          Text(s.italic, style: Type.display(46, color: Tokens.onDarkAccent, height: 1.05, italic: true, weight: FontWeight.w500)),
                           const SizedBox(height: 18),
                           Text(s.body, style: Type.body(16, color: Colors.white.withValues(alpha: .86), height: 1.5)),
                         ]),
@@ -104,7 +104,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     margin: const EdgeInsets.only(right: 6),
                     width: i == _i ? 28 : 8,
                     height: 8,
-                    decoration: BoxDecoration(color: i == _i ? Tokens.gold : Colors.white38, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: i == _i ? Tokens.onDarkAccent : Colors.white38, borderRadius: BorderRadius.circular(8)),
                   ),
                 const Spacer(),
                 Pressable(
@@ -113,11 +113,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     padding: EdgeInsets.symmetric(horizontal: last ? 28 : 20, vertical: 18),
-                    decoration: BoxDecoration(color: Tokens.gold, borderRadius: BorderRadius.circular(99), boxShadow: [BoxShadow(color: Tokens.gold.withValues(alpha: .4), blurRadius: 22, offset: const Offset(0, 8))]),
+                    decoration: BoxDecoration(color: Tokens.cta, borderRadius: BorderRadius.circular(99), boxShadow: [BoxShadow(color: Tokens.cta.withValues(alpha: .4), blurRadius: 22, offset: const Offset(0, 8))]),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(last ? 'Start exploring' : 'Next', style: Type.body(15, weight: FontWeight.w800, color: Tokens.forestDeep)),
+                      Text(last ? 'Start exploring' : 'Next', style: Type.body(15, weight: FontWeight.w800, color: Tokens.onCta)),
                       const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, color: Tokens.forestDeep, size: 20),
+                      const Icon(Icons.arrow_forward_rounded, color: Tokens.onCta, size: 20),
                     ]),
                   ),
                 ),

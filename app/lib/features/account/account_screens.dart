@@ -60,7 +60,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final nextQ = widget.next == null ? '' : '?next=${Uri.encodeComponent(widget.next!)}';
     final kb = MediaQuery.viewInsetsOf(context).bottom;
     return StatusTone.light(child: Scaffold(
-      backgroundColor: Tokens.ivory,
+      backgroundColor: Tokens.pageBg,
       body: Stack(fit: StackFit.expand, children: [
         Positioned(
           top: 0,
@@ -76,7 +76,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               bottom: 70,
               right: 26,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [const Icon(Icons.explore_rounded, color: Tokens.gold, size: 22), const SizedBox(width: 8), Text('WAYFARER', style: Type.display(15, color: Colors.white, spacing: 3))]),
+                Row(children: [const Icon(Icons.explore_rounded, color: Tokens.onDarkAccent, size: 22), const SizedBox(width: 8), Text('WAYFARER', style: Type.display(15, color: Colors.white, spacing: 3))]),
                 const SizedBox(height: 14),
                 Text(reg ? 'Begin your\nnext journey.' : 'Welcome\nback, traveller.', style: Type.display(38, color: Colors.white, height: 1.02)),
               ]),
@@ -87,7 +87,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         Positioned.fill(
           top: 290 - (kb > 0 ? 160 : 0),
           child: Container(
-            decoration: const BoxDecoration(color: Tokens.ivory, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
+            decoration: const BoxDecoration(color: Tokens.pageBg, borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
             child: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(24, 28, 24, 24 + kb),
               child: Form(
@@ -132,7 +132,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           _pw.text = 'Wayfarer#Demo2026';
                           _submit();
                         },
-                        icon: const Icon(Icons.bolt_rounded, color: Tokens.gold),
+                        icon: const Icon(Icons.bolt_rounded, color: Tokens.accent),
                         label: const Text('Try the demo account'),
                       ),
                     ],
@@ -216,14 +216,14 @@ class AccountScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(26),
             decoration: BoxDecoration(gradient: Tokens.dusk, borderRadius: BorderRadius.circular(30)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Icon(Icons.explore_rounded, color: Tokens.gold, size: 34),
+              const Icon(Icons.explore_rounded, color: Tokens.onDarkAccent, size: 34),
               const SizedBox(height: 18),
               Text('Your travel\nlife, in one place.', style: Type.display(32, color: Colors.white, height: 1.05)),
               const SizedBox(height: 10),
-              Text('Sign in to see bookings, saved trips and your wishlist.', style: Type.body(14, color: Colors.white70, height: 1.5)),
+              Text('Sign in to see bookings, saved trips and your wishlist.', style: Type.body(14, color: Tokens.onDarkMuted, height: 1.5)),
               const SizedBox(height: 22),
               Row(children: [
-                Expanded(child: FilledButton(onPressed: () => context.push('/login'), style: FilledButton.styleFrom(backgroundColor: Tokens.gold, foregroundColor: Tokens.forestDeep), child: const Text('Sign in'))),
+                Expanded(child: FilledButton(onPressed: () => context.push('/login'), style: FilledButton.styleFrom(backgroundColor: Tokens.cta, foregroundColor: Tokens.onCta), child: const Text('Sign in'))),
                 const SizedBox(width: 10),
                 Expanded(child: OutlinedButton(onPressed: () => context.push('/register'), style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Colors.white38)), child: const Text('Join'))),
               ]),
@@ -236,13 +236,13 @@ class AccountScreen extends ConsumerWidget {
 
     final role = auth.role;
     final name = user['name'] as String;
-    Widget tile(IconData i, String t, String sub, String path, {Color color = Tokens.forest}) => Padding(
+    Widget tile(IconData i, String t, String sub, String path, {Color color = Tokens.primary}) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Pressable(
             onTap: () => context.push(path),
             child: Container(
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+              decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
               child: Row(children: [
                 Container(width: 46, height: 46, decoration: BoxDecoration(color: color.withValues(alpha: .12), borderRadius: BorderRadius.circular(15)), child: Icon(i, color: color)),
                 const SizedBox(width: 14),
@@ -269,9 +269,9 @@ class AccountScreen extends ConsumerWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(name, style: Type.display(25, color: Colors.white, height: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 3),
-              Text('${user['email']}', style: Type.body(12.5, color: Colors.white70), maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('${user['email']}', style: Type.body(12.5, color: Tokens.onDarkMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 8),
-              Pill(capitalize(role), color: Tokens.gold, solid: true),
+              Pill(capitalize(role), color: Tokens.accent, solid: true),
             ]),
           ),
         ]),
@@ -280,11 +280,11 @@ class AccountScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           tile(Icons.confirmation_number_outlined, 'My bookings', 'Tickets, cancellation and receipts', '/bookings'),
-          tile(Icons.favorite_border_rounded, 'Wishlist', 'Saved destinations and stays', '/wishlist', color: Tokens.lotus),
-          tile(Icons.notifications_none_rounded, 'Notifications', 'Booking and payment updates', '/notifications', color: Tokens.terracotta),
-          tile(Icons.map_outlined, 'Explore map', 'Destinations and stays near you', '/map', color: const Color(0xFF5E8FA8)),
-          if (auth.isStaff) tile(Icons.admin_panel_settings_outlined, 'Administration', 'Overview, bookings, payments, reviews, audit log', '/admin', color: Tokens.forestDeep),
-          if (auth.isPartner) tile(Icons.storefront_outlined, 'Partner portal', 'Your properties, bookings and availability', '/partner', color: Tokens.forestDeep),
+          tile(Icons.favorite_border_rounded, 'Wishlist', 'Saved destinations and stays', '/wishlist', color: Tokens.heart),
+          tile(Icons.notifications_none_rounded, 'Notifications', 'Booking and payment updates', '/notifications', color: Tokens.primary),
+          tile(Icons.map_outlined, 'Explore map', 'Destinations and stays near you', '/map', color: Tokens.primary),
+          if (auth.isStaff) tile(Icons.admin_panel_settings_outlined, 'Administration', 'Overview, bookings, payments, reviews, audit log', '/admin', color: Tokens.charcoal),
+          if (auth.isPartner) tile(Icons.storefront_outlined, 'Partner portal', 'Your properties, bookings and availability', '/partner', color: Tokens.charcoal),
         ]),
       ),
       currencySection(),
@@ -341,7 +341,7 @@ class WishlistScreen extends ConsumerWidget {
     final res = ref.watch(wishlistProvider);
     return Scaffold(
       body: CustomScrollView(slivers: [
-        SliverAppBar(pinned: true, expandedHeight: 120, backgroundColor: Tokens.ivory, surfaceTintColor: Colors.transparent, flexibleSpace: FlexibleSpaceBar(titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14), title: Text('Wishlist', style: Type.display(26)))),
+        SliverAppBar(pinned: true, expandedHeight: 120, backgroundColor: Tokens.pageBg, surfaceTintColor: Colors.transparent, flexibleSpace: FlexibleSpaceBar(titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14), title: Text('Wishlist', style: Type.display(26)))),
         SliverToBoxAdapter(
           child: res.when(
             loading: () => const Padding(padding: EdgeInsets.all(20), child: SkeletonList(count: 3, itemHeight: 100)),
@@ -365,14 +365,14 @@ class WishlistScreen extends ConsumerWidget {
                           },
                           child: Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+                            decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
                             child: Row(children: [
                               WImage(i['image'] as String?, width: 80, height: 80, radius: 16),
                               const SizedBox(width: 14),
-                              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text((i['name'] ?? 'Saved item') as String, style: Type.display(19, height: 1.1)), const SizedBox(height: 4), Pill(i['kind'] == 'accommodation' ? 'Stay' : capitalize(i['kind'] as String), color: Tokens.jade)])),
+                              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text((i['name'] ?? 'Saved item') as String, style: Type.display(19, height: 1.1)), const SizedBox(height: 4), Pill(i['kind'] == 'accommodation' ? 'Stay' : capitalize(i['kind'] as String), color: Tokens.primary)])),
                               IconButton(
                                 tooltip: 'Remove from wishlist',
-                                icon: const Icon(Icons.favorite_rounded, color: Tokens.lotus),
+                                icon: const Icon(Icons.favorite_rounded, color: Tokens.heart),
                                 onPressed: () async {
                                   await ref.read(apiProvider).delete('/wishlist/${i['kind']}/${i['ref_id']}');
                                   ref.invalidate(wishlistProvider);
@@ -404,7 +404,7 @@ class NotificationsScreen extends ConsumerWidget {
         SliverAppBar(
           pinned: true,
           expandedHeight: 120,
-          backgroundColor: Tokens.ivory,
+          backgroundColor: Tokens.pageBg,
           surfaceTintColor: Colors.transparent,
           flexibleSpace: FlexibleSpaceBar(titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14), title: Text('Notifications', style: Type.display(26))),
           actions: [
@@ -440,9 +440,9 @@ class NotificationsScreen extends ConsumerWidget {
                         },
                         child: Container(
                           padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(color: n['read_at'] == null ? Tokens.mint.withValues(alpha: .55) : Tokens.paper, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
+                          decoration: BoxDecoration(color: n['read_at'] == null ? Tokens.tint.withValues(alpha: .55) : Tokens.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
                           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Container(width: 42, height: 42, decoration: BoxDecoration(color: Tokens.paper, shape: BoxShape.circle), child: Icon(n['type'] == 'payment' ? Icons.payments_outlined : n['type'] == 'itinerary' ? Icons.map_outlined : Icons.confirmation_number_outlined, color: Tokens.forest, size: 21)),
+                            Container(width: 42, height: 42, decoration: BoxDecoration(color: Tokens.surface, shape: BoxShape.circle), child: Icon(n['type'] == 'payment' ? Icons.payments_outlined : n['type'] == 'itinerary' ? Icons.map_outlined : Icons.confirmation_number_outlined, color: Tokens.primary, size: 21)),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -453,7 +453,7 @@ class NotificationsScreen extends ConsumerWidget {
                                 Text(fmtDate(n['created_at'] as String, pattern: 'd MMM y, HH:mm'), style: Type.body(11.5, color: Tokens.inkMuted)),
                               ]),
                             ),
-                            if (n['read_at'] == null) Container(width: 9, height: 9, margin: const EdgeInsets.only(top: 6), decoration: const BoxDecoration(color: Tokens.terracotta, shape: BoxShape.circle)),
+                            if (n['read_at'] == null) Container(width: 9, height: 9, margin: const EdgeInsets.only(top: 6), decoration: const BoxDecoration(color: Tokens.primary, shape: BoxShape.circle)),
                           ]),
                         ),
                       ),

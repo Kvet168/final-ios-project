@@ -118,9 +118,9 @@ class _WImageState extends State<WImage> {
         height: widget.height,
         width: widget.width,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xFFE9DFC8), Color(0xFFD3DFD2)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(colors: [Tokens.neutralTint, Tokens.border], begin: Alignment.topLeft, end: Alignment.bottomRight),
         ),
-        child: Center(child: Icon(widget.fallbackIcon, color: Tokens.forest.withValues(alpha: 0.4), size: 34)),
+        child: Center(child: Icon(widget.fallbackIcon, color: Tokens.primary.withValues(alpha: 0.4), size: 34)),
       );
 
   @override
@@ -136,7 +136,7 @@ class _WImageState extends State<WImage> {
     if (sync) return child;
     final reduce = MediaQuery.of(context).disableAnimations;
     return Stack(fit: StackFit.passthrough, children: [
-      Container(height: widget.height, width: widget.width, color: Tokens.sand),
+      Container(height: widget.height, width: widget.width, color: Tokens.neutralTint),
       AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: reduce ? Duration.zero : const Duration(milliseconds: 260), child: child),
     ]);
   }
@@ -211,8 +211,8 @@ class Scrim extends StatelessWidget {
                 colors: [
                   top ? Colors.black.withValues(alpha: 0.38) : Colors.transparent,
                   Colors.transparent,
-                  if (bottom) const Color(0xFF0B1511).withValues(alpha: 0.12),
-                  if (bottom) const Color(0xFF0B1511).withValues(alpha: strength),
+                  if (bottom) Tokens.charcoal.withValues(alpha: 0.12),
+                  if (bottom) Tokens.charcoal.withValues(alpha: strength),
                 ],
                 stops: bottom ? const [0, 0.35, 0.55, 1] : const [0, 1, 1, 1],
               ),
@@ -230,7 +230,7 @@ class SkeletonBox extends StatelessWidget {
   final double? width;
   final double radius;
   @override
-  Widget build(BuildContext context) => Shimmer(child: Container(height: height, width: width, decoration: BoxDecoration(color: Tokens.sand, borderRadius: BorderRadius.circular(radius))));
+  Widget build(BuildContext context) => Shimmer(child: Container(height: height, width: width, decoration: BoxDecoration(color: Tokens.tint, borderRadius: BorderRadius.circular(radius))));
 }
 
 class SkeletonList extends StatelessWidget {
@@ -263,8 +263,8 @@ class ErrorState extends StatelessWidget {
             Container(
               width: 76,
               height: 76,
-              decoration: BoxDecoration(color: Tokens.terracotta.withValues(alpha: .12), shape: BoxShape.circle),
-              child: Icon(network ? Icons.wifi_off_rounded : Icons.error_outline_rounded, size: 34, color: Tokens.terracotta),
+              decoration: BoxDecoration(color: Tokens.warning.withValues(alpha: .10), shape: BoxShape.circle),
+              child: Icon(network ? Icons.wifi_off_rounded : Icons.error_outline_rounded, size: 34, color: Tokens.warning),
             ),
             const SizedBox(height: 18),
             Text(network ? 'No connection' : "That didn't load", style: Type.display(24), textAlign: TextAlign.center),
@@ -298,8 +298,8 @@ class EmptyState extends StatelessWidget {
               Container(
                 width: 84,
                 height: 84,
-                decoration: BoxDecoration(gradient: LinearGradient(colors: [Tokens.mint, Tokens.sand], begin: Alignment.topLeft, end: Alignment.bottomRight), shape: BoxShape.circle),
-                child: Icon(icon, size: 36, color: Tokens.forest),
+                decoration: const BoxDecoration(color: Tokens.tint, shape: BoxShape.circle),
+                child: Icon(icon, size: 36, color: Tokens.primary),
               ),
               const SizedBox(height: 18),
               Text(title, style: Type.display(23), textAlign: TextAlign.center),
@@ -341,27 +341,32 @@ class DemoBadge extends StatelessWidget {
         message: 'Educational sample data: not a real commercial offer',
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(color: onImage ? const Color(0xCC14342C) : Tokens.gold.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(8)),
-          child: Text(text, style: Type.body(10.5, weight: FontWeight.w700, color: onImage ? Tokens.gold : const Color(0xFF7A5517))),
+          decoration: BoxDecoration(color: onImage ? const Color(0xCC292B2E) : Tokens.promo, borderRadius: BorderRadius.circular(8)),
+          child: Text(text, style: Type.body(10.5, weight: FontWeight.w700, color: onImage ? Tokens.onDarkAccent : Tokens.warning)),
         ),
       );
 }
 
 class Pill extends StatelessWidget {
-  const Pill(this.text, {super.key, this.color = Tokens.forest, this.icon, this.solid = false});
+  const Pill(this.text, {super.key, this.color = Tokens.primary, this.icon, this.solid = false});
   final String text;
   final Color color;
   final IconData? icon;
   final bool solid;
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(color: solid ? color : color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 14, color: solid ? Colors.white : color), const SizedBox(width: 4)],
-          Flexible(child: Text(text, style: Type.body(12, weight: FontWeight.w700, color: solid ? Colors.white : color), overflow: TextOverflow.ellipsis)),
-        ]),
-      );
+  Widget build(BuildContext context) {
+    // Coral text on tinted pills uses the deeper coral for contrast; solid coral pills use the deeper coral fill with white text.
+    final isAccent = color == Tokens.accent;
+    final fg = solid ? Colors.white : (isAccent ? Tokens.primaryText : color);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: solid ? (isAccent ? Tokens.primaryText : color) : color.withValues(alpha: 0.09), borderRadius: BorderRadius.circular(999)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        if (icon != null) ...[Icon(icon, size: 14, color: fg), const SizedBox(width: 4)],
+        Flexible(child: Text(text, style: Type.body(12, weight: FontWeight.w700, color: fg), overflow: TextOverflow.ellipsis)),
+      ]),
+    );
+  }
 }
 
 class RatingBadge extends StatelessWidget {
@@ -371,12 +376,12 @@ class RatingBadge extends StatelessWidget {
   final bool light;
   @override
   Widget build(BuildContext context) {
-    if (count == 0) return Text('New', style: Type.body(12, color: light ? Colors.white70 : Tokens.inkMuted, weight: FontWeight.w700));
+    if (count == 0) return Text('New', style: Type.body(12, color: light ? Tokens.onDarkMuted : Tokens.inkMuted, weight: FontWeight.w700));
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.star_rounded, size: 17, color: Tokens.gold),
+      const Icon(Icons.star_rounded, size: 17, color: Tokens.star),
       const SizedBox(width: 3),
       Text(rating.toStringAsFixed(1), style: Type.body(13.5, weight: FontWeight.w800, color: light ? Colors.white : Tokens.ink)),
-      Text('  ($count)', style: Type.body(12, color: light ? Colors.white70 : Tokens.inkMuted)),
+      Text('  ($count)', style: Type.body(12, color: light ? Tokens.onDarkMuted : Tokens.inkMuted)),
     ]);
   }
 }
@@ -388,7 +393,7 @@ class StarRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         label: '$stars star property',
-        child: Row(mainAxisSize: MainAxisSize.min, children: [for (var i = 0; i < stars; i++) Icon(Icons.star_rounded, size: size, color: Tokens.gold)]),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [for (var i = 0; i < stars; i++) Icon(Icons.star_rounded, size: size, color: Tokens.star)]),
       );
 }
 
@@ -399,17 +404,17 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, color, icon) = switch (status) {
       'CONFIRMED' => ('Confirmed', Tokens.success, Icons.check_circle_outline),
-      'PENDING_CONFIRMATION' => ('Awaiting payment', Tokens.terracotta, Icons.hourglass_bottom_rounded),
-      'CHECKED_IN' => ('Checked in', Tokens.forest, Icons.login_rounded),
-      'COMPLETED' => ('Completed', Tokens.forest, Icons.task_alt_rounded),
+      'PENDING_CONFIRMATION' => ('Awaiting payment', Tokens.warning, Icons.hourglass_bottom_rounded),
+      'CHECKED_IN' => ('Checked in', Tokens.primary, Icons.login_rounded),
+      'COMPLETED' => ('Completed', Tokens.primary, Icons.task_alt_rounded),
       'CANCELLED' => ('Cancelled', Tokens.danger, Icons.cancel_outlined),
       'EXPIRED' => ('Expired', Tokens.inkMuted, Icons.timer_off_outlined),
-      'REFUND_PENDING' => ('Refund pending', Tokens.terracotta, Icons.undo_rounded),
+      'REFUND_PENDING' => ('Refund pending', Tokens.warning, Icons.undo_rounded),
       'REFUNDED' => ('Refunded', Tokens.inkMuted, Icons.undo_rounded),
       'DRAFT' => ('Draft', Tokens.inkMuted, Icons.edit_outlined),
       'SUCCESS' => ('Paid (simulated)', Tokens.success, Icons.check_circle_outline),
       'FAILED' => ('Payment failed', Tokens.danger, Icons.error_outline),
-      'PENDING' => ('Payment pending', Tokens.terracotta, Icons.hourglass_bottom_rounded),
+      'PENDING' => ('Payment pending', Tokens.warning, Icons.hourglass_bottom_rounded),
       _ => (status, Tokens.inkMuted, Icons.info_outline),
     };
     return Pill(label, color: color, icon: icon);

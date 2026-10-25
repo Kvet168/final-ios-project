@@ -96,7 +96,7 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
     Widget policy(IconData i, String title, String body) => Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(width: 40, height: 40, decoration: BoxDecoration(color: Tokens.mint, borderRadius: BorderRadius.circular(13)), child: Icon(i, size: 20, color: Tokens.forest)),
+            Container(width: 40, height: 40, decoration: BoxDecoration(color: Tokens.tint, borderRadius: BorderRadius.circular(13)), child: Icon(i, size: 20, color: Tokens.primary)),
             const SizedBox(width: 14),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: Type.body(14, weight: FontWeight.w800)), const SizedBox(height: 2), Text(body, style: Type.body(13.5, color: Tokens.inkSoft, height: 1.5))])),
           ]),
@@ -112,7 +112,7 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
           expandedHeight: 360,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           automaticallyImplyLeading: false,
-          backgroundColor: Tokens.forestDeep,
+          backgroundColor: Tokens.charcoal,
           surfaceTintColor: Colors.transparent,
           toolbarHeight: 64,
           leading: Padding(padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8), child: GlassIconButton(icon: Icons.arrow_back_rounded, tooltip: 'Back', onTap: () => context.canPop() ? context.pop() : context.go('/stays'))),
@@ -143,7 +143,7 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
           ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(28),
-            child: Container(height: 28, decoration: const BoxDecoration(color: Tokens.ivory, borderRadius: BorderRadius.vertical(top: Radius.circular(32)))),
+            child: Container(height: 28, decoration: const BoxDecoration(color: Tokens.pageBg, borderRadius: BorderRadius.vertical(top: Radius.circular(32)))),
           ),
         ),
         SliverToBoxAdapter(
@@ -170,7 +170,7 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
               if (a['data_notice'] != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 14),
-                  child: Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Tokens.gold.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(16)), child: Text(a['data_notice'] as String, style: Type.body(12.5, height: 1.5))),
+                  child: Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Tokens.promo, borderRadius: BorderRadius.circular(16)), child: Text(a['data_notice'] as String, style: Type.body(12.5, height: 1.5))),
                 ),
               if (a['image_credit'] != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(a['image_credit'] as String, style: Type.body(10.5, color: Tokens.inkMuted))),
               const SizedBox(height: 18),
@@ -180,8 +180,8 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
                 for (final m in amenities)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(16), border: Border.all(color: Tokens.border)),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(amenityIcon(m['code'] as String), size: 18, color: Tokens.forest), const SizedBox(width: 8), Text(m['label'] as String, style: Type.body(13, weight: FontWeight.w600))]),
+                    decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: Tokens.border)),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(amenityIcon(m['code'] as String), size: 18, color: Tokens.primary), const SizedBox(width: 8), Text(m['label'] as String, style: Type.body(13, weight: FontWeight.w600))]),
                   ),
               ]),
               const SectionHeader('Good to know'),
@@ -273,12 +273,12 @@ class _DateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
         child: Column(children: [
           Pressable(
             onTap: onDates,
             child: Row(children: [
-              Container(width: 44, height: 44, decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .1), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.calendar_month_rounded, color: Tokens.forest)),
+              Container(width: 44, height: 44, decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: .1), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.calendar_month_rounded, color: Tokens.primary)),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -291,7 +291,7 @@ class _DateCard extends StatelessWidget {
           ),
           const Divider(height: 28),
           Row(children: [
-            Container(width: 44, height: 44, decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .1), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.people_alt_rounded, color: Tokens.forest)),
+            Container(width: 44, height: 44, decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: .1), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.people_alt_rounded, color: Tokens.primary)),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -330,10 +330,10 @@ class _RoomCard extends StatelessWidget {
     } else {
       action = FilledButton.icon(onPressed: onReserve, icon: const Icon(Icons.lock_outline_rounded, size: 18), label: const Text('Reserve'), style: FilledButton.styleFrom(minimumSize: const Size(140, 50)));
     }
-    Widget meta(IconData i, String t) => Row(mainAxisSize: MainAxisSize.min, children: [Icon(i, size: 16, color: Tokens.jade), const SizedBox(width: 5), Text(t, style: Type.body(12.5, color: Tokens.inkSoft, weight: FontWeight.w600))]);
+    Widget meta(IconData i, String t) => Row(mainAxisSize: MainAxisSize.min, children: [Icon(i, size: 16, color: Tokens.primary), const SizedBox(width: 5), Text(t, style: Type.body(12.5, color: Tokens.inkSoft, weight: FontWeight.w600))]);
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
+      decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Tokens.border), boxShadow: Tokens.softShadow(0.06)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(child: Text(room['name'] as String, style: Type.display(22, height: 1.1))),
@@ -391,13 +391,13 @@ class _Reviews extends ConsumerWidget {
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
+                decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    CircleAvatar(radius: 18, backgroundColor: Tokens.mint, child: Text(((v['author'] as String?) ?? '?').substring(0, 1), style: Type.body(15, weight: FontWeight.w800, color: Tokens.forest))),
+                    CircleAvatar(radius: 18, backgroundColor: Tokens.tint, child: Text(((v['author'] as String?) ?? '?').substring(0, 1), style: Type.body(15, weight: FontWeight.w800, color: Tokens.primaryText))),
                     const SizedBox(width: 12),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('${v['author']}', style: Type.body(14, weight: FontWeight.w800)), Text(fmtDate(v['created_at'] as String?, pattern: 'MMM y'), style: Type.body(11.5, color: Tokens.inkMuted))])),
-                    Row(children: [for (var i = 0; i < (v['rating'] as int); i++) const Icon(Icons.star_rounded, size: 16, color: Tokens.gold)]),
+                    Row(children: [for (var i = 0; i < (v['rating'] as int); i++) const Icon(Icons.star_rounded, size: 16, color: Tokens.star)]),
                   ]),
                   const SizedBox(height: 12),
                   Text(v['title'] as String, style: Type.body(15, weight: FontWeight.w800)),
@@ -427,7 +427,7 @@ class _Reviews extends ConsumerWidget {
           child: Form(
             key: formKey,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(children: [for (var i = 1; i <= 5; i++) IconButton(tooltip: '$i star${i > 1 ? 's' : ''}', onPressed: () => set(() => rating = i), icon: Icon(i <= rating ? Icons.star_rounded : Icons.star_border_rounded, color: Tokens.gold))]),
+              Row(children: [for (var i = 1; i <= 5; i++) IconButton(tooltip: '$i star${i > 1 ? 's' : ''}', onPressed: () => set(() => rating = i), icon: Icon(i <= rating ? Icons.star_rounded : Icons.star_border_rounded, color: Tokens.star))]),
               TextFormField(controller: title, decoration: const InputDecoration(labelText: 'Title'), validator: (v) => (v ?? '').trim().length < 3 ? 'Add a short title' : null),
               const SizedBox(height: 12),
               TextFormField(controller: body, decoration: const InputDecoration(labelText: 'Your experience'), maxLines: 4, validator: (v) => (v ?? '').trim().length < 10 ? 'Please write at least 10 characters' : null),

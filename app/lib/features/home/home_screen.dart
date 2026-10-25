@@ -32,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
     final name = auth.signedIn ? (auth.user!['name'] as String).split(' ').first : null;
 
     return RefreshIndicator(
-      color: Tokens.forest,
+      color: Tokens.primary,
       edgeOffset: MediaQuery.paddingOf(context).top + 8,
       onRefresh: () async {
         ref.invalidate(homeProvider);
@@ -117,20 +117,20 @@ class _HeroState extends ConsumerState<_Hero> {
                 left: 20,
                 right: 20,
                 child: Row(children: [
-                  const Icon(Icons.explore_rounded, color: Tokens.gold, size: 26),
+                  const Icon(Icons.explore_rounded, color: Tokens.onDarkAccent, size: 26),
                   const SizedBox(width: 8),
                   Text('WAYFARER', style: Type.display(17, color: Colors.white, spacing: 3.2, weight: FontWeight.w600)),
                   const Spacer(),
                   if (widget.signedIn)
                     Stack(clipBehavior: Clip.none, children: [
                       GlassIconButton(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', onTap: () => context.push('/notifications')),
-                      if (unread > 0) Positioned(right: 0, top: 0, child: Container(padding: const EdgeInsets.all(5), decoration: const BoxDecoration(color: Tokens.terracotta, shape: BoxShape.circle), child: Text('$unread', style: Type.body(10, color: Colors.white, weight: FontWeight.w800)))),
+                      if (unread > 0) Positioned(right: 0, top: 0, child: Container(padding: const EdgeInsets.all(5), decoration: const BoxDecoration(color: Tokens.primaryText, shape: BoxShape.circle), child: Text('$unread', style: Type.body(10, color: Colors.white, weight: FontWeight.w800)))),
                     ])
                   else
                     Pressable(
                       onTap: () => context.push('/login'),
                       radius: 99,
-                      child: Glass(radius: 99, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), tint: const Color(0x40101A16), child: Text('Sign in', style: Type.body(13, color: Colors.white, weight: FontWeight.w700))),
+                      child: Glass(radius: 99, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), tint: const Color(0x400F172A), child: Text('Sign in', style: Type.body(13, color: Colors.white, weight: FontWeight.w700))),
                     ),
                 ]),
               ),
@@ -140,21 +140,21 @@ class _HeroState extends ConsumerState<_Hero> {
                 bottom: 78,
                 child: Reveal(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.name != null ? '${_greeting()}, ${widget.name}'.toUpperCase() : _greeting().toUpperCase(), style: Type.label(11.5, color: Tokens.gold)),
+                    Text(widget.name != null ? '${_greeting()}, ${widget.name}'.toUpperCase() : _greeting().toUpperCase(), style: Type.label(11.5, color: Tokens.onDarkAccent)),
                     const SizedBox(height: 12),
                     Text('Where will you', style: Type.display(42, color: Colors.white, height: 1.0)),
-                    Text('wander next?', style: Type.display(42, color: Tokens.gold, height: 1.05, italic: true, weight: FontWeight.w500)),
+                    Text('wander next?', style: Type.display(42, color: Tokens.onDarkAccent, height: 1.05, italic: true, weight: FontWeight.w500)),
                     const SizedBox(height: 14),
                     if (current != null)
                       Pressable(
                         onTap: () => context.push('/destinations/${current['slug']}'),
                         radius: 99,
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          const Icon(Icons.place_rounded, size: 16, color: Colors.white70),
+                          const Icon(Icons.place_rounded, size: 16, color: Tokens.onDarkMuted),
                           const SizedBox(width: 4),
                           Text('${current['name']}, ${current['country']}', style: Type.body(13.5, color: Colors.white, weight: FontWeight.w700)),
                           const SizedBox(width: 4),
-                          const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white70),
+                          const Icon(Icons.arrow_forward_rounded, size: 15, color: Tokens.onDarkMuted),
                         ]),
                       ),
                   ]),
@@ -171,7 +171,7 @@ class _HeroState extends ConsumerState<_Hero> {
                         margin: const EdgeInsets.only(left: 4),
                         width: i == _i % f.length ? 20 : 6,
                         height: 6,
-                        decoration: BoxDecoration(color: i == _i % f.length ? Tokens.gold : Colors.white54, borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: i == _i % f.length ? Tokens.onDarkAccent : Colors.white54, borderRadius: BorderRadius.circular(6)),
                       ),
                   ]),
                 ),
@@ -190,9 +190,9 @@ class _HeroState extends ConsumerState<_Hero> {
             child: Container(
               height: 68,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(24), boxShadow: Tokens.softShadow(0.18)),
+              decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(24), boxShadow: Tokens.softShadow(0.18)),
               child: Row(children: [
-                Container(width: 40, height: 40, decoration: BoxDecoration(color: Tokens.forest.withValues(alpha: .1), shape: BoxShape.circle), child: const Icon(Icons.search_rounded, color: Tokens.forest)),
+                Container(width: 40, height: 40, decoration: BoxDecoration(color: Tokens.primary.withValues(alpha: .1), shape: BoxShape.circle), child: const Icon(Icons.search_rounded, color: Tokens.primary)),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -299,11 +299,11 @@ class _Body extends ConsumerWidget {
 class _QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final items = <(IconData, String, String, VoidCallback, List<Color>)>[
-      (Icons.auto_awesome_rounded, 'AI planner', 'Day-by-day', () => context.push('/trips/new'), [const Color(0xFFF0B85A), Tokens.terracotta]),
-      (Icons.chat_bubble_rounded, 'Ask guide', 'Instant answers', () => context.push('/assistant'), [Tokens.jade, Tokens.forest]),
-      (Icons.map_rounded, 'Map', 'Near you', () => context.push('/map'), [const Color(0xFF5E8FA8), const Color(0xFF2F5870)]),
-      (Icons.attractions_rounded, 'Places', 'Things to do', () => context.push('/places'), [const Color(0xFFD9788A), const Color(0xFF9B4458)]),
+    final items = <(IconData, String, String, VoidCallback)>[
+      (Icons.auto_awesome_rounded, 'AI planner', 'Day-by-day', () => context.push('/trips/new')),
+      (Icons.chat_bubble_rounded, 'Ask guide', 'Instant answers', () => context.push('/assistant')),
+      (Icons.map_rounded, 'Map', 'Near you', () => context.push('/map')),
+      (Icons.attractions_rounded, 'Places', 'Things to do', () => context.push('/places')),
     ];
     return SizedBox(
       height: 118,
@@ -313,7 +313,7 @@ class _QuickActions extends StatelessWidget {
         itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
-          final (icon, title, sub, onTap, colors) = items[i];
+          final (icon, title, sub, onTap) = items[i];
           return Reveal(
             delay: Duration(milliseconds: 80 * i),
             child: Pressable(
@@ -321,12 +321,17 @@ class _QuickActions extends StatelessWidget {
               child: Container(
                 width: 132,
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(gradient: LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(22), boxShadow: [BoxShadow(color: colors.last.withValues(alpha: .3), blurRadius: 16, offset: const Offset(0, 8))]),
+                decoration: BoxDecoration(
+                  color: Tokens.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: Tokens.border),
+                  boxShadow: Tokens.softShadow(0.08),
+                ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(width: 34, height: 34, decoration: const BoxDecoration(color: Color(0x33FFFFFF), shape: BoxShape.circle), child: Icon(icon, color: Colors.white, size: 19)),
+                  Container(width: 34, height: 34, decoration: const BoxDecoration(color: Tokens.tint, shape: BoxShape.circle), child: Icon(icon, color: Tokens.primary, size: 19)),
                   const Spacer(),
-                  Text(title, style: Type.body(14.5, color: Colors.white, weight: FontWeight.w800)),
-                  Text(sub, style: Type.body(11.5, color: Colors.white70)),
+                  Text(title, style: Type.body(14.5, color: Tokens.ink, weight: FontWeight.w800)),
+                  Text(sub, style: Type.body(11.5, color: Tokens.inkMuted)),
                 ]),
               ),
             ),
@@ -345,7 +350,7 @@ class _Stats extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget stat(num v, String l) => Expanded(
           child: Column(children: [
-            CountUp(value: v.toDouble(), builder: (x) => Text('${x.round()}', style: Type.display(28, color: Tokens.forest))),
+            CountUp(value: v.toDouble(), builder: (x) => Text('${x.round()}', style: Type.display(28, color: Tokens.primaryText))),
             const SizedBox(height: 2),
             Text(l.toUpperCase(), style: Type.label(10)),
           ]),
@@ -354,7 +359,7 @@ class _Stats extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
         child: Row(children: [
           stat(counts['destinations'] as num, 'Destinations'),
           Container(width: 1, height: 34, color: Tokens.border),
@@ -421,17 +426,17 @@ class _TripCard extends StatelessWidget {
             child: Stack(fit: StackFit.expand, children: [
               WImage(trip['cover_image'] as String?, width: double.infinity, height: double.infinity),
               const Scrim(top: true, strength: 0.9),
-              Positioned(left: 14, top: 14, child: Pill('${trip['num_days']} DAY${trip['num_days'] == 1 ? '' : 'S'}', color: Tokens.gold, solid: true, icon: Icons.route_rounded)),
+              Positioned(left: 14, top: 14, child: Pill('${trip['num_days']} DAY${trip['num_days'] == 1 ? '' : 'S'}', color: Tokens.accent, solid: true, icon: Icons.route_rounded)),
               Positioned(
                 left: 16,
                 right: 16,
                 bottom: 16,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${trip['destination_name']}'.toUpperCase(), style: Type.label(10.5, color: Colors.white70)),
+                  Text('${trip['destination_name']}'.toUpperCase(), style: Type.label(10.5, color: Tokens.onDarkMuted)),
                   const SizedBox(height: 4),
                   Text(trip['title'] as String, style: Type.display(19, color: Colors.white, height: 1.12), maxLines: 3, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
-                  Text('Est. ${money(trip['est_total_usd'] as num)}', style: Type.body(12.5, color: Tokens.gold, weight: FontWeight.w800)),
+                  Text('Est. ${money(trip['est_total_usd'] as num)}', style: Type.body(12.5, color: Tokens.onDarkAccent, weight: FontWeight.w800)),
                 ]),
               ),
             ]),
@@ -450,9 +455,9 @@ class _TrendRow extends StatelessWidget {
         onTap: () => context.push('/destinations/${d['slug']}'),
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
-          decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
+          decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Tokens.border)),
           child: Row(children: [
-            SizedBox(width: 38, child: Text('$rank', style: Type.display(34, color: rank <= 3 ? Tokens.terracotta : Tokens.sandDeep, italic: true))),
+            SizedBox(width: 38, child: Text('$rank', style: Type.display(34, color: rank <= 3 ? Tokens.primary : Tokens.border, italic: true))),
             const SizedBox(width: 8),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -473,7 +478,7 @@ class _Honesty extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: Tokens.sand, borderRadius: BorderRadius.circular(22)),
+        decoration: BoxDecoration(color: Tokens.tint, borderRadius: BorderRadius.circular(22)),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Icon(Icons.info_outline_rounded, size: 20, color: Tokens.inkMuted),
           const SizedBox(width: 12),

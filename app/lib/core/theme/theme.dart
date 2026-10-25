@@ -2,39 +2,73 @@ import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// WAYFARER design tokens. The palette is taken from the places the app is about:
-/// jungle forest, Angkor sandstone paper, temple gold and Mekong-dusk terracotta.
+/// WAYFARER design tokens, following the Holafly look: warm coral for brand highlights and active states, mint green for
+/// primary call-to-action buttons (always with dark text), charcoal text and soft grey-white surfaces.
+/// Semantic colours (danger, warning, success) stay separate from the brand palette and are always paired with text or an icon.
 class Tokens {
-  static const ivory = Color(0xFFFAF5EA);
-  static const paper = Color(0xFFFFFFFF);
-  static const sand = Color(0xFFF2EADA);
-  static const sandDeep = Color(0xFFE7DBC3);
-  static const ink = Color(0xFF17211D);
-  static const inkSoft = Color(0xFF3A4540);
-  static const inkMuted = Color(0xFF6B746E);
-  static const border = Color(0xFFE8DFCB);
-  static const forest = Color(0xFF1F4A3F);
-  static const forestDeep = Color(0xFF14342C);
-  static const jade = Color(0xFF3E8F7A);
-  static const mint = Color(0xFFD8E8DE);
-  static const terracotta = Color(0xFFC4633A);
-  static const gold = Color(0xFFE2A64C);
-  static const amber = Color(0xFFE2A64C);
-  static const lotus = Color(0xFFD9788A);
-  static const danger = Color(0xFFB3382C);
-  static const success = Color(0xFF2E7D4F);
+  // Brand
+  /// Coral: fills, icons, selected states and large text.
+  static const primary = Color(0xFFE6485C);
+  /// Deeper coral for small coral text and pressed states (4.5:1 or better on white, page and tint backgrounds).
+  static const primaryText = Color(0xFFC7364B);
+  static const primaryPressed = Color(0xFFC7364B);
+  /// Brand highlight colour (AI button, hero highlights). Same coral as [primary].
+  static const accent = primary;
+  static const accentDeep = Color(0xFFC7364B);
+  static const onAccent = Color(0xFFFFFFFF);
+  /// Lighter coral for small labels and highlighted words on charcoal bands and photo scrims.
+  static const onDarkAccent = Color(0xFFFF8896);
+
+  // Primary call-to-action: mint with dark text
+  static const cta = Color(0xFF48EC86);
+  static const ctaHover = Color(0xFF32A45E);
+  static const ctaPressed = Color(0xFF206B43);
+  static const onCta = Color(0xFF292B2E);
+
+  // Surfaces and text
+  static const pageBg = Color(0xFFF8F8FB);
+  static const surface = Color(0xFFFFFFFF);
+  /// Pale coral wash for icon circles, selected pills and quiet highlights.
+  static const tint = Color(0xFFFFEEF0);
+  /// Neutral fill for skeletons, placeholders and tracks.
+  static const neutralTint = Color(0xFFEFF0F4);
+  static const border = Color(0xFFE4E6EA);
+  static const ink = Color(0xFF292B2E);
+  static const inkSoft = Color(0xFF3E4044);
+  static const inkMuted = Color(0xFF56575A);
+  /// Charcoal used for dark bands, overlays, scrims and shadows.
+  static const charcoal = Color(0xFF292B2E);
+  /// Disabled controls.
+  static const disabledFill = Color(0xFFE4E6EA);
+  static const disabledInk = Color(0xFF8A8D93);
+  /// Secondary chart colour (Holafly link blue).
+  static const sky = Color(0xFF327DF0);
+  /// Rating stars.
+  static const star = Color(0xFFF5A524);
+  /// Soft amber wash for promos and notices (pair with [warning] text).
+  static const promo = Color(0xFFFFEAC0);
+  /// Secondary text on charcoal bands and scrims.
+  static const onDarkMuted = Color(0xFFD9DCE2);
+
+  // Semantic
+  static const danger = Color(0xFF841C05);
+  static const warning = Color(0xFF835617);
+  static const success = Color(0xFF206B43);
+  /// Favourite hearts.
+  static const heart = primary;
 
   static const s1 = 4.0, s2 = 8.0, s3 = 12.0, s4 = 16.0, s5 = 24.0, s6 = 32.0, s7 = 48.0;
   static const radius = 20.0;
   static const radiusLg = 28.0;
   static const maxContent = 720.0;
 
-  static const dusk = LinearGradient(colors: [Color(0xFF1F4A3F), Color(0xFF14342C)], begin: Alignment.topLeft, end: Alignment.bottomRight);
-  static const sunrise = LinearGradient(colors: [Color(0xFFE2A64C), Color(0xFFC4633A)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+  /// Charcoal header/hero fill behind photos and on header bands. White text and light-coral labels keep 4.5:1 on it.
+  static const dusk = LinearGradient(colors: [Color(0xFF34373B), Color(0xFF292B2E)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+  static const sunrise = LinearGradient(colors: [Color(0xFFE6485C), Color(0xFFC7364B)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
   static List<BoxShadow> softShadow([double a = 0.10]) => [
-        BoxShadow(color: forestDeep.withValues(alpha: a), blurRadius: 28, offset: const Offset(0, 12)),
-        BoxShadow(color: forestDeep.withValues(alpha: a * 0.5), blurRadius: 6, offset: const Offset(0, 2)),
+        BoxShadow(color: charcoal.withValues(alpha: a), blurRadius: 28, offset: const Offset(0, 12)),
+        BoxShadow(color: charcoal.withValues(alpha: a * 0.5), blurRadius: 6, offset: const Offset(0, 2)),
       ];
 }
 
@@ -73,18 +107,21 @@ class Type {
 
 class WayfarerTheme {
   static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(seedColor: Tokens.forest, brightness: Brightness.light).copyWith(
-      primary: Tokens.forest,
+    final scheme = ColorScheme.fromSeed(seedColor: Tokens.primary, brightness: Brightness.light).copyWith(
+      primary: Tokens.primary,
       onPrimary: Colors.white,
-      secondary: Tokens.terracotta,
-      onSecondary: Colors.white,
-      surface: Tokens.paper,
+      primaryContainer: Tokens.tint,
+      onPrimaryContainer: Tokens.primaryText,
+      secondary: Tokens.cta,
+      onSecondary: Tokens.onCta,
+      surface: Tokens.surface,
       onSurface: Tokens.ink,
       error: Tokens.danger,
       outline: Tokens.border,
-      surfaceContainerHighest: Tokens.sand,
+      surfaceContainerHighest: Tokens.neutralTint,
+      surfaceTint: Colors.transparent,
     );
-    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.ivory, fontFamily: 'Inter', fontFamilyFallback: const ['KantumruyPro']);
+    final base = ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: Tokens.pageBg, fontFamily: 'Inter', fontFamilyFallback: const ['KantumruyPro']);
     final text = base.textTheme.copyWith(
       displayLarge: Type.display(48),
       displayMedium: Type.display(40),
@@ -102,7 +139,7 @@ class WayfarerTheme {
       labelMedium: Type.body(12, weight: FontWeight.w600),
       labelSmall: Type.body(11, weight: FontWeight.w600),
     );
-    OutlineInputBorder ob(Color c, [double w = 1]) => OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: c, width: w));
+    OutlineInputBorder ob(Color c, [double w = 1]) => OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: c, width: w));
     return base.copyWith(
       textTheme: text,
       splashFactory: InkSparkle.splashFactory,
@@ -116,7 +153,8 @@ class WayfarerTheme {
         titleTextStyle: Type.display(22),
       ),
       cardTheme: CardThemeData(
-        color: Tokens.paper,
+        color: Tokens.surface,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tokens.radius), side: const BorderSide(color: Tokens.border)),
@@ -124,56 +162,100 @@ class WayfarerTheme {
       dividerTheme: const DividerThemeData(color: Tokens.border, space: 1, thickness: 1),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Tokens.paper,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        hintStyle: Type.body(15, color: Tokens.inkMuted),
-        labelStyle: Type.body(15, color: Tokens.inkMuted),
+        fillColor: Tokens.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+        hintStyle: Type.body(16, color: Tokens.inkMuted),
+        labelStyle: Type.body(16, color: Tokens.inkMuted),
+        prefixIconColor: Tokens.inkMuted,
+        suffixIconColor: Tokens.inkMuted,
         border: ob(Tokens.border),
         enabledBorder: ob(Tokens.border),
-        focusedBorder: ob(Tokens.forest, 1.6),
+        focusedBorder: ob(Tokens.primary, 1.6),
         errorBorder: ob(Tokens.danger),
         focusedErrorBorder: ob(Tokens.danger, 1.6),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(48, 54),
-          backgroundColor: Tokens.forest,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          minimumSize: const Size(48, 58),
+          foregroundColor: Tokens.onCta,
+          backgroundColor: Tokens.cta,
+          disabledBackgroundColor: Tokens.disabledFill,
+          disabledForegroundColor: Tokens.disabledInk,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: Type.body(15, weight: FontWeight.w700, spacing: 0.2),
+        ).copyWith(
+          backgroundColor: WidgetStateProperty.resolveWith((s) {
+            if (s.contains(WidgetState.disabled)) return Tokens.disabledFill;
+            if (s.contains(WidgetState.pressed)) return Tokens.ctaPressed;
+            if (s.contains(WidgetState.hovered)) return Tokens.ctaHover;
+            return Tokens.cta;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((s) {
+            if (s.contains(WidgetState.disabled)) return Tokens.disabledInk;
+            return s.contains(WidgetState.pressed) ? Colors.white : Tokens.onCta;
+          }),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size(48, 54),
+          minimumSize: const Size(48, 58),
           foregroundColor: Tokens.ink,
+          disabledForegroundColor: Tokens.disabledInk,
           side: const BorderSide(color: Tokens.border, width: 1.4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: Type.body(15, weight: FontWeight.w700),
+        ).copyWith(
+          side: WidgetStateProperty.resolveWith((s) {
+            if (s.contains(WidgetState.focused) || s.contains(WidgetState.pressed)) return const BorderSide(color: Tokens.primary, width: 1.6);
+            return const BorderSide(color: Tokens.border, width: 1.4);
+          }),
+          overlayColor: WidgetStateProperty.all(Tokens.primary.withValues(alpha: 0.08)),
         ),
       ),
-      textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: Tokens.forest, textStyle: Type.body(14, weight: FontWeight.w700))),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: Tokens.primaryText, disabledForegroundColor: Tokens.disabledInk, textStyle: Type.body(14, weight: FontWeight.w700))
+            .copyWith(overlayColor: WidgetStateProperty.all(Tokens.primary.withValues(alpha: 0.08))),
+      ),
+      iconTheme: const IconThemeData(color: Tokens.ink),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(color: Tokens.primary, linearTrackColor: Tokens.neutralTint, circularTrackColor: Tokens.neutralTint),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? Colors.white : Tokens.inkMuted),
+        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? Tokens.primary : Tokens.border),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? Tokens.primary : Colors.transparent),
+        checkColor: WidgetStateProperty.all(Colors.white),
+        side: const BorderSide(color: Tokens.inkMuted, width: 1.5),
+      ),
+      radioTheme: RadioThemeData(fillColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? Tokens.primary : Tokens.inkMuted)),
+      sliderTheme: SliderThemeData(activeTrackColor: Tokens.primary, inactiveTrackColor: Tokens.border, thumbColor: Tokens.primary, overlayColor: Tokens.primary.withValues(alpha: 0.12)),
+      textSelectionTheme: TextSelectionThemeData(cursorColor: Tokens.primary, selectionColor: Tokens.primary.withValues(alpha: 0.2), selectionHandleColor: Tokens.primary),
+      tabBarTheme: TabBarThemeData(labelColor: Tokens.primaryText, unselectedLabelColor: Tokens.inkMuted, indicatorColor: Tokens.primary, dividerColor: Tokens.border),
       chipTheme: base.chipTheme.copyWith(
-        backgroundColor: Tokens.paper,
-        selectedColor: Tokens.forest,
+        backgroundColor: Tokens.surface,
+        selectedColor: Tokens.charcoal,
+        checkmarkColor: Colors.white,
         side: const BorderSide(color: Tokens.border),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         labelStyle: Type.body(13, weight: FontWeight.w600),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Tokens.ivory,
+        backgroundColor: Tokens.pageBg,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(Tokens.radiusLg))),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: Tokens.ivory,
+        backgroundColor: Tokens.pageBg,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Tokens.radiusLg)),
         titleTextStyle: Type.display(22),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Tokens.forestDeep,
+        backgroundColor: Tokens.charcoal,
         contentTextStyle: Type.body(14, color: Colors.white, weight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),

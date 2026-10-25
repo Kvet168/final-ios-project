@@ -90,7 +90,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             radius: 99,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(color: Tokens.forest, borderRadius: BorderRadius.circular(99), boxShadow: Tokens.softShadow(0.25)),
+              decoration: BoxDecoration(color: Tokens.primaryText, borderRadius: BorderRadius.circular(99), boxShadow: Tokens.softShadow(0.25)),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 locating ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.my_location_rounded, size: 18, color: Colors.white),
                 const SizedBox(width: 8),
@@ -104,7 +104,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             left: 16,
             right: 16,
             top: top + 64,
-            child: Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(18), boxShadow: Tokens.softShadow(0.2)), child: Text(permissionMsg!, style: Type.body(13, color: Tokens.terracotta, height: 1.45))),
+            child: Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(18), boxShadow: Tokens.softShadow(0.2)), child: Text(permissionMsg!, style: Type.body(13, color: Tokens.warning, height: 1.45))),
           ),
         if (nearby != null)
           Positioned(
@@ -113,7 +113,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             bottom: 0,
             child: Container(
               padding: EdgeInsets.fromLTRB(16, 14, 16, 16 + MediaQuery.paddingOf(context).bottom),
-              decoration: const BoxDecoration(color: Tokens.ivory, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+              decoration: const BoxDecoration(color: Tokens.pageBg, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Stays near you', style: Type.display(22)),
                 const SizedBox(height: 10),
@@ -133,7 +133,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           child: Container(
                             width: 250,
                             padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
+                            decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
                             child: Row(children: [
                               WImage(s['cover_image'] as String?, width: 66, height: 66, radius: 14, fallbackIcon: Icons.bed_outlined),
                               const SizedBox(width: 10),

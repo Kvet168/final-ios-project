@@ -40,7 +40,7 @@ class _DestinationsScreenState extends ConsumerState<DestinationsScreen> {
         SliverAppBar(
           pinned: true,
           expandedHeight: 120,
-          backgroundColor: Tokens.ivory,
+          backgroundColor: Tokens.pageBg,
           surfaceTintColor: Colors.transparent,
           flexibleSpace: FlexibleSpaceBar(titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 14), title: Text('Destinations', style: Type.display(26))),
           actions: [
@@ -161,9 +161,9 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
     Widget fact(IconData icon, String title, String body) => Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
+          decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Tokens.border)),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(width: 42, height: 42, decoration: BoxDecoration(color: Tokens.mint, borderRadius: BorderRadius.circular(14)), child: Icon(icon, size: 22, color: Tokens.forest)),
+            Container(width: 42, height: 42, decoration: BoxDecoration(color: Tokens.tint, borderRadius: BorderRadius.circular(14)), child: Icon(icon, size: 22, color: Tokens.primary)),
             const SizedBox(width: 14),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: Type.body(14, weight: FontWeight.w800)), const SizedBox(height: 3), Text(body, style: Type.body(13.5, color: Tokens.inkSoft, height: 1.5))])),
           ]),
@@ -177,7 +177,7 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
           expandedHeight: 430,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           automaticallyImplyLeading: false,
-          backgroundColor: Tokens.forestDeep,
+          backgroundColor: Tokens.charcoal,
           surfaceTintColor: Colors.transparent,
           toolbarHeight: 64,
           leading: Padding(padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8), child: GlassIconButton(icon: Icons.arrow_back_rounded, tooltip: 'Back', onTap: () => context.canPop() ? context.pop() : context.go('/'))),
@@ -198,7 +198,7 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
                 bottom: 52,
                 child: IgnorePointer(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${d['region'] ?? ''}${d['region'] != null ? ' · ' : ''}${d['country']}'.toUpperCase(), style: Type.label(11, color: Tokens.gold)),
+                    Text('${d['region'] ?? ''}${d['region'] != null ? ' · ' : ''}${d['country']}'.toUpperCase(), style: Type.label(11, color: Tokens.onDarkAccent)),
                     const SizedBox(height: 8),
                     Text(d['name'] as String, style: Type.display(44, color: Colors.white, height: 1.0)),
                   ]),
@@ -208,13 +208,13 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
                 Positioned(
                   right: 24,
                   bottom: 62,
-                  child: Glass(radius: 99, padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5), tint: const Color(0x55101A16), child: Text('${_img + 1} / ${photos.length}', style: Type.body(12, color: Colors.white, weight: FontWeight.w700))),
+                  child: Glass(radius: 99, padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5), tint: const Color(0x550F172A), child: Text('${_img + 1} / ${photos.length}', style: Type.body(12, color: Colors.white, weight: FontWeight.w700))),
                 ),
             ]),
           ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(28),
-            child: Container(height: 28, decoration: const BoxDecoration(color: Tokens.ivory, borderRadius: BorderRadius.vertical(top: Radius.circular(32)))),
+            child: Container(height: 28, decoration: const BoxDecoration(color: Tokens.pageBg, borderRadius: BorderRadius.vertical(top: Radius.circular(32)))),
           ),
         ),
         SliverToBoxAdapter(
@@ -223,8 +223,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Wrap(spacing: 8, runSpacing: 8, children: [
                 Pill('~${money(d['daily_budget_usd'] as num)} / day', icon: Icons.payments_outlined),
-                if (d['best_period'] != null) Pill(((d['best_period'] as String).split(';').first.split('.').first), icon: Icons.wb_sunny_outlined, color: Tokens.terracotta),
-                Pill(d['currency'] as String, icon: Icons.currency_exchange_rounded, color: Tokens.jade),
+                if (d['best_period'] != null) Pill(((d['best_period'] as String).split(';').first.split('.').first), icon: Icons.wb_sunny_outlined, color: Tokens.primary),
+                Pill(d['currency'] as String, icon: Icons.currency_exchange_rounded, color: Tokens.primary),
               ]),
               const SizedBox(height: 18),
               AnimatedSize(
@@ -319,7 +319,7 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
                 separatorBuilder: (_, _) => const SizedBox(width: 14),
                 itemBuilder: (_, i) => Stack(children: [
                   DestinationCard(related[i], width: 210, aspect: 0.7, showSave: false),
-                  Positioned(right: 10, top: 10, child: Pill('${related[i]['distance_km']} km', icon: Icons.near_me_outlined, color: Tokens.gold, solid: true)),
+                  Positioned(right: 10, top: 10, child: Pill('${related[i]['distance_km']} km', icon: Icons.near_me_outlined, color: Tokens.accent, solid: true)),
                 ]),
               ),
             ),
@@ -338,12 +338,12 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
                       onTap: () => context.push('/assistant?q=${Uri.encodeComponent(g['title'] as String)}&destination=${d['slug']}'),
                       child: Container(
                         padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(color: Tokens.paper, borderRadius: BorderRadius.circular(18), border: Border.all(color: Tokens.border)),
+                        decoration: BoxDecoration(color: Tokens.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: Tokens.border)),
                         child: Row(children: [
-                          const Icon(Icons.menu_book_rounded, color: Tokens.terracotta),
+                          const Icon(Icons.menu_book_rounded, color: Tokens.primary),
                           const SizedBox(width: 12),
                           Expanded(child: Text(g['title'] as String, style: Type.body(14.5, weight: FontWeight.w700))),
-                          const Icon(Icons.auto_awesome_rounded, size: 18, color: Tokens.gold),
+                          const Icon(Icons.auto_awesome_rounded, size: 18, color: Tokens.primary),
                         ]),
                       ),
                     ),
