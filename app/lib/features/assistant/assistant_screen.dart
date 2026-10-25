@@ -91,10 +91,16 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     });
     _toBottom();
     try {
-      // Repeated questions (including the starter cards) are answered instantly from this session's cache.
+      // The recent conversation goes with every question so follow-ups ("only Phnom Penh", "what about food?") keep their context.
+      final history = [
+        for (final m in msgs.where((m) => !m.failed && m.text.trim().isNotEmpty).toList().reversed.skip(1).take(8).toList().reversed)
+          {'role': m.fromUser ? 'user' : 'assistant', 'text': m.text.length > 1400 ? m.text.substring(0, 1400) : m.text},
+      ];
+      // A first question (including the starter cards) is answered instantly from this session's cache; follow-ups depend on the chat, so they are not cached.
       final key = '${_topic ?? ''}|${q.toLowerCase()}';
-      final r = _answers[key] ?? await ref.read(apiProvider).postJson('/ai/assistant', body: {'question': q, if (_topic != null) 'destination': _topic}, timeout: const Duration(seconds: 20));
-      _answers[key] = r;
+      final r = (history.isEmpty ? _answers[key] : null) ??
+          await ref.read(apiProvider).postJson('/ai/assistant', body: {'question': q, if (_topic != null) 'destination': _topic, if (history.isNotEmpty) 'history': history}, timeout: const Duration(seconds: 30));
+      if (history.isEmpty) _answers[key] = r;
       final dest = r['destination'] as Json?;
       if (dest != null) _topic = dest['slug'] as String?;
       msgs.add(_Msg(
@@ -184,7 +190,7 @@ class _Header extends StatelessWidget {
               Row(children: [
                 Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF6EE7A8), shape: BoxShape.circle)),
                 const SizedBox(width: 6),
-                Text(llm ? 'AI-written · grounded in our guides' : 'Instant · answers from our guides', style: Type.body(11.5, color: Tokens.onDarkMuted)),
+                Text(llm ? 'AI travel assistant · uses our guides' : 'Instant · answers from our guides', style: Type.body(11.5, color: Tokens.onDarkMuted)),
               ]),
             ]),
           ),
@@ -202,7 +208,7 @@ class _Empty extends StatelessWidget {
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 20), children: [
         Reveal(child: Text('Ask me anything\nabout your trip.', style: Type.display(34, height: 1.05))),
         const SizedBox(height: 10),
-        Reveal(delay: const Duration(milliseconds: 80), child: Text('I answer from WAYFARER\'s destination data and approved guides, and always show where it came from.', style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5))),
+        Reveal(delay: const Duration(milliseconds: 80), child: Text('Ask in your own words. I use WAYFARER\'s guides when they help and general travel knowledge when they don\'t, and I show my sources.', style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5))),
         const SizedBox(height: 24),
         GridView.count(
           crossAxisCount: 2,
@@ -353,7 +359,8 @@ class _AssistantBubbleState extends State<_AssistantBubble> with SingleTickerPro
               ),
               if (done) ...[
                 if (m.failed && m.retry != null) Padding(padding: const EdgeInsets.only(top: 12), child: OutlinedButton.icon(onPressed: () => widget.onAsk(m.retry!), icon: const Icon(Icons.refresh_rounded), label: const Text('Try again'))),
-                if (!m.grounded && !m.failed) const Padding(padding: EdgeInsets.only(top: 10), child: Pill('Not in approved guides', color: Tokens.warning, icon: Icons.help_outline_rounded)),
+                if (!m.grounded && !m.failed)
+                  Padding(padding: const EdgeInsets.only(top: 10), child: m.mode == 'llm' ? const Pill('General travel knowledge', color: Tokens.inkMuted, icon: Icons.public_rounded) : const Pill('Not in approved guides', color: Tokens.warning, icon: Icons.help_outline_rounded)),
                 if (m.cards.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   SizedBox(

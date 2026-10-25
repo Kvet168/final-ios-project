@@ -4,6 +4,7 @@ import com.wayfarer.ai.dto.AssistantDtos.Answer;
 import com.wayfarer.ai.dto.AssistantDtos.Card;
 import com.wayfarer.ai.dto.AssistantDtos.DestinationRef;
 import com.wayfarer.ai.dto.AssistantDtos.Source;
+import com.wayfarer.ai.dto.PlanDtos.ChatTurn;
 import com.wayfarer.catalog.repository.AccommodationRepository;
 import com.wayfarer.catalog.repository.AttractionRepository;
 import com.wayfarer.catalog.repository.DestinationRepository;
@@ -209,9 +210,81 @@ public class AssistantService {
         return cards;
     }
 
-    public Answer answer(String question, String destinationHint) {
+    private static final String CHAT_SYSTEM = "You are WAYFARER Guide, a friendly, knowledgeable travel assistant inside a travel-booking app. You help with anything about travel: "
+        + "choosing destinations, itineraries, best seasons, getting around, food, culture and etiquette, budgets, visas and safety basics, packing and trip logistics, "
+        + "in Cambodia, Southeast Asia and worldwide. Chat naturally, like a helpful general AI assistant, but keep every answer about travel; if the user asks about something "
+        + "unrelated, say briefly that you focus on travel and offer a travel-related alternative. "
+        + "Use the conversation so far to understand follow-ups (for example 'only Phnom Penh' refers to the earlier topic) and silently correct obvious typos in place names. "
+        + "A numbered CONTEXT from WAYFARER's own guides and database may be provided. It can be about a different place than the traveller's current message, so use it only "
+        + "when it is relevant, and cite it like [1] whenever you use a fact from it. For everything else, answer from your general travel knowledge and be honest about uncertainty. "
+        + "Never invent WAYFARER-specific facts (our listings, prices, availability, bookings or policies) that are not in the context. For visas, prices, opening hours, health and "
+        + "safety, remind the traveller to check official sources. Style: warm and concise, short paragraphs or short bullet lists, usually under 180 words. For a multi-day trip "
+        + "request, give a brief day-by-day outline and mention that the AI planner in the app can build a bookable itinerary. If you need the destination, dates or budget to help, "
+        + "ask one short question.";
+    private static final String CHAT_DISCLAIMER = "AI-generated travel advice, grounded in WAYFARER guides where cited. Verify prices, opening hours, visas and safety information with official sources before you travel.";
+    private static final Pattern CITATION = Pattern.compile("\\[(\\d+)\\]");
+
+    public Answer answer(String question, String destinationHint) { return answer(question, destinationHint, List.of()); }
+
+    /**
+     * With a language model configured the assistant behaves like a travel-focused chat assistant: it sees the recent conversation, gets the best matching WAYFARER
+     * guides and data as context, and may add general travel knowledge. Without a model (or if the call fails) it falls back to the strict guide-only answers below.
+     */
+    public Answer answer(String question, String destinationHint, List<ChatTurn> history) {
         String q = question.trim();
         List<Facts> dests = loadDestinations();
+        if (llm.configured()) {
+            try {
+                Answer a = conversational(q, history == null ? List.of() : history, dests);
+                if (a != null) return a;
+            } catch (Exception e) {
+                log.warn("LLM chat failed, using guide answers: {}", e.getMessage());
+            }
+        }
+        return guideAnswer(q, destinationHint, dests);
+    }
+
+    private Answer conversational(String q, List<ChatTurn> history, List<Facts> dests) {
+        List<ChatTurn> recent = history.size() > 8 ? history.subList(history.size() - 8, history.size()) : history;
+        Facts named = findDestination(q, dests, null);
+        String prevUser = null;
+        for (int i = recent.size() - 1; i >= 0; i--) {
+            ChatTurn t = recent.get(i);
+            if (!"user".equals(t.role()) || t.text() == null) continue;
+            if (prevUser == null) prevUser = t.text();
+            if (named == null) named = findDestination(t.text(), dests, null);
+        }
+        Intent intent = detectIntent(q, named != null);
+        DestinationRef destRef = named == null ? null : new DestinationRef(named.slug, named.name);
+        String retrievalQuery = (q.length() < 45 && prevUser != null ? prevUser + " " : "") + q;
+        List<Source> ranked = rerank(retrieval.retrieve(retrievalQuery, 6, named == null ? null : named.slug), retrievalQuery, intent, dests.stream().map(d -> d.country).distinct().toList());
+        double top = ranked.isEmpty() ? 0 : ranked.get(0).score();
+        List<Source> context = new ArrayList<>();
+        if (named != null) {
+            StringBuilder f = new StringBuilder(named.shortDescription == null ? "" : named.shortDescription);
+            if (named.bestPeriod != null) f.append(" Best time to visit: ").append(named.bestPeriod).append('.');
+            if (named.transportInfo != null) f.append(" Getting around: ").append(named.transportInfo);
+            if (named.practicalInfo != null) f.append(" Practical info: ").append(named.practicalInfo);
+            if (named.dailyBudgetUsd != null) f.append(" Indicative budget: ").append(usd(named.dailyBudgetUsd)).append(" per person per day.");
+            context.add(new Source(named.id, named.slug, named.name + " destination guide", "WAYFARER destination data", "destination", f.toString().trim(), 1, false));
+        }
+        ranked.stream().filter(s -> s.score() >= top * 0.5).limit(4).forEach(context::add);
+
+        StringBuilder ctx = new StringBuilder();
+        for (int i = 0; i < context.size(); i++) ctx.append(i > 0 ? "\n\n" : "").append('[').append(i + 1).append("] ").append(context.get(i).title()).append(": ").append(context.get(i).snippet());
+        List<LlmClient.Turn> turns = new ArrayList<>();
+        for (ChatTurn t : recent) turns.add(new LlmClient.Turn(t.role(), t.text()));
+        turns.add(new LlmClient.Turn("user", (ctx.length() == 0 ? "" : "CONTEXT (WAYFARER guides and data):\n" + ctx + "\n\n") + "Traveller's message: " + q));
+        String text = llm.chat(CHAT_SYSTEM, turns, 800, Duration.ofSeconds(20));
+
+        // Only claim sources when the answer actually cites them.
+        boolean cited = CITATION.matcher(text).find();
+        boolean wantsCards = named != null && List.of(Intent.STAY, Intent.FOOD, Intent.THINGS_TO_DO, Intent.OVERVIEW).contains(intent);
+        List<Card> cards = wantsCards ? destinationCards(named, intent) : List.of();
+        return new Answer(text, "llm", cited ? context : List.of(), cited, CHAT_DISCLAIMER, intent.id(), destRef, cards, followUps(intent, named));
+    }
+
+    private Answer guideAnswer(String q, String destinationHint, List<Facts> dests) {
         Facts dest = findDestination(q, dests, destinationHint);
         Intent intent = detectIntent(q, dest != null);
         DestinationRef destRef = dest == null ? null : new DestinationRef(dest.slug, dest.name);

@@ -120,7 +120,7 @@ public class AiService {
 
     public Answer ask(AssistantRequest b, AuthUser user) {
         long started = System.currentTimeMillis();
-        Answer out = assistant.answer(b.question(), b.destination());
+        Answer out = assistant.answer(b.question(), b.destination(), b.history());
         usage(user, "assistant", out.mode(), started, out.grounded());
         if (user != null) {
             try {

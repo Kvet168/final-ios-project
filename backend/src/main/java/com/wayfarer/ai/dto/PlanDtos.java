@@ -57,7 +57,11 @@ public final class PlanDtos {
         }
     }
 
-    public record AssistantRequest(@jakarta.validation.constraints.NotBlank @Size(min = 3, max = 500) String question, @Size(max = 60) String destination) {}
+    /** One earlier chat message ({@code role} is "user" or "assistant"), sent so follow-up questions keep their context. */
+    public record ChatTurn(@Size(max = 12) String role, @Size(max = 1500) String text) {}
+
+    public record AssistantRequest(@jakarta.validation.constraints.NotBlank @Size(min = 3, max = 500) String question, @Size(max = 60) String destination,
+                                   @Size(max = 10) List<@Valid ChatTurn> history) {}
 
     public record RecommendationRequest(@jakarta.validation.constraints.NotBlank @Size(min = 2) String destination, @Size(max = 8) List<@Size(max = 30) String> interests,
                                         @Positive Double budgetPerNightUsd, @Min(0) @Max(10) Integer children) {}

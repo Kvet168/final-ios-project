@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.wayfarer.config.AppProperties;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
@@ -18,6 +19,9 @@ import org.springframework.web.client.RestClient;
  */
 @Component
 public class LlmClient {
+    /** One chat message. {@code role} is "user" or "assistant". */
+    public record Turn(String role, String text) {}
+
     private final AppProperties.Ai cfg;
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
@@ -26,12 +30,19 @@ public class LlmClient {
     public boolean configured() { return cfg.configured(); }
 
     public String complete(String system, String user, int maxTokens, Duration timeout) {
+        return chat(system, List.of(new Turn("user", user)), maxTokens, timeout);
+    }
+
+    /** Multi-turn chat. The last turn should be the user's current message. */
+    public String chat(String system, List<Turn> turns, int maxTokens, Duration timeout) {
         if (!configured()) throw new IllegalStateException("LLM not configured");
+        List<Turn> conversation = normalize(turns);
+        if (conversation.isEmpty()) throw new IllegalArgumentException("No messages to send");
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(http);
         factory.setReadTimeout(timeout);
         String provider = cfg.isGemini() ? "gemini" : "anthropic";
         try {
-            String text = cfg.isGemini() ? completeGemini(factory, system, user, maxTokens) : completeAnthropic(factory, system, user, maxTokens);
+            String text = cfg.isGemini() ? chatGemini(factory, system, conversation, maxTokens) : chatAnthropic(factory, system, conversation, maxTokens);
             if (text.isBlank()) throw new IllegalStateException("empty response (model " + cfg.modelName() + ")");
             return text;
         } catch (org.springframework.web.client.RestClientResponseException e) {
@@ -41,11 +52,29 @@ public class LlmClient {
         }
     }
 
-    private String completeAnthropic(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
+    /** Both providers want alternating roles that start with the user: drop blanks, merge neighbours with the same role, skip a leading assistant turn. */
+    static List<Turn> normalize(List<Turn> turns) {
+        List<Turn> out = new ArrayList<>();
+        for (Turn t : turns) {
+            if (t == null || t.text() == null || t.text().isBlank()) continue;
+            String role = "assistant".equals(t.role()) || "model".equals(t.role()) ? "assistant" : "user";
+            if (out.isEmpty() && role.equals("assistant")) continue;
+            if (!out.isEmpty() && out.get(out.size() - 1).role().equals(role)) {
+                Turn last = out.remove(out.size() - 1);
+                out.add(new Turn(role, last.text() + "\n\n" + t.text().trim()));
+            } else {
+                out.add(new Turn(role, t.text().trim()));
+            }
+        }
+        return out;
+    }
+
+    private String chatAnthropic(JdkClientHttpRequestFactory factory, String system, List<Turn> turns, int maxTokens) {
+        List<Map<String, String>> messages = turns.stream().map(t -> Map.of("role", t.role(), "content", t.text())).toList();
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://api.anthropic.com").build().post().uri("/v1/messages")
             .contentType(MediaType.APPLICATION_JSON)
             .header("x-api-key", cfg.key()).header("anthropic-version", "2023-06-01")
-            .body(Map.of("model", cfg.modelName(), "max_tokens", maxTokens, "system", system, "messages", List.of(Map.of("role", "user", "content", user))))
+            .body(Map.of("model", cfg.modelName(), "max_tokens", maxTokens, "system", system, "messages", messages))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
         if (body != null && body.has("content")) {
@@ -63,14 +92,16 @@ public class LlmClient {
         return g;
     }
 
-    private String completeGemini(JdkClientHttpRequestFactory factory, String system, String user, int maxTokens) {
+    private String chatGemini(JdkClientHttpRequestFactory factory, String system, List<Turn> turns, int maxTokens) {
+        List<Map<String, Object>> contents = turns.stream()
+            .map(t -> Map.<String, Object>of("role", "assistant".equals(t.role()) ? "model" : "user", "parts", List.of(Map.of("text", t.text())))).toList();
         JsonNode body = RestClient.builder().requestFactory(factory).baseUrl("https://generativelanguage.googleapis.com").build().post()
             .uri("/v1beta/models/{model}:generateContent", cfg.modelName())
             .contentType(MediaType.APPLICATION_JSON)
             .header("x-goog-api-key", cfg.key())
             .body(Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", system))),
-                "contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", user)))),
+                "contents", contents,
                 "generationConfig", generationConfig(maxTokens)))
             .retrieve().body(JsonNode.class);
         StringBuilder out = new StringBuilder();
