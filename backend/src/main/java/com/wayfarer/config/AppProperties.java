@@ -25,8 +25,8 @@ public record AppProperties(boolean prod, int holdMinutes, Jwt jwt, Payment paym
         /** The configured model, or the provider's default when AI_MODEL is unset or belongs to the other provider. */
         public String modelName() {
             boolean gemini = isGemini();
-            if (model == null || model.isBlank()) return gemini ? "gemini-2.5-flash" : "claude-sonnet-5-5";
-            if (gemini && !model.startsWith("gemini")) return "gemini-2.5-flash";
+            if (model == null || model.isBlank()) return gemini ? "gemini-3.8-flash" : "claude-sonnet-5-5";
+            if (gemini && !model.startsWith("gemini")) return "gemini-3.8-flash";
             return model;
         }
     }

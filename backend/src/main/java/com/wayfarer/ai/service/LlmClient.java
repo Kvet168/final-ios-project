@@ -77,7 +77,8 @@ public class LlmClient {
 
     private List<String> geminiModels() {
         List<String> models = new ArrayList<>(List.of(cfg.modelName()));
-        for (String m : List.of("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash")) if (!models.contains(m)) models.add(m);
+        // Google retires models quickly (2.0 and 2.5-flash-lite already answer 404), so the current generation comes first.
+        for (String m : List.of("gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash")) if (!models.contains(m)) models.add(m);
         return models;
     }
 
@@ -115,8 +116,12 @@ public class LlmClient {
     /** Gemini 2.5 models "think" before answering and count that against maxOutputTokens, which can leave the answer empty. */
     private static Map<String, Object> generationConfig(String m, int maxTokens) {
         Map<String, Object> g = new java.util.HashMap<>();
-        g.put("maxOutputTokens", maxTokens);
-        if (m.startsWith("gemini-2.5") && !m.contains("pro")) g.put("thinkingConfig", Map.of("thinkingBudget", 0));
+        if (m.startsWith("gemini-2.5") && !m.contains("pro")) {
+            g.put("maxOutputTokens", maxTokens);
+            g.put("thinkingConfig", Map.of("thinkingBudget", 0));
+        } else {
+            g.put("maxOutputTokens", maxTokens + 1024); // headroom: newer models may spend part of the budget on thinking
+        }
         return g;
     }
 
