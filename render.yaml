@@ -1,0 +1,62 @@
+# Render Blueprint: API + PostgreSQL + Key Value (Redis). In the Render dashboard: New → Blueprint → pick this repo.
+# Secrets marked `sync: false` are asked for once during setup; generated ones are created by Render and never committed.
+# See docs/DEPLOYMENT.md for the free-tier limits (sleeping instance, 30-day free database).
+services:
+  - type: web
+    name: wayfarer-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore
+    # /actuator/health includes the database check, so a deploy that can't reach PostgreSQL is never marked live.
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: WAYFARER_PROD
+        value: "true"
+      # Render's connection string (postgres://user:pass@host/db) is converted to JDBC at startup.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wayfarer-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: wayfarer-cache
+          property: connectionString
+      - key: DB_POOL_SIZE
+        value: "5"
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: PAYMENT_WEBHOOK_SECRET
+        generateValue: true
+      - key: PAYMENT_PROVIDER_MODE
+        value: mock
+      # Password of the seeded demo accounts (customer Maya, partner, admin). Pick your own.
+      - key: DEMO_PASSWORD
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        value: travel-app-5b220
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: AI_PROVIDER_API_KEY
+        sync: false
+      # The mobile app is not subject to CORS; list web origins here if you host the Flutter web build elsewhere.
+      - key: CORS_ORIGINS
+        value: "*"
+
+  - type: keyvalue
+    name: wayfarer-cache
+    plan: free
+    region: singapore
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: [] # internal connections only
+
+databases:
+  - name: wayfarer-db
+    plan: free
+    region: singapore
+    databaseName: wayfarer
+    user: wayfarer
+    postgresMajorVersion: "16"

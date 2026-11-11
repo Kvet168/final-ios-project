@@ -1,16 +1,29 @@
 server:
   port: ${PORT:8080}
   shutdown: graceful
+  max-http-request-header-size: 64KB
+  # Hosts like Render terminate HTTPS at a proxy; trust its X-Forwarded-* headers so links and redirects use https.
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/css,application/javascript
 
 spring:
   application:
     name: wayfarer-api
   datasource:
+    # Either a JDBC URL with DATABASE_USER/DATABASE_PASSWORD, or the provider form postgres://user:pass@host/db
+    # (converted by ConnectionUrlEnvironmentPostProcessor).
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/wayfarer}
     username: ${DATABASE_USER:wayfarer}
     password: ${DATABASE_PASSWORD:wayfarer_local_only}
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      # Fail fast and visibly when the database is unreachable. A longer pool fail-timeout makes Flyway's startup checks
+      # retry it silently forever (the server then hangs with no error); Flyway's own bounded retries cover a database
+      # that is still starting.
+      connection-timeout: 10000
+      initialization-fail-timeout: 1
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -18,6 +31,9 @@ spring:
       timeout: 1s
   flyway:
     enabled: true
+    # Database still starting (e.g. right after a host restart): retry for about a minute, then exit with the error.
+    connect-retries: 5
+    connect-retries-interval: 15
     # Attaching to a database the Express backend already created (same schema as V1): treat V1 as applied.
     baseline-on-migrate: true
     baseline-version: "1"

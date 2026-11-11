@@ -31,6 +31,17 @@ services:
       DATABASE_PASSWORD: wayfarer_local_only
       REDIS_HOST: redis
       PAYMENT_PROVIDER_MODE: mock
+      SERVER_MAX_HTTP_REQUEST_HEADER_SIZE: 64KB
+      # Email and Google sign-in go through Firebase: the server must trust the same project the app uses (public identifiers, also in
+      # app/lib/core/config/firebase_config.dart). Empty = Firebase sign-in disabled.
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-travel-app-5b220}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-77263866261-c41oqe6uhmtpm2m72codn4vmi530cohh.apps.googleusercontent.com}
+      # Real AI for the planner and guide: put the key in a .env file next to this one (git-ignored; see .env.example).
+      # Empty key = rules engine and guide retrieval only.
+      AI_PROVIDER_API_KEY: ${AI_PROVIDER_API_KEY:-}
+      AI_PROVIDER: ${AI_PROVIDER:-auto}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_RATE_LIMIT_PER_MINUTE: ${AI_RATE_LIMIT_PER_MINUTE:-20}
     ports: ["8080:8080"]
 volumes:
   pgdata:
