@@ -93,7 +93,12 @@ final class DayScheduler {
 
     /** Builds one day from the pool; `used` is updated with every place chosen so days never repeat a stop. */
     static PlannedDay buildDay(int day, List<Place> pool, Set<UUID> used, PlanRequest req, Anchor hotel, Slot slot) {
-        return new Builder(pool, used, req, hotel).build(day, slot);
+        return buildDay(day, pool, used, req, hotel, slot, 0);
+    }
+
+    /** [startOffsetMin] pushes the first stop later, for a day that begins with a transfer from another city. */
+    static PlannedDay buildDay(int day, List<Place> pool, Set<UUID> used, PlanRequest req, Anchor hotel, Slot slot, int startOffsetMin) {
+        return new Builder(pool, used, req, hotel, DAY_START + Math.max(0, startOffsetMin)).build(day, slot);
     }
 
     private static final class Builder {
@@ -102,10 +107,11 @@ final class DayScheduler {
         private final Anchor hotel;
         private final List<Place> sights = new ArrayList<>(), eats = new ArrayList<>();
         private final List<PlannedItem> items = new ArrayList<>();
-        private int cursor = DAY_START;
+        private int cursor;
         private Anchor prev;
 
-        Builder(List<Place> pool, Set<UUID> used, PlanRequest req, Anchor hotel) {
+        Builder(List<Place> pool, Set<UUID> used, PlanRequest req, Anchor hotel, int dayStart) {
+            this.cursor = dayStart;
             this.used = used;
             this.req = req;
             this.hotel = hotel;

@@ -33,7 +33,7 @@ req GET /api/health;                                  check "health" 200
 req GET /actuator/health;                             check "actuator health" 200
 req GET /api/meta;                                    check "meta" 200
 req GET /api/home;                                    check "home feed" 200
-expect_eq "30 destinations seeded" "$(echo "$BODY" | j "d['counts']['destinations']")" "30"
+expect_eq "12 destinations seeded (Cambodia only)" "$(echo "$BODY" | j "d['counts']['destinations']")" "12"
 req GET "/api/destinations?q=siem";                   check "destination search" 200
 expect_eq "search finds siem-reap" "$(echo "$BODY" | j "d['items'][0]['slug']")" "siem-reap"
 req GET /api/destinations/phnom-penh;                 check "destination detail" 200
@@ -69,10 +69,14 @@ req POST /api/auth/refresh "" "{\"refreshToken\":\"$RT\"}"; check "old refresh t
 req POST /api/auth/refresh "" "{\"refreshToken\":\"$RT2\"}"; check "reuse revoked the whole family -> 401" 401
 req POST /api/auth/login "" "{\"email\":\"$EMAIL\",\"password\":\"$PW\"}"; AT=$(echo "$BODY" | j "d['accessToken']"); RT=$(echo "$BODY" | j "d['refreshToken']")
 req POST /api/auth/forgot-password "" "{\"email\":\"$EMAIL\"}"; check "forgot password" 200
-RESET=$(echo "$BODY" | j "d['demoResetToken']")
-req POST /api/auth/reset-password "" "{\"token\":\"$RESET\",\"password\":\"New-password-12345\"}"; check "reset password" 200
-req POST /api/auth/login "" "{\"email\":\"$EMAIL\",\"password\":\"New-password-12345\"}"; check "login with new password" 200
-AT=$(echo "$BODY" | j "d['accessToken']"); RT=$(echo "$BODY" | j "d['refreshToken']")
+RESET=$(echo "$BODY" | j "d.get('demoResetToken') or ''")
+if [ -n "$RESET" ]; then
+  req POST /api/auth/reset-password "" "{\"token\":\"$RESET\",\"password\":\"New-password-12345\"}"; check "reset password" 200
+  req POST /api/auth/login "" "{\"email\":\"$EMAIL\",\"password\":\"New-password-12345\"}"; check "login with new password" 200
+  AT=$(echo "$BODY" | j "d['accessToken']"); RT=$(echo "$BODY" | j "d['refreshToken']")
+else
+  echo "skip  reset password (production mode: the reset token is only sent by email)"
+fi
 
 echo "== roles"
 STAFF=$(login staff1@demo.wayfarer.test); ADMIN=$(login admin@demo.wayfarer.test); PARTNER=$(login partner.pp@demo.wayfarer.test)
@@ -142,6 +146,27 @@ expect_eq "assistant is grounded" "$(echo "$BODY" | j "d['grounded']")" "True"
 req POST /api/ai/assistant "" '{"question":"zzzz qqqq xxxx"}'; expect_eq "assistant refuses to guess" "$(echo "$BODY" | j "d['grounded']")" "False"
 req POST /api/ai/recommendations "" '{"destination":"siem-reap","interests":["temples"]}'; check "recommendations" 200
 req GET /api/ai/sources;                              check "ai sources" 200
+
+echo "== trip through two cities"
+req POST /api/ai/travel-plan "$AT" '{"prompt":"3 days in Kampot and 2 days in Siem Reap, 2 adults","save":true}'; check "two-city plan saved" 200
+MID=$(echo "$BODY" | j "d['itineraryId']")
+expect_eq "cities in the order named" "$(echo "$BODY" | j "[d['understood']['destination']] + d['understood']['alsoVisit']")" "['kampot', 'siem-reap']"
+expect_eq "days follow the request" "$(echo "$BODY" | j "[x['destination']['slug'] for x in d['plan']['days']]")" "['kampot', 'kampot', 'kampot', 'siem-reap', 'siem-reap']"
+expect_eq "transfer on the first day in the new city" "$(echo "$BODY" | j "[x['day'] for x in d['plan']['days'] if x.get('transfer')]")" "[4]"
+expect_eq "a stay in each city" "$(echo "$BODY" | j "[l['destination'] for l in d['plan']['lodgings']]")" "['kampot', 'siem-reap']"
+req GET "/api/itineraries/$MID" "$AT";                check "get saved two-city trip" 200
+expect_eq "saved days keep their city" "$(echo "$BODY" | j "[x['destination']['slug'] for x in d['days']]")" "['kampot', 'kampot', 'kampot', 'siem-reap', 'siem-reap']"
+req GET /api/itineraries "$AT";                       expect_eq "trip list names both cities" "$(echo "$BODY" | j "[i['destination_name'] for i in d['items'] if i['id'] == '$MID']")" "['Kampot · Siem Reap']"
+req POST "/api/ai/travel-plan" "$AT" '{"prompt":"kampot and siemreap. for 5 days"}'; expect_eq "misspelt run-together names still give two cities" "$(echo "$BODY" | j "len(d['plan']['destinations'])")" "2"
+SR_PLACE=$(curl -s "$BASE/api/destinations/siem-reap/attractions?pageSize=50" | j "[a['id'] for a in d['items']][0]")
+KP_PLACE=$(curl -s "$BASE/api/destinations/kampot/attractions?pageSize=5" | j "d['items'][0]['id']")
+req PATCH "/api/itineraries/$MID" "$AT" "{\"days\":[{\"day\":5,\"items\":[{\"attractionId\":\"$KP_PLACE\"}]}]}"; check "a Kampot place cannot go on a Siem Reap day -> 422" 422
+req POST "/api/itineraries/$MID/generate" "$AT" '{"day":4}'; check "regenerate the arrival day" 200
+expect_eq "arrival day stays in Siem Reap" "$(echo "$BODY" | j "d['days'][3]['destination']['slug']")" "siem-reap"
+req POST "/api/itineraries/$MID/recalculate" "$AT";   check "recalculate the two-city trip" 200
+req POST "/api/itineraries/$MID/copy" "$AT";          check "copy keeps the cities" 201
+expect_eq "copy has both cities" "$(echo "$BODY" | j "sorted({x['destination']['slug'] for x in d['days']})")" "['kampot', 'siem-reap']"
+req DELETE "/api/itineraries/$MID" "$AT";             check "delete the two-city trip" 204
 
 echo "== itineraries"
 req GET "/api/itineraries/$IID" "$AT";                check "get saved trip" 200

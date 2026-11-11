@@ -28,6 +28,11 @@ public class DestinationRepository {
         return db.one("SELECT * FROM destinations WHERE id = :id AND deleted_at IS NULL", Map.of("id", id));
     }
 
+    /** Every destination with its country, most popular first (the AI planner's default pick within a country). */
+    public List<Map<String, Object>> listForPlanner() {
+        return db.list("SELECT slug, name, country FROM destinations WHERE deleted_at IS NULL ORDER BY popularity DESC, name");
+    }
+
     public List<Map<String, Object>> listAllSlugs() {
         return db.list("SELECT slug, name, country FROM destinations WHERE deleted_at IS NULL ORDER BY name");
     }

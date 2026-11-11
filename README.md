@@ -12,7 +12,7 @@ A Flutter mobile app (iOS and Android) backed by a **Java 21 / Spring Boot** RES
 | ERD / schema / SQL | [backend/docs/ERD.md](backend/docs/ERD.md), [backend/sql](backend/sql), Flyway scripts in `backend/src/main/resources/db` |
 
 ## What it does
-- **Discover**: 30 destinations (Cambodia and Southeast/East Asia), 373 places, activities and restaurants, 76 stays, curated itineraries. Photos and fonts ship inside the app.
+- **Discover**: 12 destinations across Cambodia (from Siem Reap and Phnom Penh to Kampot, Koh Rong and Mondulkiri), 152 places, activities and restaurants, 32 stays, curated itineraries. WAYFARER covers Cambodia only (migration V104). Photos and fonts ship inside the app.
 - **Hotel, room, attraction and restaurant search** with filters, date availability, price breakdowns, maps and distance.
 - **Booking**: held rooms with a countdown, simulated payment (clearly labelled), cancellation with refund rules, receipts, tickets, reviews from verified stays, live status updates over WebSocket.
 - **AI trip planner**: "three days in Phnom Penh and $150" becomes a day-by-day plan (sights, restaurants, a stay, budget split, travel times, route links) built only from stored records, optimised for budget, distance, opening hours, travel time and interests. Without an LLM key it uses a transparent rules engine and says so.

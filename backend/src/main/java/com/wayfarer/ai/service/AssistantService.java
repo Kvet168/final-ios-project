@@ -212,7 +212,9 @@ public class AssistantService {
 
     private static final String CHAT_SYSTEM = "You are WAYFARER Guide, a friendly, knowledgeable travel assistant inside a travel-booking app. You help with anything about travel: "
         + "choosing destinations, itineraries, best seasons, getting around, food, culture and etiquette, budgets, visas and safety basics, packing and trip logistics, "
-        + "in Cambodia, Southeast Asia and worldwide. Chat naturally, like a helpful general AI assistant, but keep every answer about travel; if the user asks about something "
+        + "with a focus on Cambodia: WAYFARER's destinations, stays, trip planner and bookings cover Cambodia only. If the traveller asks about a trip outside Cambodia, "
+        + "answer briefly from general knowledge, say that WAYFARER plans and books Cambodian trips only, and suggest a comparable Cambodian destination. "
+        + "Chat naturally, like a helpful general AI assistant, but keep every answer about travel; if the user asks about something "
         + "unrelated, say briefly that you focus on travel and offer a travel-related alternative. "
         + "Use the conversation so far to understand follow-ups (for example 'only Phnom Penh' refers to the earlier topic) and silently correct obvious typos in place names. "
         + "A numbered CONTEXT from WAYFARER's own guides and database may be provided. It can be about a different place than the traveller's current message, so use it only "
@@ -290,8 +292,8 @@ public class AssistantService {
         DestinationRef destRef = dest == null ? null : new DestinationRef(dest.slug, dest.name);
 
         if (intent == Intent.SMALLTALK) {
-            return new Answer("Hi! I'm your WAYFARER travel guide. Ask me about the best time to go, getting around, budgets, food, where to stay or local etiquette across Cambodia and "
-                + "Southeast Asia, and I'll answer from our guides and listings.", "retrieval-only", List.of(), true, DISCLAIMER, intent.id(), null, List.of(), followUps(Intent.GENERAL, null));
+            return new Answer("Hi! I'm your WAYFARER travel guide. Ask me about the best time to go, getting around, budgets, food, where to stay or local etiquette across "
+                + "Cambodia, and I'll answer from our guides and listings.", "retrieval-only", List.of(), true, DISCLAIMER, intent.id(), null, List.of(), followUps(Intent.GENERAL, null));
         }
 
         boolean wantsCards = dest != null && List.of(Intent.STAY, Intent.FOOD, Intent.THINGS_TO_DO, Intent.OVERVIEW).contains(intent);
@@ -356,7 +358,7 @@ public class AssistantService {
             try {
                 StringBuilder ctx = new StringBuilder();
                 for (int i = 0; i < allSources.size(); i++) ctx.append(i > 0 ? "\n\n" : "").append('[').append(i + 1).append("] ").append(allSources.get(i).title()).append(": ").append(allSources.get(i).snippet());
-                String text = llm.complete("You are a friendly travel guide for Southeast Asia. Answer ONLY using the numbered context. Cite sources like [1]. If the context does not contain "
+                String text = llm.complete("You are a friendly travel guide for Cambodia. Answer ONLY using the numbered context. Cite sources like [1]. If the context does not contain "
                     + "the answer, say you do not have that information. Never invent prices, opening hours or policies. Keep it under 120 words, in short paragraphs.",
                     "Context:\n" + ctx + "\n\nQuestion: " + q, 350, Duration.ofSeconds(9));
                 if (!text.isBlank()) return new Answer(text, "llm", allSources, true, DISCLAIMER, intent.id(), destRef, cards, followUps(intent, dest));

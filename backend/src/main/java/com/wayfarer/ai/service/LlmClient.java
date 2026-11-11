@@ -90,8 +90,9 @@ public class LlmClient {
 
     private List<String> geminiModels() {
         List<String> models = new ArrayList<>(List.of(cfg.modelName()));
-        // Google retires models quickly (2.0 and 2.5-flash-lite already answer 404), so the current generation comes first.
-        for (String m : List.of("gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-flash")) if (!models.contains(m)) models.add(m);
+        // Google retires models quickly (2.0 and the 2.5 family already answer 404 for new keys), so the current generation
+        // comes first, then the "-latest" aliases, which Google keeps pointed at a live model.
+        for (String m : List.of("gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-flash-lite-latest")) if (!models.contains(m)) models.add(m);
         return models;
     }
 

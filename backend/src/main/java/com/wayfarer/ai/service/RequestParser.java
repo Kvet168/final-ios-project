@@ -19,7 +19,10 @@ import org.springframework.stereotype.Component;
 public class RequestParser {
     private static final Logger log = LoggerFactory.getLogger(RequestParser.class);
 
-    public record Slug(String slug, String name) {}
+    /** A plannable destination. Lists passed to the parser are ordered most popular first. */
+    public record Slug(String slug, String name, String country) {
+        public Slug(String slug, String name) { this(slug, name, null); }
+    }
 
     public record Parsed(PlanRequest request, String mode, String note) {}
 
@@ -63,10 +66,10 @@ public class RequestParser {
 
     public PlanRequest parseWithRules(String text, List<Slug> destinations) {
         String t = text.toLowerCase();
-        Optional<Slug> dest = destinations.stream().filter(d -> t.contains(d.name().toLowerCase()) || t.contains(d.slug().replace('-', ' '))).findFirst();
-        if (dest.isEmpty() && t.contains("angkor")) dest = findSlug(destinations, "siem-reap");
-        if (dest.isEmpty() && Pattern.compile("\\bbali\\b|\\bubud\\b").matcher(t).find()) dest = findSlug(destinations, "bali");
-        if (dest.isEmpty() && Pattern.compile("\\bsaigon\\b").matcher(t).find()) dest = findSlug(destinations, "ho-chi-minh-city");
+        List<String> words = CityMatcher.tokens(text);
+        List<CityMatcher.Mention> mentions = CityMatcher.find(words, destinations);
+        List<String> cities = mentions.stream().map(m -> m.slug().slug()).limit(PlanRequest.MAX_DESTINATIONS).toList();
+        List<Integer> perCity = cities.size() == mentions.size() ? CityMatcher.daysPerCity(words, mentions) : null;
 
         Integer days = null;
         Matcher dm = DAYS.matcher(t);
@@ -78,6 +81,7 @@ public class RequestParser {
         if (days == null && Pattern.compile("\\bweekend\\b").matcher(t).find()) days = 2;
         if (days == null && Pattern.compile("\\bweek\\b").matcher(t).find()) days = 7;
         if (days != null && nightHit) days = days + 1;
+        if (perCity != null) days = perCity.stream().mapToInt(Integer::intValue).sum();   // "3 days in Kampot and 2 in Siem Reap" is a 5-day trip
 
         int adults = 1;
         Matcher am = ADULTS.matcher(t);
@@ -103,21 +107,70 @@ public class RequestParser {
         String pace = Pattern.compile("relax|slow|easy|calm").matcher(t).find() ? "relaxed"
             : Pattern.compile("packed|busy|see everything|as much as").matcher(t).find() ? "packed" : "balanced";
         if (children > 0 && !interests.contains("family")) interests.add("family");
-        return new PlanRequest(dest.map(Slug::slug).orElse(null), days, adults, children, budget, perDay, interests, pace);
+        return new PlanRequest(null, days, adults, children, budget, perDay, interests, pace).withDestinations(cities, perCity);
+    }
+
+    /**
+     * A country named without a city ("Vietnam, 3 days"): that country's most popular destination, so the user gets a
+     * plan instead of a question. [destinations] must be ordered most popular first.
+     */
+    static Optional<Slug> byCountry(String text, List<Slug> destinations) {
+        String t = text.toLowerCase().replace("viet nam", "vietnam");
+        return destinations.stream()
+            .filter(d -> d.country() != null && Pattern.compile("\\b" + Pattern.quote(d.country().toLowerCase()) + "\\b").matcher(t).find())
+            .findFirst();
+    }
+
+    /** Fills in the destination from a named country and explains the choice; returns [p] unchanged otherwise. */
+    private static Parsed withCountryFallback(Parsed p, String text, List<Slug> destinations) {
+        PlanRequest r = p.request();
+        if (r.destination() != null) return p;
+        Optional<Slug> pick = byCountry(text, destinations);
+        if (pick.isEmpty()) return p;
+        Slug d = pick.get();
+        List<String> others = destinations.stream().filter(o -> d.country().equals(o.country()) && !o.slug().equals(d.slug())).map(Slug::name).limit(4).toList();
+        String note = "You named " + d.country() + " without a city, so this plan is for " + d.name() + ", its most visited destination."
+            + (others.isEmpty() ? "" : " Name a city to plan another: " + String.join(", ", others) + ".");
+        PlanRequest filled = new PlanRequest(d.slug(), r.days(), r.adults(), r.children(), r.budgetUsd(), r.budgetIsPerDay(), r.interests(), r.pace());
+        return new Parsed(filled, p.mode(), p.note() == null ? note : p.note() + " " + note);
     }
 
     /** Tries the model for extraction when a key exists; the result is validated and the rules parser is used on any doubt. */
     public Parsed understand(String text, List<Slug> destinations) {
+        return withCountryFallback(understandRaw(text, destinations), text, destinations);
+    }
+
+    /**
+     * The model's cities, cross-checked against the rules parser: if the text clearly names more cities than the model returned
+     * (it dropped one), the rules parser's list wins. Per-city days are kept only when they match the cities and the total.
+     */
+    private PlanRequest reconcileCities(PlanRequest r, String text, List<Slug> destinations) {
+        PlanRequest rules = parseWithRules(text, destinations);
+        if (rules.allDestinations().size() > r.allDestinations().size()) {
+            r = r.withDestinations(rules.allDestinations(), rules.daysPerDestination());
+            if (rules.daysPerDestination() != null) r = new PlanRequest(r.destination(), rules.days(), r.adults(), r.children(), r.budgetUsd(), r.budgetIsPerDay(), r.interests(), r.pace(), r.alsoVisit(), r.daysPerDestination());
+        }
+        List<Integer> per = r.daysPerDestination();
+        boolean perOk = per != null && per.size() == r.allDestinations().size() && r.days() != null && per.stream().mapToInt(Integer::intValue).sum() == r.days();
+        return perOk || per == null ? r : r.withDestinations(r.allDestinations(), null);
+    }
+
+    private Parsed understandRaw(String text, List<Slug> destinations) {
         if (llm.configured()) {
             try {
-                String raw = llm.complete("Extract trip parameters. Reply with ONLY a JSON object with keys: destination (one of the provided slugs or null), days (int|null), adults (int), "
+                String raw = llm.complete("Extract trip parameters. Reply with ONLY a JSON object with keys: destination (the FIRST city, one of the provided slugs or null), "
+                    + "alsoVisit (array of further city slugs in the order they will be visited, empty when only one city), days (total trip days, int|null), "
+                    + "daysPerDestination (array of ints for [destination, ...alsoVisit] when the user states days per city, else null), adults (int), "
                     + "children (int), budgetUsd (number|null), budgetIsPerDay (boolean), interests (array of lowercase keywords), pace ('relaxed'|'balanced'|'packed'). "
-                    + "Do not invent values that the user did not state.",
+                    + "Do not invent values that the user did not state. People often mis-spell or join place names (siemreap = siem-reap); map them to the provided slugs.",
                     "Destination slugs: " + String.join(", ", destinations.stream().map(Slug::slug).toList()) + "\nUser request: " + text, 300, Duration.ofSeconds(8));
                 PlanRequest r = json.readValue(LlmClient.extractJson(raw), PlanRequest.class).normalized();
-                boolean slugOk = r.destination() == null || findSlug(destinations, r.destination()).isPresent();
+                boolean slugOk = r.allDestinations().stream().allMatch(c -> findSlug(destinations, c).isPresent()) && r.allDestinations().size() <= PlanRequest.MAX_DESTINATIONS;
                 boolean rangeOk = (r.days() == null || (r.days() >= 1 && r.days() <= 14)) && r.adults() >= 1 && r.adults() <= 12 && r.children() >= 0 && r.children() <= 12;
-                if (slugOk && rangeOk) return new Parsed(r, "llm", null);
+                if (slugOk && rangeOk) {
+                    r = reconcileCities(r, text, destinations);
+                    return new Parsed(r, "llm", null);
+                }
             } catch (Exception e) {
                 log.warn("LLM request parsing failed, using rules: {}", e.getMessage());
             }

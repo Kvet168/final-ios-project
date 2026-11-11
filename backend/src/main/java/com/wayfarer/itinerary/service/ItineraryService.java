@@ -7,6 +7,9 @@ import com.wayfarer.ai.dto.PlanDtos.Plan;
 import com.wayfarer.ai.dto.PlanDtos.PlanRequest;
 import com.wayfarer.ai.dto.PlanDtos.PlannedDay;
 import com.wayfarer.ai.dto.PlanDtos.PlannedItem;
+import com.wayfarer.ai.dto.PlanDtos.PlanDestination;
+import com.wayfarer.ai.dto.PlanDtos.Lodging;
+import com.wayfarer.ai.dto.PlanDtos.Transfer;
 import com.wayfarer.ai.service.PlannerService;
 import com.wayfarer.audit.service.AuditService;
 import com.wayfarer.catalog.repository.AccommodationRepository;
@@ -60,6 +63,8 @@ public class ItineraryService {
         Map<String, Object> it = itineraries.findDetail(id).orElseThrow(() -> ApiException.notFound("Itinerary"));
         List<Map<String, Object>> items = itineraries.items(id);
         List<PlannedDay> days = new ArrayList<>();
+        Map<Integer, Map<String, Object>> dayRows = new java.util.HashMap<>();
+        itineraries.days(id).forEach(r -> dayRows.put(Rows.integer(r, "day_index"), r));
         for (int d = 1; d <= Rows.integer(it, "num_days"); d++) {
             final int day = d;
             List<PlannedItem> its = items.stream().filter(x -> Rows.integer(x, "day_index") == day).map(x -> new PlannedItem(
@@ -67,7 +72,12 @@ public class ItineraryService {
                 ((Number) x.get("lng")).doubleValue(), Rows.str(x, "image"), Rows.integer(x, "start_min"), Rows.integer(x, "duration_min"),
                 Rows.integer(x, "travel_min_from_prev"), Rows.dec(x, "est_cost_usd").doubleValue(), x.get("reason") == null ? "" : Rows.str(x, "reason"),
                 Boolean.TRUE.equals(x.get("is_demo")), Boolean.TRUE.equals(x.get("hours_verified")))).toList();
-            days.add(new PlannedDay(day, its, round2(its.stream().mapToDouble(PlannedItem::costUsd).sum())));
+            Map<String, Object> row = dayRows.get(day);
+            PlanDestination where = row == null ? null : new PlanDestination((UUID) row.get("destination_id"), Rows.str(row, "destination_slug"), Rows.str(row, "destination_name"),
+                num(row, "dest_lat"), num(row, "dest_lng"));
+            Transfer transfer = row == null || row.get("transfer_from") == null ? null
+                : new Transfer(Rows.str(row, "transfer_from"), num(row, "transfer_km"), Rows.integer(row, "transfer_min"), num(row, "transfer_cost_usd"));
+            days.add(new PlannedDay(day, its, round2(its.stream().mapToDouble(PlannedItem::costUsd).sum()), where, transfer));
         }
         Map<String, Object> out = new LinkedHashMap<>(it);
         out.put("days", days);
@@ -101,6 +111,7 @@ public class ItineraryService {
             .addValue("adults", r.adults() == null ? 1 : r.adults()).addValue("children", r.children() == null ? 0 : r.children())
             .addValue("budget", r.budgetUsd() == null ? null : BigDecimal.valueOf(r.budgetUsd()))
             .addValue("interests", Text.pgArray(r.interests() == null ? List.of() : r.interests())).addValue("pace", r.pace() == null ? "balanced" : r.pace()));
+        for (int d = 1; d <= days; d++) itineraries.insertDay(id, d, (UUID) dest.get("id"), null, null, null, 0, 0);
         return load(id);
     }
 
@@ -145,6 +156,7 @@ public class ItineraryService {
         accessible(id, user, false);
         UUID copy = itineraries.copyHeader(id, user.id());
         itineraries.copyItems(id, copy);
+        itineraries.copyDays(id, copy);
         return load(copy);
     }
 
@@ -164,7 +176,15 @@ public class ItineraryService {
             .addValue("interests", Text.pgArray(req.interests())).addValue("pace", req.pace()).addValue("by", template ? "curated" : plan.mode())
             .addValue("acc", plan.lodging() == null ? null : plan.lodging().id()).addValue("total", BigDecimal.valueOf(plan.budget().totalUsd()))
             .addValue("assumptions", assumptions).addValue("template", template));
+        List<Lodging> stays = plan.lodgings() != null ? plan.lodgings() : plan.lodging() == null ? List.of() : List.of(plan.lodging());
+        Map<String, Integer> nightsUsed = new java.util.HashMap<>();
         for (PlannedDay d : plan.days()) {
+            PlanDestination where = d.destination() != null ? d.destination() : plan.destination();
+            // The stay for this night: the city's stay for as many nights as it was chosen for (none after the last day).
+            Lodging stay = stays.stream().filter(l -> l.destination() == null || l.destination().equals(where.slug())).findFirst().orElse(null);
+            UUID acc = stay != null && nightsUsed.merge(where.slug(), 1, Integer::sum) <= stay.nights() ? stay.id() : null;
+            Transfer t = d.transfer();
+            itineraries.insertDay(id, d.day(), where.id(), acc, t == null ? null : t.fromName(), t == null ? null : t.km(), t == null ? 0 : t.minutes(), t == null ? 0 : t.costUsd());
             int pos = 0;
             for (PlannedItem i : d.items()) itineraries.insertItem(id, d.day(), pos++, i.attractionId(), i.startMin(), i.durationMin(), i.travelMinFromPrev(), i.costUsd(), i.reason());
         }
@@ -178,7 +198,8 @@ public class ItineraryService {
         Map<String, Object> it = itineraries.findRaw(itineraryId).orElseThrow(() -> ApiException.notFound("Itinerary"));
         if (day < 1 || day > Rows.integer(it, "num_days")) throw ApiException.unprocessable("INVALID_DAY", "Day is outside the itinerary");
         if (attractionIds.stream().distinct().count() != attractionIds.size()) throw ApiException.unprocessable("DUPLICATE_STOP", "A place can only appear once per day");
-        List<PlannedItem> scheduled = planner.scheduleStops(Rows.uuid(it, "destination_id"), attractionIds, Rows.integer(it, "adults"), Rows.integer(it, "children"));
+        Map<String, Object> row = dayRow(itineraryId, it, day);
+        List<PlannedItem> scheduled = planner.scheduleStops((UUID) row.get("destination_id"), attractionIds, Rows.integer(it, "adults"), Rows.integer(it, "children"));
         itineraries.deleteDay(itineraryId, day);
         int pos = 0;
         for (PlannedItem i : scheduled) itineraries.insertItem(itineraryId, day, pos++, i.attractionId(), i.startMin(), i.durationMin(), i.travelMinFromPrev(), i.costUsd(), i.reason());
@@ -188,29 +209,71 @@ public class ItineraryService {
         Map<String, Object> it = itineraries.findRaw(itineraryId).orElseThrow(() -> ApiException.notFound("Itinerary"));
         if (day < 1 || day > Rows.integer(it, "num_days")) throw ApiException.unprocessable("INVALID_DAY", "Day is outside the itinerary");
         List<UUID> other = itineraries.attractionIds(itineraryId, null, day), current = itineraries.attractionIds(itineraryId, day, null);
-        UUID accId = (UUID) it.get("accommodation_id");
-        PlannedDay planned = planner.regenerateDay(it, day, other, current, accId == null ? null : accommodations.findLocation(accId).orElse(null));
+        Map<String, Object> row = dayRow(itineraryId, it, day);
+        UUID destId = (UUID) row.get("destination_id");
+        // The day is anchored to the stay used in its city (the last day of a trip has no night of its own).
+        UUID accId = row.get("accommodation_id") != null ? (UUID) row.get("accommodation_id") : itineraries.stayIn(itineraryId, destId).orElse(null);
+        PlannedDay planned = planner.regenerateDay(it, day, destId, Rows.integer(row, "transfer_min"), other, current, accId == null ? null : accommodations.findLocation(accId).orElse(null));
         itineraries.deleteDay(itineraryId, day);
         int pos = 0;
         for (PlannedItem i : planned.items()) itineraries.insertItem(itineraryId, day, pos++, i.attractionId(), i.startMin(), i.durationMin(), i.travelMinFromPrev(), i.costUsd(), i.reason());
     }
 
-    /** Re-prices every stop for the current party size and recomputes the trip total. */
+    /** The itinerary's day rows; a trip saved before cities were tracked per day is read as one city with the trip's stay. */
+    private List<Map<String, Object>> dayRows(UUID itineraryId, Map<String, Object> it) {
+        List<Map<String, Object>> rows = itineraries.days(itineraryId);
+        if (!rows.isEmpty()) return rows;
+        Map<String, Object> dest = destinations.findById((UUID) it.get("destination_id")).orElseThrow();
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (int d = 1; d <= Rows.integer(it, "num_days"); d++) {
+            Map<String, Object> r = new LinkedHashMap<>();
+            r.put("day_index", d);
+            r.put("destination_id", it.get("destination_id"));
+            r.put("accommodation_id", d < Rows.integer(it, "num_days") ? it.get("accommodation_id") : null);
+            r.put("transfer_min", 0);
+            r.put("transfer_cost_usd", java.math.BigDecimal.ZERO);
+            r.put("daily_budget_usd", dest.get("daily_budget_usd"));
+            out.add(r);
+        }
+        return out;
+    }
+
+    private Map<String, Object> dayRow(UUID itineraryId, Map<String, Object> it, int day) {
+        return dayRows(itineraryId, it).stream().filter(r -> Rows.integer(r, "day_index") == day).findFirst().orElseThrow(() -> ApiException.notFound("Itinerary day"));
+    }
+
+    /** Re-prices every stop, stay and transfer for the current party size and recomputes the trip total. */
     Map<String, Object> recalculate(UUID itineraryId) {
         Map<String, Object> it = itineraries.findRaw(itineraryId).orElseThrow(() -> ApiException.notFound("Itinerary"));
-        int adults = Rows.integer(it, "adults"), children = Rows.integer(it, "children"), numDays = Rows.integer(it, "num_days");
+        int adults = Rows.integer(it, "adults"), children = Rows.integer(it, "children");
         for (Map<String, Object> i : itineraries.itemPrices(itineraryId)) {
             double price = i.get("price_usd") == null ? 0 : ((Number) i.get("price_usd")).doubleValue();
             double c = "restaurant".equals(i.get("kind")) ? price * (adults + children * 0.6) : price * adults + price * 0.5 * children;
             itineraries.setItemCost(i.get("id"), round2(c));
         }
-        double dailyBudget = ((Number) destinations.findById(Rows.uuid(it, "destination_id")).orElseThrow().get("daily_budget_usd")).doubleValue();
-        Map<String, Object> lodging = it.get("accommodation_id") == null ? null : accommodations.findPricing((UUID) it.get("accommodation_id")).orElse(null);
-        int rooms = Math.max(1, (int) Math.ceil(adults / 2.0)), nights = Math.max(0, numDays - 1);
-        double lodgingUsd = lodging == null ? 0 : round2(num(lodging, "from_price_usd") * rooms * (1 + num(lodging, "tax_rate") + num(lodging, "service_fee_rate")) * nights);
+        int rooms = Math.max(1, (int) Math.ceil(adults / 2.0)), people = adults + children;
+        Map<UUID, Map<String, Object>> pricing = new java.util.HashMap<>();
+        Map<UUID, UUID> cityStay = new java.util.HashMap<>();
+        double lodgingUsd = 0, transport = 0, breakfast = 0;
+        for (Map<String, Object> row : dayRows(itineraryId, it)) {
+            UUID destId = (UUID) row.get("destination_id");
+            int day = Rows.integer(row, "day_index");
+            UUID night = (UUID) row.get("accommodation_id");
+            UUID stayId = night != null ? night : cityStay.computeIfAbsent(destId, k -> itineraries.stayIn(itineraryId, k).orElse(null));
+            Map<String, Object> stay = stayId == null ? null : pricing.computeIfAbsent(stayId, k -> accommodations.findPricing(k).orElse(null));
+            if (night != null && stay != null) lodgingUsd += num(stay, "from_price_usd") * rooms * (1 + num(stay, "tax_rate") + num(stay, "service_fee_rate"));
+            if (stay == null || !Boolean.TRUE.equals(stay.get("breakfast_included"))) breakfast += 3.0 * people;
+            transport += Math.max(4, Math.min(20, num(row, "daily_budget_usd") * 0.12));
+            if (row.get("transfer_from") != null) {
+                double fare = PlannerService.transferCost(num(row, "transfer_km"), adults, children);
+                itineraries.setTransferCost(itineraryId, day, fare);
+                transport += fare;
+            }
+        }
+        lodgingUsd = round2(lodgingUsd);
+        transport = round2(transport);
+        breakfast = round2(breakfast);
         double activities = itineraries.sumItemCosts(itineraryId);
-        double transport = round2(Math.max(4, Math.min(20, dailyBudget * 0.12)) * numDays);
-        double breakfast = lodging != null && Boolean.TRUE.equals(lodging.get("breakfast_included")) ? 0 : round2(3.0 * (adults + children) * numDays);
         double total = round2(lodgingUsd + activities + transport + breakfast);
         itineraries.setTotal(itineraryId, total);
         Double budget = it.get("budget_usd") == null ? null : ((Number) it.get("budget_usd")).doubleValue();

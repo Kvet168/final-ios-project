@@ -1,6 +1,6 @@
 # Project proposal
 
-**Product:** WAYFARER, an AI travel, hotel and location platform for Cambodia and Southeast Asia.
+**Product:** WAYFARER, an AI travel, hotel and location platform for Cambodia.
 
 **Problem.** Travellers juggle separate tools for destination research, hotel search, itinerary planning and bookings; generic AI planners invent places and prices. WAYFARER keeps these in one product and grounds every suggestion in stored, inspectable records.
 

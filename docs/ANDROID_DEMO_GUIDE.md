@@ -14,11 +14,11 @@ The phone needs to reach the API for accounts, bookings, search and the AI. Buil
 ## Suggested 6-minute flow
 | Step | What to show | Talking point |
 |---|---|---|
-| 1 | Welcome carousel, then **Discover** | 30 destinations, 373 places, 76 stays, offline-capable assets |
-| 2 | Tap a destination (Siem Reap, Kyoto, Hoi An) | Parallax gallery, facts, map, places, stays |
+| 1 | Welcome carousel, then **Discover** | 12 Cambodian destinations, 152 places, 32 stays, offline-capable assets |
+| 2 | Tap a destination (Siem Reap, Kampot, Koh Rong) | Parallax gallery, facts, map, places, stays |
 | 3 | **Stays** tab: filters, then a stay detail | Real date availability and price breakdown |
 | 4 | Reserve a room, pay (simulated), open the **ticket** | Held room countdown, server-verified payment, receipt |
-| 5 | Centre **AI orb**: "What is the best time to visit Hoi An?" then a follow-up chip | Intent + destination facts + sources, cards, instant answers |
+| 5 | Centre **AI orb**: "What is the best time to visit Siem Reap?" then a follow-up chip | Intent + destination facts + sources, cards, instant answers |
 | 6 | **Trips** tab: "3 days in Kampot, relaxed, two kids" | Itinerary built only from stored places, budget split, route map, editable stops |
 
 ## How the AI works (for questions)

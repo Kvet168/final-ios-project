@@ -79,7 +79,7 @@ public class AiService {
         if (b.prompt() == null && b.structured() == null) throw ApiException.unprocessable("VALIDATION_ERROR", "Provide a prompt or structured request");
         if (b.shouldSave() && user == null) throw ApiException.unauthorized("UNAUTHENTICATED", "Sign in to save an itinerary");
 
-        List<RequestParser.Slug> dests = destinations.listAllSlugs().stream().map(d -> new RequestParser.Slug(Rows.str(d, "slug"), Rows.str(d, "name"))).toList();
+        List<RequestParser.Slug> dests = destinations.listForPlanner().stream().map(d -> new RequestParser.Slug(Rows.str(d, "slug"), Rows.str(d, "name"), Rows.str(d, "country"))).toList();
         RequestParser.Parsed parsed;
         if (b.prompt() != null) {
             parsed = parser.understand(b.prompt(), dests);
@@ -97,8 +97,8 @@ public class AiService {
             out.put("status", "needs_more_info");
             out.put("understood", r);
             out.put("missing", missing);
-            out.put("questions", missing.stream().map(m -> "destination".equals(m) ? "Which destination would you like to visit?" : "How many days will you travel?").toList());
-            out.put("availableDestinations", dests.stream().map(d -> Map.of("slug", d.slug(), "name", d.name())).toList());
+            out.put("questions", missing.stream().map(m -> "destination".equals(m) ? "Which destination in Cambodia would you like to visit? WAYFARER plans trips in Cambodia only." : "How many days will you travel?").toList());
+            out.put("availableDestinations", dests.stream().sorted(java.util.Comparator.comparing(RequestParser.Slug::name)).map(d -> Map.of("slug", d.slug(), "name", d.name())).toList());
             return out;
         }
         Plan plan = planner.polishSummary(planner.generate(r));
