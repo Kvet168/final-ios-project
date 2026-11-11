@@ -11,7 +11,7 @@ export function reviewsPage({ api }) {
       { label: 'Review', render: (v) => h('div', {}, h('strong', {}, v.title), h('div', { class: 'muted small' }, v.body)) },
       { label: 'Hotel', render: (v) => v.accommodation_name }, { label: 'Author', render: (v) => v.author }, { label: 'Date', render: (v) => dateTime(v.created_at) },
       { label: 'Status', render: (v) => badge(v.status) },
-      { label: '', render: (v) => h('button', { class: 'btn small', type: 'button', onclick: () => act(v.id, v.status === 'published' ? 'hidden' : 'published') }, v.status === 'published' ? 'Hide' : 'Publish') }], rows: r.items }),
+      { label: '', render: (v) => h('button', { class: `btn small ${v.status === 'published' ? 'danger' : 'primary'}`, type: 'button', onclick: () => act(v.id, v.status === 'published' ? 'hidden' : 'published') }, v.status === 'published' ? 'Hide' : 'Publish') }], rows: r.items }),
     pager({ page: r.page, pageSize: r.pageSize, total: r.total, onChange: (p) => { state.page = p; load(); } }));
   }
   load().catch((e) => box.replaceChildren(h('div', { class: 'empty' }, e.message)));

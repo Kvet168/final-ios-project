@@ -96,6 +96,9 @@ public class PartnerController {
     @PostMapping("/bookings/{id}/transition")
     public Map<String, Object> transition(@PathVariable UUID id, @Valid @RequestBody TransitionRequest r) { return partner.transition(CurrentUser.require(), id, r.to(), r.note()); }
 
+    @PostMapping("/bookings/{id}/cancel")
+    public Map<String, Object> cancelBooking(@PathVariable UUID id) { return partner.cancelBooking(CurrentUser.require(), id); }
+
     /* QR payments */
     @GetMapping("/payments")
     public Map<String, Object> payments(@RequestParam(required = false) String status, @RequestParam(required = false) String method,

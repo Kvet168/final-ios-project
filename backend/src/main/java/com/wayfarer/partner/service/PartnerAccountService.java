@@ -55,13 +55,17 @@ public class PartnerAccountService {
     @Transactional
     public Map<String, Object> create(UUID actor, CreatePartnerRequest r) {
         if (users.emailTaken(r.email())) throw ApiException.conflict("EMAIL_TAKEN", "An account with this email already exists");
-        String temp = temporaryPassword();
-        Map<String, Object> u = users.insertPartnerUser(r.email().trim(), encoder.encode(temp), r.ownerName().trim(), r.phone());
+        boolean customPw = r.password() != null && !r.password().isBlank();
+        String chosenPw = customPw ? r.password() : temporaryPassword();
+        Map<String, Object> u = users.insertManagedUser(r.email().trim(), encoder.encode(chosenPw), r.ownerName().trim(), r.phone(), "partner", !customPw);
         UUID partnerId = partners.insert(Rows.uuid(u, "id"), r.businessName().trim(), r.phone());
         audit.record(actor, "partner.create", "partner", partnerId, Map.of("owner", r.email(), "business", r.businessName()));
         Map<String, Object> out = new LinkedHashMap<>(partners.findDetail(partnerId).orElseThrow());
-        out.put("temporaryPassword", temp);
-        out.put("notice", "Give these credentials to the partner. The password is shown only once and must be changed at first sign-in.");
+        out.put("temporaryPassword", chosenPw);
+        out.put("customPassword", customPw);
+        out.put("notice", customPw
+            ? "Account created with the password you set. Give these credentials to the partner."
+            : "Give these credentials to the partner. The password is shown only once and must be changed at first sign-in.");
         return out;
     }
 

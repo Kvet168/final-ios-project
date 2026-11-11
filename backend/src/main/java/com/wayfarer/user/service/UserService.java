@@ -6,10 +6,13 @@ import com.wayfarer.booking.repository.BookingRepository;
 import com.wayfarer.common.ApiException;
 import com.wayfarer.common.Pages;
 import com.wayfarer.common.Rows;
+import com.wayfarer.user.dto.UserDtos.CreateUserRequest;
 import com.wayfarer.user.dto.UserDtos.DeleteAccountRequest;
 import com.wayfarer.user.dto.UserDtos.UpdateProfileRequest;
 import com.wayfarer.user.dto.UserDtos.UserDto;
 import com.wayfarer.user.repository.UserRepository;
+import java.security.SecureRandom;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz", DIGITS = "23456789";
+
     private final UserRepository users;
     private final RefreshTokenRepository refreshTokens;
     private final BookingRepository bookings;
@@ -30,6 +36,14 @@ public class UserService {
         this.bookings = bookings;
         this.encoder = encoder;
         this.audit = audit;
+    }
+
+    /** 12 characters, no look-alike characters, always at least one letter and one digit. */
+    static String temporaryPassword() {
+        char[] c = new char[12];
+        for (int i = 0; i < c.length; i++) c[i] = (i % 4 == 3 ? DIGITS : LETTERS).charAt(RANDOM.nextInt((i % 4 == 3 ? DIGITS : LETTERS).length()));
+        for (int i = c.length - 1; i > 0; i--) { int j = RANDOM.nextInt(i + 1); char t = c[i]; c[i] = c[j]; c[j] = t; }
+        return new String(c);
     }
 
     public static UserDto toDto(Map<String, Object> u) {
@@ -70,5 +84,47 @@ public class UserService {
         users.setRole(targetId, role).orElseThrow(() -> ApiException.notFound("User"));
         refreshTokens.revokeAllForUser(targetId);       // force a fresh sign-in under the new role
         audit.record(actorId, "user.role_change", "user", targetId, Map.of("role", role));
+    }
+
+    @Transactional
+    public Map<String, Object> createByAdmin(UUID actorId, CreateUserRequest r) {
+        String email = r.email().trim();
+        if (users.emailTaken(email)) throw ApiException.conflict("EMAIL_TAKEN", "An account with this email already exists");
+        boolean customPw = r.password() != null && !r.password().isBlank();
+        String chosenPw = customPw ? r.password() : temporaryPassword();
+        String phone = (r.phone() == null || r.phone().isBlank()) ? null : r.phone().trim();
+        Map<String, Object> u = users.insertManagedUser(email, encoder.encode(chosenPw), r.name().trim(), phone, r.role(), !customPw);
+        UUID userId = Rows.uuid(u, "id");
+        audit.record(actorId, "user.create", "user", userId, Map.of("email", email, "role", r.role()));
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("id", userId);
+        out.put("name", Rows.str(u, "name"));
+        out.put("email", Rows.str(u, "email"));
+        out.put("phone", Rows.str(u, "phone"));
+        out.put("role", Rows.str(u, "role"));
+        out.put("temporaryPassword", chosenPw);
+        out.put("customPassword", customPw);
+        out.put("notice", customPw
+            ? "Account created with the password you set. Give these sign-in credentials to the user."
+            : "Give these credentials to the user. The temporary password is shown only once and must be changed at first sign-in.");
+        return out;
+    }
+
+    @Transactional
+    public Map<String, Object> resetPasswordByAdmin(UUID actorId, UUID targetId) {
+        if (actorId.equals(targetId)) throw ApiException.conflict("SELF_PASSWORD_RESET", "Use the Account page to change your own password.");
+        Map<String, Object> u = users.findActiveById(targetId).orElseThrow(() -> ApiException.notFound("User"));
+        String temp = temporaryPassword();
+        users.setPassword(targetId, encoder.encode(temp), true);
+        refreshTokens.revokeAllForUser(targetId);
+        audit.record(actorId, "user.password_reset", "user", targetId, Map.of("email", Rows.str(u, "email"), "role", Rows.str(u, "role")));
+        return Map.of(
+            "id", targetId,
+            "name", Rows.str(u, "name"),
+            "email", Rows.str(u, "email"),
+            "role", Rows.str(u, "role"),
+            "temporaryPassword", temp,
+            "notice", "Shown only once. The user is signed out everywhere and must set a new password at next sign-in."
+        );
     }
 }

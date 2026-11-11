@@ -47,9 +47,10 @@ public class BookingRepository {
     public Optional<Map<String, Object>> findStatusForUpdate(UUID id) { return db.one("SELECT id, status, user_id, reference, accommodation_id FROM bookings WHERE id = :id FOR UPDATE", Map.of("id", id)); }
 
     public Optional<Map<String, Object>> findDetail(UUID id) {
-        return db.one("SELECT b.*, a.name AS accommodation_name, a.slug AS accommodation_slug, a.address, a.cover_image, a.partner_id, "
+        return db.one("SELECT b.*, a.name AS accommodation_name, a.slug AS accommodation_slug, a.address, a.cover_image, a.partner_id, pt.name AS partner_name, "
             + "r.name AS room_name, d.name AS destination_name, a.is_demo AS accommodation_is_demo FROM bookings b "
-            + "JOIN accommodations a ON a.id = b.accommodation_id JOIN room_types r ON r.id = b.room_type_id JOIN destinations d ON d.id = a.destination_id WHERE b.id = :id", Map.of("id", id));
+            + "JOIN accommodations a ON a.id = b.accommodation_id JOIN room_types r ON r.id = b.room_type_id JOIN destinations d ON d.id = a.destination_id "
+            + "LEFT JOIN partners pt ON pt.id = a.partner_id WHERE b.id = :id", Map.of("id", id));
     }
 
     public List<Map<String, Object>> nights(UUID id) { return db.list("SELECT night, rate_usd FROM booking_items WHERE booking_id = :id ORDER BY night", Map.of("id", id)); }
@@ -115,10 +116,10 @@ public class BookingRepository {
             where.add("b.accommodation_id IN (:acc)");
         }
         String cols = partnerShape
-            ? "b.id, b.reference, b.status, b.guest_name, b.check_in, b.check_out, b.nights, b.rooms, b.adults, b.children, b.total_usd, a.name AS accommodation_name, r.name AS room_name"
-            : "b.id, b.reference, b.status, b.guest_name, b.guest_email, b.check_in, b.check_out, b.total_usd, b.created_at, b.is_demo, a.name AS accommodation_name";
+            ? "b.id, b.reference, b.status, b.guest_name, b.guest_email, b.guest_phone, b.check_in, b.check_out, b.nights, b.rooms, b.adults, b.children, b.subtotal_usd, b.taxes_usd, b.fees_usd, b.total_usd, b.created_at, a.name AS accommodation_name, r.name AS room_name, pt.name AS partner_name"
+            : "b.id, b.reference, b.status, b.guest_name, b.guest_email, b.guest_phone, b.check_in, b.check_out, b.nights, b.rooms, b.adults, b.children, b.subtotal_usd, b.taxes_usd, b.fees_usd, b.total_usd, b.created_at, b.is_demo, a.name AS accommodation_name, r.name AS room_name, pt.name AS partner_name";
         return db.list("SELECT " + cols + ", COUNT(*) OVER () AS total_count FROM bookings b JOIN accommodations a ON a.id = b.accommodation_id "
-            + (partnerShape ? "JOIN room_types r ON r.id = b.room_type_id " : "") + "WHERE " + String.join(" AND ", where)
+            + "JOIN room_types r ON r.id = b.room_type_id LEFT JOIN partners pt ON pt.id = a.partner_id WHERE " + String.join(" AND ", where)
             + " ORDER BY " + (partnerShape ? "b.check_in" : "b.created_at") + " DESC LIMIT :limit OFFSET :offset", ps);
     }
 }

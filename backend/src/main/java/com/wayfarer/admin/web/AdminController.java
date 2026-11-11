@@ -10,6 +10,7 @@ import com.wayfarer.payment.repository.PaymentRepository;
 import com.wayfarer.review.dto.ReviewDtos.ModerateRequest;
 import com.wayfarer.review.service.ReviewService;
 import com.wayfarer.security.CurrentUser;
+import com.wayfarer.user.dto.UserDtos.CreateUserRequest;
 import com.wayfarer.user.dto.UserDtos.RoleRequest;
 import com.wayfarer.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,6 +66,19 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setRole(@PathVariable UUID id, @Valid @RequestBody RoleRequest r) { users.changeRole(CurrentUser.require().id(), id, r.role()); }
+
+    @PostMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> createUser(@Valid @RequestBody CreateUserRequest r) {
+        return users.createByAdmin(CurrentUser.require().id(), r);
+    }
+
+    @PostMapping("/users/{id}/reset-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, Object> resetUserPassword(@PathVariable UUID id) {
+        return users.resetPasswordByAdmin(CurrentUser.require().id(), id);
+    }
 
     @GetMapping("/bookings")
     public Map<String, Object> bookingsList(@RequestParam(required = false) String status, @RequestParam(required = false) String q,

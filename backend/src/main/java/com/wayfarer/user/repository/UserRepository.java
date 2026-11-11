@@ -56,8 +56,13 @@ public class UserRepository {
 
     /** Partner owner account created by an administrator: must pick a new password at first sign-in. */
     public Map<String, Object> insertPartnerUser(String email, String passwordHash, String name, String phone) {
-        return db.one("INSERT INTO users(email, password_hash, name, phone, role, must_change_password) VALUES (:e, :h, :n, :p, 'partner', true) RETURNING *",
-            Db.params().addValue("e", email).addValue("h", passwordHash).addValue("n", name).addValue("p", phone)).orElseThrow();
+        return insertManagedUser(email, passwordHash, name, phone, "partner", true);
+    }
+
+    /** Administrator-provisioned user account (admin, staff, customer, partner). */
+    public Map<String, Object> insertManagedUser(String email, String passwordHash, String name, String phone, String role, boolean mustChangePassword) {
+        return db.one("INSERT INTO users(email, password_hash, name, phone, role, must_change_password) VALUES (:e, :h, :n, :p, :r, :m) RETURNING *",
+            Db.params().addValue("e", email).addValue("h", passwordHash).addValue("n", name).addValue("p", phone).addValue("r", role).addValue("m", mustChangePassword)).orElseThrow();
     }
 
     /** Soft delete and anonymise personal data; bookings and payments stay for financial records. */
@@ -75,7 +80,7 @@ public class UserRepository {
         StringBuilder where = new StringBuilder("deleted_at IS NULL");
         if (q != null && !q.isBlank()) { ps.addValue("q", Text.like(q)); where.append(" AND (email ILIKE :q OR name ILIKE :q)"); }
         if (role != null) { ps.addValue("role", role); where.append(" AND role = :role"); }
-        return db.list("SELECT id, email, name, role, is_demo, created_at, COUNT(*) OVER () AS total_count FROM users WHERE " + where
+        return db.list("SELECT id, email, name, phone, role, is_demo, must_change_password, created_at, COUNT(*) OVER () AS total_count FROM users WHERE " + where
             + " ORDER BY created_at DESC LIMIT :limit OFFSET :offset", ps);
     }
 

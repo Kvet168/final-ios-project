@@ -11,11 +11,18 @@ createDashboard({
   roleLabel: 'Hotel partners',
   allowedRoles: ['partner'],
   nav: [
-    { id: 'dashboard', label: 'Dashboard', icon: 'chart', page: dashboardPage },
-    { id: 'properties', label: 'My properties', icon: 'bed', page: propertiesPage },
-    { id: 'bookings', label: 'Bookings', icon: 'ticket', page: (ctx) => bookingsPage({ ...ctx, scope: 'partner' }) },
-    { id: 'payments', label: 'QR payments', icon: 'card', page: paymentsPage },
-    { id: 'reviews', label: 'Guest reviews', icon: 'star', page: reviewsPage },
-    { id: 'account', label: 'Account', icon: 'users', page: accountPage },
+    // Analytics
+    { id: 'dashboard', group: 'Analytics', label: 'Dashboard', icon: 'chart', page: dashboardPage },
+
+    // Property Management
+    { id: 'properties', group: 'Property Management', label: 'My properties', icon: 'bed', page: propertiesPage },
+    { id: 'reviews', group: 'Property Management', label: 'Guest reviews', icon: 'star', page: reviewsPage },
+
+    // Reservations & Finance
+    { id: 'bookings', group: 'Reservations & Finance', label: 'Bookings', icon: 'ticket', page: (ctx) => bookingsPage({ ...ctx, scope: 'partner' }) },
+    { id: 'payments', group: 'Reservations & Finance', label: 'QR payments', icon: 'card', page: paymentsPage },
+
+    // Account Settings
+    { id: 'account', group: 'Settings', label: 'Account', icon: 'users', page: accountPage },
   ],
 });

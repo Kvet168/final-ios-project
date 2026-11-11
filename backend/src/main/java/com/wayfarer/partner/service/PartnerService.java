@@ -96,8 +96,16 @@ public class PartnerService {
     }
 
     public Map<String, Object> transition(AuthUser u, UUID bookingId, BookingStatus to, String note) {
-        if (to != BookingStatus.CHECKED_IN && to != BookingStatus.COMPLETED) throw ApiException.unprocessable("VALIDATION_ERROR", "Partners can set CHECKED_IN or COMPLETED");
+        if (to != BookingStatus.CHECKED_IN && to != BookingStatus.COMPLETED && to != BookingStatus.CONFIRMED) {
+            throw ApiException.unprocessable("VALIDATION_ERROR", "Partners can set CONFIRMED, CHECKED_IN or COMPLETED");
+        }
         return bookings.staffTransition(bookingId, to, u.id(), note, scope(u), "partner");
+    }
+
+    public Map<String, Object> cancelBooking(AuthUser u, UUID bookingId) {
+        Map<String, Object> b = bookingRepository.findById(bookingId).orElseThrow(() -> ApiException.notFound("Booking"));
+        if (!scope(u).contains((UUID) b.get("accommodation_id"))) throw ApiException.notFound("Booking");
+        return bookings.cancel(bookingId, u.id(), true);
     }
 
     /* ------------------------------------------------------------ stock and prices */

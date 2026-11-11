@@ -57,8 +57,11 @@ public class PaymentRepository {
         MapSqlParameterSource ps = Db.params().addValue("limit", limit).addValue("offset", offset);
         String where = "true";
         if (status != null) { ps.addValue("s", status); where = "p.status = :s"; }
-        return db.list("SELECT p.id, p.amount_usd, p.refunded_usd, p.status, p.provider, p.provider_ref, p.simulated, p.failure_reason, p.created_at, b.reference, "
-            + "COUNT(*) OVER () AS total_count FROM payments p JOIN bookings b ON b.id = p.booking_id WHERE " + where + " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset", ps);
+        return db.list("SELECT p.id, p.amount_usd, p.refunded_usd, p.status, p.method, p.provider, p.provider_ref, p.simulated, p.failure_reason, p.created_at, "
+            + "b.reference, b.guest_name, b.guest_email, b.subtotal_usd, b.taxes_usd, b.fees_usd, a.name AS accommodation_name, pt.name AS partner_name, "
+            + "COUNT(*) OVER () AS total_count FROM payments p JOIN bookings b ON b.id = p.booking_id "
+            + "JOIN accommodations a ON a.id = b.accommodation_id LEFT JOIN partners pt ON pt.id = a.partner_id "
+            + "WHERE " + where + " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset", ps);
     }
 
     public void claim(UUID id, String note) {
@@ -84,7 +87,7 @@ public class PaymentRepository {
         if (status != null) { ps.addValue("s", status); where.append(" AND p.status = :s"); }
         if (method != null) { ps.addValue("m", method); where.append(" AND p.method = :m"); }
         return db.list("SELECT p.id, p.amount_usd, p.status, p.method, p.provider_ref, p.claimed_at, p.claim_note, p.failure_reason, p.created_at, b.reference, b.guest_name, b.check_in, b.check_out, "
-            + "a.name AS accommodation_name, COUNT(*) OVER () AS total_count FROM payments p JOIN bookings b ON b.id = p.booking_id JOIN accommodations a ON a.id = b.accommodation_id "
+            + "b.subtotal_usd, b.taxes_usd, b.fees_usd, a.name AS accommodation_name, COUNT(*) OVER () AS total_count FROM payments p JOIN bookings b ON b.id = p.booking_id JOIN accommodations a ON a.id = b.accommodation_id "
             + "JOIN partners pt ON pt.id = a.partner_id WHERE " + where + " ORDER BY (p.status = 'PENDING' AND p.claimed_at IS NOT NULL) DESC, p.created_at DESC LIMIT :l OFFSET :o", ps);
     }
 }
