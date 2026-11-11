@@ -2,7 +2,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Access/refresh token persistence. Uses the platform keystore on mobile (Keychain / EncryptedSharedPreferences).
 class TokenStore {
-  TokenStore({FlutterSecureStorage? storage}) : _s = storage ?? const FlutterSecureStorage();
+  TokenStore({FlutterSecureStorage? storage})
+    : _s = storage ?? const FlutterSecureStorage();
   final FlutterSecureStorage _s;
   String? _accessCache;
   String? _refreshCache;

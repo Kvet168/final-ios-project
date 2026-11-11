@@ -1,0 +1,494 @@
+{
+ "status": "ok",
+ "understood": {
+  "destination": "kampot",
+  "days": 5,
+  "adults": 2,
+  "children": 0,
+  "budgetUsd": null,
+  "budgetIsPerDay": false,
+  "interests": [],
+  "pace": "balanced",
+  "alsoVisit": [
+   "siem-reap"
+  ],
+  "daysPerDestination": [
+   3,
+   2
+  ]
+ },
+ "understoodBy": "llm",
+ "parserNote": null,
+ "plan": {
+  "title": "5 days in Kampot & Siem Reap",
+  "summary": "Experience the charm of Kampot with strolls by the Kampot Riverside Promenade, visits to the Kampot Old Bridge, Kampot Durian Monument, Old Market Morning Cafe, and scenic stops including the Kampot Salt Fields, Phnom Chhngok Cave Temple, Teuk Chhou Rapids, and a Kampot Pepper Farm Visit, complemented by meals at Riverbank Pepper Crab and Bokor View Bistro, as well as a Countryside Tuk-tuk Loop. Afterwards, journey to Siem Reap to explore Angkor Wat, the Angkor National Museum, Pub Street, Angkor Night Market, Kuy Teav Alley Stall, and shop or dine at the Old Market (Psar Chas), Old Market Lok Lak House, and Apsara Dinner Pavilion.",
+  "destination": {
+   "id": "c732bbd6-37b5-48fb-b049-a1af6eb01322",
+   "slug": "kampot",
+   "name": "Kampot",
+   "lat": 10.6104,
+   "lng": 104.1815
+  },
+  "days": [
+   {
+    "day": 1,
+    "items": [
+     {
+      "attractionId": "23604050-779a-471c-8407-4916b67b030e",
+      "name": "Kampot Old Bridge",
+      "kind": "attraction",
+      "category": "landmark",
+      "lat": 10.6139,
+      "lng": 104.1822,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Passing_Under_the_Bridge_-_Kampot_River_-_Kampot_-_Cambodia_%2848529032082%29.jpg/960px-Passing_Under_the_Bridge_-_Kampot_River_-_Kampot_-_Cambodia_%2848529032082%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 551,
+      "durationMin": 20,
+      "travelMinFromPrev": 11,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; open access, no fixed hours.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "584760ec-aad4-43ad-bb79-7e128e6cb970",
+      "name": "Kampot Riverside Promenade",
+      "kind": "attraction",
+      "category": "landmark",
+      "lat": 10.6104,
+      "lng": 104.1815,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/2022.08-516-214ap1_sculpture%2C_monument_Durian_Roundabout%2CKampot%2CKH_sat20aug2022-1556h.jpg/960px-2022.08-516-214ap1_sculpture%2C_monument_Durian_Roundabout%2CKampot%2CKH_sat20aug2022-1556h.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 580,
+      "durationMin": 60,
+      "travelMinFromPrev": 9,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; open access, no fixed hours.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "017d6334-ae12-411c-bfb7-cd1fb77e5478",
+      "name": "Old Market Morning Cafe",
+      "kind": "restaurant",
+      "category": "cafe",
+      "lat": 10.6107,
+      "lng": 104.1802,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Cafe_wall_in_Kampot%2C_Cambodia%2C_features_Arn_Chorn-Pond%2C_Kong_Nay_and_Bob_Dylan_2017-03.jpg/960px-Cafe_wall_in_Kampot%2C_Cambodia%2C_features_Arn_Chorn-Pond%2C_Kong_Nay_and_Bob_Dylan_2017-03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 720,
+      "durationMin": 45,
+      "travelMinFromPrev": 9,
+      "costUsd": 8.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 07:00-17:00.",
+      "isDemo": true,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "ba973e3c-f302-4447-bfd9-85218de2e676",
+      "name": "Kampot Durian Monument",
+      "kind": "attraction",
+      "category": "landmark",
+      "lat": 10.6119,
+      "lng": 104.1862,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/2016_Kampot%2C_Departament_Gospodarki_i_Finans%C3%B3w_prowincji_Kampot_%2804%29.jpg/960px-2016_Kampot%2C_Departament_Gospodarki_i_Finans%C3%B3w_prowincji_Kampot_%2804%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 810,
+      "durationMin": 20,
+      "travelMinFromPrev": 10,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; open access, no fixed hours.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "6baf6f76-2cbf-4a74-b76d-6378c3111e3f",
+      "name": "Riverbank Pepper Crab",
+      "kind": "restaurant",
+      "category": "food",
+      "lat": 10.6112,
+      "lng": 104.1827,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/2016_Kampot%2C_Old_Market_Street%2C_Sklepy_i_restauracje.jpg/960px-2016_Kampot%2C_Old_Market_Street%2C_Sklepy_i_restauracje.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 1110,
+      "durationMin": 70,
+      "travelMinFromPrev": 9,
+      "costUsd": 20.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 11:00-21:30.",
+      "isDemo": true,
+      "hoursVerified": false
+     }
+    ],
+    "costUsd": 28.0,
+    "destination": {
+     "id": "c732bbd6-37b5-48fb-b049-a1af6eb01322",
+     "slug": "kampot",
+     "name": "Kampot",
+     "lat": 10.6104,
+     "lng": 104.1815
+    },
+    "transfer": null
+   },
+   {
+    "day": 2,
+    "items": [
+     {
+      "attractionId": "eec92cb2-9b60-4351-8d06-ceb8e01522db",
+      "name": "Countryside Tuk-tuk Loop",
+      "kind": "activity",
+      "category": "tour",
+      "lat": 10.62,
+      "lng": 104.17,
+      "image": null,
+      "startMin": 555,
+      "durationMin": 240,
+      "travelMinFromPrev": 15,
+      "costUsd": 36.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 08:00-16:00.",
+      "isDemo": true,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "c1e52e0a-e246-40a9-9f7b-a0450a34c3a7",
+      "name": "Bokor View Bistro",
+      "kind": "restaurant",
+      "category": "food",
+      "lat": 10.6082,
+      "lng": 104.1859,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Baguettes_in_Kampot.jpg/960px-Baguettes_in_Kampot.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 811,
+      "durationMin": 70,
+      "travelMinFromPrev": 16,
+      "costUsd": 18.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 11:00-21:30.",
+      "isDemo": true,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "1117de45-459b-4d0d-bdff-feba03646d94",
+      "name": "Kampot Pepper Farm Visit",
+      "kind": "attraction",
+      "category": "nature",
+      "lat": 10.6,
+      "lng": 104.22,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Poivre_kampot01.jpg/960px-Poivre_kampot01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "startMin": 903,
+      "durationMin": 90,
+      "travelMinFromPrev": 22,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 08:00-17:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     }
+    ],
+    "costUsd": 54.0,
+    "destination": {
+     "id": "c732bbd6-37b5-48fb-b049-a1af6eb01322",
+     "slug": "kampot",
+     "name": "Kampot",
+     "lat": 10.6104,
+     "lng": 104.1815
+    },
+    "transfer": null
+   },
+   {
+    "day": 3,
+    "items": [
+     {
+      "attractionId": "1035962b-fefe-4616-952c-f7799f744f21",
+      "name": "Kampot Salt Fields",
+      "kind": "attraction",
+      "category": "nature",
+      "lat": 10.593,
+      "lng": 104.275,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Woman_working_the_salt_fields_in_Kampot.jpg/960px-Woman_working_the_salt_fields_in_Kampot.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 585,
+      "durationMin": 60,
+      "travelMinFromPrev": 45,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 06:00-17:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "8f45f849-fdc0-46de-93e5-068077bccdf4",
+      "name": "Phnom Chhngok Cave Temple",
+      "kind": "attraction",
+      "category": "nature",
+      "lat": 10.541,
+      "lng": 104.229,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/02-Pepper_Farm%2C_Kampot-nX-8.jpg/960px-02-Pepper_Farm%2C_Kampot-nX-8.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 681,
+      "durationMin": 60,
+      "travelMinFromPrev": 36,
+      "costUsd": 2.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 07:00-17:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "00bbf548-7b21-47d4-a744-968c0cd4babd",
+      "name": "Teuk Chhou Rapids",
+      "kind": "attraction",
+      "category": "nature",
+      "lat": 10.5546,
+      "lng": 104.113,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/02-Pepper_Farm%2C_Kampot-nX-7.jpg/960px-02-Pepper_Farm%2C_Kampot-nX-7.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 810,
+      "durationMin": 90,
+      "travelMinFromPrev": 55,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 07:00-17:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     }
+    ],
+    "costUsd": 2.0,
+    "destination": {
+     "id": "c732bbd6-37b5-48fb-b049-a1af6eb01322",
+     "slug": "kampot",
+     "name": "Kampot",
+     "lat": 10.6104,
+     "lng": 104.1815
+    },
+    "transfer": null
+   },
+   {
+    "day": 4,
+    "items": [
+     {
+      "attractionId": "f47ca43f-1cf2-4b98-9ddb-81d91a76a11a",
+      "name": "Pub Street",
+      "kind": "attraction",
+      "category": "landmark",
+      "lat": 13.354,
+      "lng": 103.8536,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Interview_Wall_Street_Journal_%286425462779%29.jpg/960px-Interview_Wall_Street_Journal_%286425462779%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 1051,
+      "durationMin": 60,
+      "travelMinFromPrev": 11,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 17:00-00:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "e6f20899-a051-40d2-b865-a75d4572d20f",
+      "name": "Old Market Lok Lak House",
+      "kind": "restaurant",
+      "category": "food",
+      "lat": 13.3547,
+      "lng": 103.8545,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Siem_Reap_restaurant_%285862249201%29.jpg/960px-Siem_Reap_restaurant_%285862249201%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 1121,
+      "durationMin": 70,
+      "travelMinFromPrev": 8,
+      "costUsd": 14.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 11:00-21:30.",
+      "isDemo": true,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "83778e5d-08c7-418c-9c79-dcf8aa291792",
+      "name": "Angkor Night Market",
+      "kind": "attraction",
+      "category": "market",
+      "lat": 13.3534,
+      "lng": 103.8553,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Angkor_night_Market%2C_Cambodia.jpg/960px-Angkor_night_Market%2C_Cambodia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 1201,
+      "durationMin": 60,
+      "travelMinFromPrev": 9,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 17:00-00:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     }
+    ],
+    "costUsd": 14.0,
+    "destination": {
+     "id": "ce678982-8c34-4633-a318-4ca601b80c86",
+     "slug": "siem-reap",
+     "name": "Siem Reap",
+     "lat": 13.3671,
+     "lng": 103.8448
+    },
+    "transfer": {
+     "fromName": "Kampot",
+     "km": 417.0,
+     "minutes": 500,
+     "costUsd": 25.02
+    }
+   },
+   {
+    "day": 5,
+    "items": [
+     {
+      "attractionId": "41f1a7a9-3d6a-4262-ba4f-f9ba6029324d",
+      "name": "Old Market (Psar Chas)",
+      "kind": "attraction",
+      "category": "market",
+      "lat": 13.354,
+      "lng": 103.8553,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Tonle_Sap_Siem_Reap_Cambodia_Girl-steering-her-boat-01.jpg/960px-Tonle_Sap_Siem_Reap_Cambodia_Girl-steering-her-boat-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 551,
+      "durationMin": 60,
+      "travelMinFromPrev": 11,
+      "costUsd": 0.0,
+      "reason": "A well-regarded local stop chosen to round out the day; free to visit; typically open 06:00-21:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "4f2f25aa-9d70-4f4c-906e-141ae960c287",
+      "name": "Angkor National Museum",
+      "kind": "attraction",
+      "category": "museum",
+      "lat": 13.3614,
+      "lng": 103.861,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Angkor_National_Museum_%28II%29.jpg/960px-Angkor_National_Museum_%28II%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "startMin": 623,
+      "durationMin": 90,
+      "travelMinFromPrev": 12,
+      "costUsd": 24.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 08:30-18:00.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "69331762-bab5-44d5-b04d-a255170aa3b0",
+      "name": "Apsara Dinner Pavilion",
+      "kind": "restaurant",
+      "category": "food",
+      "lat": 13.3601,
+      "lng": 103.8574,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Siem_Reap_old_market_%284%29.jpg/960px-Siem_Reap_old_market_%284%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 723,
+      "durationMin": 70,
+      "travelMinFromPrev": 10,
+      "costUsd": 44.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 11:00-21:30.",
+      "isDemo": true,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "e6e1f3f6-1ce1-4847-94b1-01114cc7fd05",
+      "name": "Angkor Wat",
+      "kind": "attraction",
+      "category": "temple",
+      "lat": 13.4125,
+      "lng": 103.867,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Angkor_Wat.jpg/960px-Angkor_Wat.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+      "startMin": 823,
+      "durationMin": 180,
+      "travelMinFromPrev": 30,
+      "costUsd": 74.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 05:00-17:30.",
+      "isDemo": false,
+      "hoursVerified": false
+     },
+     {
+      "attractionId": "db328a04-cc24-4c2b-978e-f9fff3b1fb57",
+      "name": "Kuy Teav Alley Stall",
+      "kind": "restaurant",
+      "category": "food",
+      "lat": 13.3562,
+      "lng": 103.8526,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Siem_Reap_street_food_%2815932997329%29.jpg/960px-Siem_Reap_street_food_%2815932997329%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "startMin": 1110,
+      "durationMin": 70,
+      "travelMinFromPrev": 32,
+      "costUsd": 4.0,
+      "reason": "A well-regarded local stop chosen to round out the day; typically open 11:00-21:30.",
+      "isDemo": true,
+      "hoursVerified": false
+     }
+    ],
+    "costUsd": 146.0,
+    "destination": {
+     "id": "ce678982-8c34-4633-a318-4ca601b80c86",
+     "slug": "siem-reap",
+     "name": "Siem Reap",
+     "lat": 13.3671,
+     "lng": 103.8448
+    },
+    "transfer": null
+   }
+  ],
+  "lodging": {
+   "id": "1312361d-2467-401e-89f9-8d00574bf1ec",
+   "name": "Bokor View Bungalows",
+   "nightlyUsd": 42.56,
+   "nights": 3,
+   "totalUsd": 127.68,
+   "breakfastIncluded": true,
+   "isDemo": true,
+   "destination": "kampot"
+  },
+  "budget": {
+   "lodgingUsd": 189.28,
+   "activitiesUsd": 136.0,
+   "foodUsd": 108.0,
+   "transportUsd": 52.62,
+   "totalUsd": 485.9,
+   "budgetUsd": null,
+   "withinBudget": null,
+   "perDayUsd": [
+    75.36,
+    101.36,
+    49.36,
+    107.22,
+    152.6
+   ]
+  },
+  "assumptions": [
+   "Prices are the stored indicative values in USD; children are charged at 50% for activities and 60% for meals.",
+   "Lodging: 3 night(s) at Bokor View Bungalows in Kampot (1 room(s)); 1 night(s) at Wat Damnak Boutique in Siem Reap (1 room(s)), base nightly rates plus taxes and fees.",
+   "Local transport allowance in USD per day: Kampot 4.8, Siem Reap 6.6 (tuk-tuk / ride-hailing estimate).",
+   "Transfer Kampot to Siem Reap: about 417 km by road, around 8 h 20 min (estimate), about 25.02 USD for the party as a bus fare estimate; no live timetables.",
+   "Breakfast is included with the stay.",
+   "Travel times between stops are straight-line estimates at ~22 km/h; they do not use live traffic.",
+   "Opening hours are indicative unless marked verified; check locally before you go."
+  ],
+  "warnings": [
+   "Getting from Kampot to Siem Reap takes about 8 h 20 min by road, so day 4 starts late and has fewer stops. A flight or an early start may suit you better.",
+   "Some stops are educational demo listings whose prices and hours are sample values."
+  ],
+  "mode": "llm",
+  "modeNote": "Structure and costs come from stored database records; the summary text was written by a language model.",
+  "destinations": [
+   {
+    "id": "c732bbd6-37b5-48fb-b049-a1af6eb01322",
+    "slug": "kampot",
+    "name": "Kampot",
+    "lat": 10.6104,
+    "lng": 104.1815
+   },
+   {
+    "id": "ce678982-8c34-4633-a318-4ca601b80c86",
+    "slug": "siem-reap",
+    "name": "Siem Reap",
+    "lat": 13.3671,
+    "lng": 103.8448
+   }
+  ],
+  "lodgings": [
+   {
+    "id": "1312361d-2467-401e-89f9-8d00574bf1ec",
+    "name": "Bokor View Bungalows",
+    "nightlyUsd": 42.56,
+    "nights": 3,
+    "totalUsd": 127.68,
+    "breakfastIncluded": true,
+    "isDemo": true,
+    "destination": "kampot"
+   },
+   {
+    "id": "c2b1307f-8081-4831-92eb-f6d053466426",
+    "name": "Wat Damnak Boutique",
+    "nightlyUsd": 61.6,
+    "nights": 1,
+    "totalUsd": 61.6,
+    "breakfastIncluded": true,
+    "isDemo": true,
+    "destination": "siem-reap"
+   }
+  ]
+ },
+ "itineraryId": null
+}

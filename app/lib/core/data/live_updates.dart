@@ -53,7 +53,12 @@ class _LiveConnection {
       if (_stopped) return;
       if (stream == null) return _scheduleRetry();
       _attempt = 0;
-      _sub = stream.listen(_onMessage, onDone: _scheduleRetry, onError: (_) => _scheduleRetry(), cancelOnError: true);
+      _sub = stream.listen(
+        _onMessage,
+        onDone: _scheduleRetry,
+        onError: (_) => _scheduleRetry(),
+        cancelOnError: true,
+      );
     } catch (_) {
       _scheduleRetry();
     }

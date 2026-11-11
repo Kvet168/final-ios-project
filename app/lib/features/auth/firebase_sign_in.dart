@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:intl/intl.dart';
 
 import '../../core/config/firebase_config.dart';
+import '../../l10n/app_localizations.dart';
 
 /// A sign-in problem the user can understand; shown as-is.
 class AuthMessage implements Exception {
@@ -34,9 +37,17 @@ class FirebaseSignIn {
   static FirebaseAuth get _auth => FirebaseAuth.instance;
 
   /// Creates the account, stores the display name and sends the verification email. The user must open that link before signing in.
-  static Future<void> signUp({required String firstName, required String lastName, required String email, required String password}) async {
+  static Future<void> signUp({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
     try {
-      final cred = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = cred.user!;
       await user.updateDisplayName('$firstName $lastName'.trim());
       await user.sendEmailVerification();
@@ -49,12 +60,15 @@ class FirebaseSignIn {
   /// Signs in and returns a fresh ID token. An address that is not verified yet gets a new verification email and an explanation.
   static Future<String> signIn(String email, String password) async {
     try {
-      final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       final user = cred.user!;
       if (!user.emailVerified) {
         await user.sendEmailVerification();
         await _auth.signOut();
-        throw AuthMessage('Please verify your email first. We just sent you a new link: open it, then sign in again.');
+        throw AuthMessage(_l.verifyEmailFirst);
       }
       return (await user.getIdToken(true))!;
     } on FirebaseAuthException catch (e) {
@@ -66,11 +80,20 @@ class FirebaseSignIn {
   static Future<String?> signInWithGoogle() async {
     try {
       final provider = GoogleAuthProvider()..addScope('email');
-      final cred = kIsWeb ? await _auth.signInWithPopup(provider) : await _auth.signInWithProvider(provider);
+      final cred = kIsWeb
+          ? await _auth.signInWithPopup(provider)
+          : await _auth.signInWithProvider(provider);
       return await cred.user?.getIdToken(true);
     } on FirebaseAuthException catch (e) {
       // Firebase spells "cancelled" both ways depending on the platform.
-      const closed = {'canceled', 'cancelled', 'popup-closed-by-user', 'web-context-canceled', 'web-context-cancelled', 'cancelled-popup-request'};
+      const closed = {
+        'canceled',
+        'cancelled',
+        'popup-closed-by-user',
+        'web-context-canceled',
+        'web-context-cancelled',
+        'cancelled-popup-request',
+      };
       if (closed.contains(e.code)) return null;
       throw AuthMessage(_message(e));
     }
@@ -93,16 +116,23 @@ class FirebaseSignIn {
     } catch (_) {}
   }
 
+  // No BuildContext here: messages use the app's current language (set in main.dart).
+  static AppLocalizations get _l =>
+      lookupAppLocalizations(Locale(Intl.defaultLocale == 'km' ? 'km' : 'en'));
+
   static String _message(FirebaseAuthException e) => switch (e.code) {
-        'email-already-in-use' => 'An account with this email already exists. Try signing in instead.',
-        'invalid-email' => 'That email address does not look right.',
-        'weak-password' => 'Choose a stronger password: at least 10 characters with letters and a number.',
-        'user-not-found' || 'wrong-password' || 'invalid-credential' || 'invalid-login-credentials' => 'Email or password is incorrect.',
-        'user-disabled' => 'This account has been disabled. Contact support.',
-        'too-many-requests' => 'Too many attempts. Please wait a few minutes and try again.',
-        'network-request-failed' => 'No connection. Check your internet and try again.',
-        'operation-not-allowed' => 'This sign-in method is not turned on in Firebase yet.',
-        'account-exists-with-different-credential' => 'This email is already used with another sign-in method.',
-        _ => 'Sign-in failed (${e.code}). Please try again.',
-      };
+    'email-already-in-use' => _l.authEmailInUse,
+    'invalid-email' => _l.authInvalidEmail,
+    'weak-password' => _l.authWeakPassword,
+    'user-not-found' ||
+    'wrong-password' ||
+    'invalid-credential' ||
+    'invalid-login-credentials' => _l.authWrongCredentials,
+    'user-disabled' => _l.authDisabled,
+    'too-many-requests' => _l.authTooMany,
+    'network-request-failed' => _l.authNetwork,
+    'operation-not-allowed' => _l.authNotAllowed,
+    'account-exists-with-different-credential' => _l.authOtherMethod,
+    _ => _l.authFailed(e.code),
+  };
 }

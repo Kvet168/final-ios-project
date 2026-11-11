@@ -1,0 +1,1254 @@
+{
+  "@@locale": "en",
+  "appName": "WAYFARER",
+  "tagline": "Travel, planned beautifully",
+  "splashLoading": "Loading WAYFARER",
+  "splashReady": "Getting things ready",
+  "splashSlow": "Waking the server, this can take a moment",
+  "tabDiscover": "Discover",
+  "tabStays": "Stays",
+  "tabTrips": "Trips",
+  "tabMe": "Me",
+  "askAiGuide": "Ask the AI travel guide",
+  "administration": "Administration",
+  "partnerPortal": "Partner portal",
+  "pageNotFound": "We could not find that page",
+  "backToDiscover": "Back to Discover",
+  "welcome1Eyebrow": "Discover",
+  "welcome1Title": "Cambodia,",
+  "welcome1Italic": "close up",
+  "welcome1Body": "Twelve destinations, hundreds of places and stays, from Angkor at sunrise to the islands of Koh Rong.",
+  "welcome2Eyebrow": "Plan",
+  "welcome2Title": "Trips that build",
+  "welcome2Italic": "themselves",
+  "welcome2Body": "Tell the AI planner where, how long and what you love. It lays out every day on real, stored places.",
+  "welcome3Eyebrow": "Go",
+  "welcome3Title": "Book it,",
+  "welcome3Italic": "carry it",
+  "welcome3Body": "Reserve rooms with clear policies, keep tickets in your pocket and ask the guide anything on the way.",
+  "skip": "Skip",
+  "next": "Next",
+  "startExploring": "Start exploring",
+  "fromPerDay": "from {price} / day",
+  "@fromPerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "priceForNights": "{price} for {nights, plural, =1{1 night} other{{nights} nights}}",
+  "@priceForNights": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "int"
+      }
+    }
+  },
+  "perNight": "/ night",
+  "kmAway": "{distance} km away",
+  "@kmAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "photoFor": "Photo for {name}",
+  "@photoFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "perkFreeCancellation": "Free cancellation",
+  "perkBreakfast": "Breakfast",
+  "perkFamily": "Family",
+  "typeHotel": "Hotel",
+  "typeGuesthouse": "Guesthouse",
+  "typeResort": "Resort",
+  "typeHostel": "Hostel",
+  "typeBoutique": "Boutique hotel",
+  "typeVilla": "Villa",
+  "typeApartment": "Apartment",
+  "typeBungalow": "Bungalow",
+  "catTemple": "Temple",
+  "catMuseum": "Museum",
+  "catMarket": "Market",
+  "catNature": "Nature",
+  "catBeach": "Beach",
+  "catFood": "Food",
+  "catCafe": "Cafe",
+  "catCulture": "Culture",
+  "catTour": "Tour",
+  "catOutdoor": "Outdoor",
+  "catFamily": "Family",
+  "catLandmark": "Landmark",
+  "catHistory": "History",
+  "catRestaurant": "Restaurant",
+  "catActivity": "Activity",
+  "catAttraction": "Attraction",
+  "tagTemples": "Temples",
+  "tagRelaxed": "Relaxed",
+  "tagCity": "City",
+  "tagIslands": "Islands",
+  "free": "Free",
+  "minutesShort": "{minutes} min",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "saveToWishlist": "Save to wishlist",
+  "removeFromWishlist": "Remove from wishlist",
+  "loading": "Loading",
+  "genericError": "Something went wrong. Please try again.",
+  "noConnection": "No connection",
+  "didntLoad": "That didn't load",
+  "tryAgain": "Try again",
+  "demoListing": "Demo listing",
+  "demoTooltip": "Educational sample data: not a real commercial offer",
+  "ratingNew": "New",
+  "starProperty": "{stars} star property",
+  "@starProperty": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "stayCardSemantics": "{name}, {stars} star {type}",
+  "@stayCardSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stars": {
+        "type": "int"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "statusConfirmed": "Confirmed",
+  "statusAwaitingPayment": "Awaiting payment",
+  "statusCheckedIn": "Checked in",
+  "statusCompleted": "Completed",
+  "statusCancelled": "Cancelled",
+  "statusExpired": "Expired",
+  "statusRefundPending": "Refund pending",
+  "statusRefunded": "Refunded",
+  "statusDraft": "Draft",
+  "statusPaidSimulated": "Paid (simulated)",
+  "statusPaymentFailed": "Payment failed",
+  "statusPaymentPending": "Payment pending",
+  "confirm": "Confirm",
+  "keep": "Keep",
+  "cancel": "Cancel",
+  "save": "Save",
+  "close": "Close",
+  "done": "Done",
+  "seeAll": "See all",
+  "all": "All",
+  "greetingNight": "Late night wanderer",
+  "greetingMorning": "Good morning",
+  "greetingAfternoon": "Good afternoon",
+  "greetingEvening": "Good evening",
+  "greetingWithName": "{greeting}, {name}",
+  "@greetingWithName": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "signIn": "Sign in",
+  "heroLine1": "Where will you",
+  "heroLine2": "wander next?",
+  "searchStays": "Search stays",
+  "findYourStay": "Find your stay",
+  "anywhereAnyDates": "Anywhere · Any dates · Any guests",
+  "quickAiPlanner": "AI planner",
+  "quickDayByDay": "Day-by-day",
+  "quickAskGuide": "Ask guide",
+  "quickInstantAnswers": "Instant answers",
+  "quickMap": "Map",
+  "quickNearYou": "Near you",
+  "recentlyViewed": "Recently viewed",
+  "pickUpWhereLeft": "Pick up where you left off",
+  "featured": "Featured",
+  "destinationsWeLove": "Destinations we love",
+  "explore": "Explore",
+  "browseByMood": "Browse by mood",
+  "topRated": "Top rated",
+  "staysWorthTrip": "Stays worth the trip",
+  "browse": "Browse",
+  "itineraries": "Itineraries",
+  "readyMadeJourneys": "Ready-made journeys",
+  "planYours": "Plan yours",
+  "thisWeek": "This week",
+  "trendingNow": "Trending now",
+  "statDestinations": "Destinations",
+  "statPlaces": "Places",
+  "statStays": "Stays",
+  "daysCount": "{days, plural, =1{1 day} other{{days} days}}",
+  "@daysCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "estimatedTotal": "Est. {amount}",
+  "@estimatedTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "destinationsTitle": "Destinations",
+  "sort": "Sort",
+  "sortPopular": "Most popular",
+  "sortNameAZ": "Name A–Z",
+  "sortBudgetLow": "Budget: low to high",
+  "sortBudgetHigh": "Budget: high to low",
+  "searchDestinations": "Search destinations",
+  "noDestinationsMatch": "No destinations match",
+  "noDestinationsHint": "Try removing a filter or searching for a different name.",
+  "clearFilters": "Clear filters",
+  "destinationsCount": "{count, plural, =1{1 destination} other{{count} destinations}}",
+  "@destinationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "photoOf": "Photo of {name}",
+  "@photoOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "photoIndex": "{index} / {total}",
+  "@photoIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetPerDay": "~{amount} / day",
+  "@budgetPerDay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "showLess": "Show less",
+  "readMore": "Read more",
+  "thingsToDo": "Things to do and eat",
+  "kindAttractions": "Attractions",
+  "kindActivities": "Activities",
+  "kindRestaurants": "Restaurants",
+  "nothingListed": "Nothing listed yet",
+  "nothingListedHint": "We have no places of this type for this destination.",
+  "showAllCount": "Show all {count}",
+  "@showAllCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "staysEyebrow": "Stays",
+  "whereToStay": "Where to stay",
+  "keepGoing": "Keep going",
+  "nearbyAndRelated": "Nearby and related",
+  "kmShort": "{distance} km",
+  "@kmShort": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "readAndAsk": "Read & ask",
+  "travelGuides": "Travel guides",
+  "findStays": "Find stays",
+  "planTrip": "Plan trip",
+  "indicative": "(indicative)",
+  "familyFriendly": "Family friendly",
+  "directions": "Directions",
+  "destination": "Destination",
+  "placesTitle": "Places",
+  "searchPlacesHint": "Search places, e.g. Angkor, market, museum",
+  "placesCount": "{count, plural, =1{1 place} other{{count} places}}",
+  "@placesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlacesMatch": "No places match",
+  "noPlacesHint": "Try a different category or search term.",
+  "locationOff": "Location services are turned off on this device.",
+  "locationDeclined": "Location permission was declined. You can still explore the map and search by destination.",
+  "locationBlocked": "Location permission is blocked. Enable it in your device settings to use this feature.",
+  "locationFailed": "We could not get your location ({reason}).",
+  "@locationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "locationTimeout": "timeout or unsupported",
+  "perNightKmAway": "{price} / night · {distance} km away",
+  "@perNightKmAway": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "youAreHere": "You are here",
+  "nearMe": "Near me",
+  "staysNearYou": "Stays near you",
+  "noStaysNearby": "No stays within 60 km. Our listings cover specific destinations; explore one instead.",
+  "noLocations": "No locations to show",
+  "directionsInMaps": "Directions in maps app",
+  "showResults": "Show results",
+  "anywhere": "Anywhere",
+  "anyDates": "Any dates",
+  "guestsCount": "{count, plural, =1{1 guest} other{{count} guests}}",
+  "@guestsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roomsCount": "{count, plural, =1{1 room} other{{count} rooms}}",
+  "@roomsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nightsCount": "{count, plural, =1{1 night} other{{count} nights}}",
+  "@nightsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adultsCount": "{count, plural, =1{1 adult} other{{count} adults}}",
+  "@adultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "childrenCount": "{count, plural, =1{1 child} other{{count} children}}",
+  "@childrenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "staysEyebrowCaps": "STAYS",
+  "findPlaceToRest": "Find a place\nto rest",
+  "filters": "Filters",
+  "filtersActive": "Filters · {count}",
+  "@filtersActive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortRecommended": "Recommended",
+  "sortPriceLow": "Price: low to high",
+  "sortPriceHigh": "Price: high to low",
+  "sortGuestRating": "Guest rating",
+  "sortDistance": "Distance",
+  "sortPriceUp": "Price ↑",
+  "sortPriceDown": "Price ↓",
+  "sortNearest": "Nearest",
+  "listView": "List view",
+  "mapView": "Map view",
+  "searching": "Searching…",
+  "staysCount": "{count, plural, =1{1 stay} other{{count} stays}}",
+  "@staysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "totalsShownForNights": "{count, plural, =1{1 night} other{{count} nights}}, totals shown",
+  "@totalsShownForNights": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addDatesForAvailability": "add dates for real availability",
+  "noStaysMatch": "No stays match",
+  "noStaysDatesHint": "There may be no availability for these dates and guests. Try different dates, fewer filters or another destination.",
+  "noStaysHint": "Try widening your price range or removing a filter.",
+  "clearAll": "Clear all",
+  "pricePerNightRange": "Price per night · {min} – {max}",
+  "@pricePerNightRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "starRating": "Star rating",
+  "guestRating": "Guest rating",
+  "propertyType": "Property type",
+  "popular": "Popular",
+  "breakfastAvailable": "Breakfast available",
+  "amenities": "Amenities",
+  "realAvailability": "Real availability and total prices for your dates.",
+  "selectCheckInOut": "Select check-in and check-out",
+  "fewer": "Fewer {label}",
+  "@fewer": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "more": "More {label}",
+  "@more": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "adults": "Adults",
+  "adultsAge": "Age 13 or above",
+  "children": "Children",
+  "childrenAge": "Age 0 to 12",
+  "rooms": "Rooms",
+  "apply": "Apply",
+  "checkoutAfterCheckin": "Check-out must be after check-in",
+  "addDates": "Add dates",
+  "whereTo": "Where to?",
+  "whereToHint": "City, destination or hotel",
+  "dates": "Dates",
+  "guests": "Guests",
+  "fieldValue": "{label}: {value}",
+  "@fieldValue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "photoNofM": "Photo {index} of {total} for {name}",
+  "@photoNofM": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "whatThisPlaceOffers": "What this place offers",
+  "goodToKnow": "Good to know",
+  "cancellation": "Cancellation",
+  "checkIn": "Check-in",
+  "checkOut": "Check-out",
+  "fromTime": "From {time}",
+  "@fromTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "byTime": "By {time}",
+  "@byTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "taxesAndFees": "Taxes and fees",
+  "taxesAndFeesBody": "{tax}% tax and {fee}% service fee are added to the room rate and shown before you pay.",
+  "@taxesAndFeesBody": {
+    "placeholders": {
+      "tax": {
+        "type": "String"
+      },
+      "fee": {
+        "type": "String"
+      }
+    }
+  },
+  "location": "Location",
+  "chooseYourRoom": "Choose your room",
+  "similarStays": "Similar stays nearby",
+  "fromCaps": "FROM",
+  "chooseARoom": "Choose a room",
+  "chooseYourDates": "Choose your dates",
+  "nightsTapToChange": "{count, plural, =1{1 night} other{{count} nights}} · tap to change",
+  "@nightsTapToChange": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToSelect": "Tap to select",
+  "removeRoom": "Remove a room",
+  "addRoom": "Add a room",
+  "selectDates": "Select dates",
+  "tooSmallForParty": "Too small for your party",
+  "notAvailable": "Not available",
+  "reserve": "Reserve",
+  "basePerNight": "base / night",
+  "upToAdults": "Up to {count, plural, =1{1 adult} other{{count} adults}}",
+  "@upToAdults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plusChildren": " + {count, plural, =1{1 child} other{{count} children}}",
+  "@plusChildren": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "breakfastIncluded": "Breakfast included",
+  "avgTimesNights": "{price} avg × {count, plural, =1{1 night} other{{count} nights}}",
+  "@avgTimesNights": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timesRooms": " × {count} rooms",
+  "@timesRooms": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "taxesPercent": "Taxes ({percent}%)",
+  "@taxesPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceFeePercent": "Service fee ({percent}%)",
+  "@serviceFeePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "total": "Total",
+  "guestReviews": "Guest reviews",
+  "sampleDataDemo": "Sample data in this demo",
+  "writeOne": "Write one",
+  "noReviewsYet": "No reviews yet",
+  "beFirstReview": "Be the first to share your stay.",
+  "demoReview": "Demo review",
+  "verifiedStay": "Verified stay",
+  "writeAReview": "Write a review",
+  "starsCount": "{count, plural, =1{1 star} other{{count} stars}}",
+  "@starsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "title": "Title",
+  "addShortTitle": "Add a short title",
+  "yourExperience": "Your experience",
+  "atLeast10Chars": "Please write at least 10 characters",
+  "onlyGuestsCanReview": "Only guests with a confirmed booking can review a property.",
+  "submit": "Submit",
+  "amenWifi": "Wi‑Fi",
+  "amenPool": "Swimming pool",
+  "amenAc": "Air conditioning",
+  "amenBreakfast": "Breakfast",
+  "amenParking": "Parking",
+  "amenShuttle": "Airport shuttle",
+  "amenGym": "Gym",
+  "amenSpa": "Spa",
+  "amenRestaurant": "Restaurant",
+  "amenFamilyRoom": "Family rooms",
+  "amenKidsPool": "Kids' pool",
+  "amenAccessible": "Accessible",
+  "amenBar": "Bar",
+  "amenLaundry": "Laundry",
+  "amenKitchen": "Kitchen",
+  "bookingNotPayable": "This booking can no longer be paid.",
+  "paymentNotConfirmed": "{status} (simulated). Your booking is not confirmed — you can try again before the hold expires.",
+  "@paymentNotConfirmed": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownError": "Unknown error",
+  "yourStayCaps": "YOUR STAY",
+  "nightWord": "{count, plural, =1{night} other{nights}}",
+  "@nightWord": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roomSubtotal": "Room subtotal",
+  "taxes": "Taxes",
+  "serviceFee": "Service fee",
+  "noLongerAvailable": "No longer available",
+  "guestDetails": "Guest details",
+  "fullNameAsId": "Full name (as on ID)",
+  "enterGuestName": "Enter the guest name",
+  "email": "Email",
+  "enterValidEmail": "Enter a valid email",
+  "phoneOptional": "Phone (optional)",
+  "specialRequestsOptional": "Special requests (optional)",
+  "continueToPayment": "Continue to payment",
+  "roomHeldNotice": "Your room is held for a short time while you pay. A booking is only confirmed after payment is verified by the server.",
+  "payment": "Payment",
+  "holdExpired": "Hold expired",
+  "roomHeldFor": "Room held for {time}",
+  "@roomHeldFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "simulatedPaymentNotice": "Simulated payment. This demo uses a mock payment provider: no card is charged and no real money moves. Choose an outcome to test how the booking reacts.",
+  "referenceValue": "Reference {ref}",
+  "@referenceValue": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "amountDue": "Amount due",
+  "payNowSimulate": "Pay now (simulate success)",
+  "simulateDeclined": "Simulate a declined card",
+  "payLater": "Pay later from My bookings",
+  "checkoutTitle": "Checkout",
+  "stepRoom": "Room",
+  "stepDetails": "Details",
+  "myBookings": "My bookings",
+  "upcoming": "Upcoming",
+  "pastAndCancelled": "Past & cancelled",
+  "nothingHereYet": "Nothing here yet",
+  "noUpcomingTrips": "No upcoming trips",
+  "pastBookingsHint": "Completed and cancelled bookings appear here.",
+  "nextAdventureHint": "Your next adventure is one search away.",
+  "nights": "Nights",
+  "reference": "Reference",
+  "cancelBookingQ": "Cancel this booking?",
+  "cancelFreeBody": "You are within the free-cancellation window. The room will be released.",
+  "cancelFreePaidBody": "You are within the free-cancellation window. A simulated refund will be recorded. The room will be released.",
+  "cancelNonRefundBody": "The free-cancellation window has passed, so this booking is non-refundable. The room will be released.",
+  "cancelBooking": "Cancel booking",
+  "bookingCancelled": "Booking cancelled.",
+  "receiptCaps": "RECEIPT",
+  "paymentRefStatus": "Payment ref {ref} · {status}",
+  "@paymentRefStatus": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "yourBooking": "Your booking",
+  "room": "Room",
+  "guest": "Guest",
+  "payForBooking": "Pay for this booking",
+  "receipt": "Receipt",
+  "priceBreakdown": "Price breakdown",
+  "cancellationPolicy": "Cancellation policy",
+  "freeCancellationUntil": "Free cancellation until {date}",
+  "@freeCancellationUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "statusHistory": "Status history",
+  "payments": "Payments",
+  "simulatedSuffix": " (simulated)",
+  "youreBooked": "You're booked!",
+  "paymentVerified": "Payment verified by the server. Simulated payment: no real money moved.",
+  "tripsEyebrowCaps": "TRIPS",
+  "tripsHero": "Tell us where.\nWe build the days.",
+  "planWithAi": "Plan with AI",
+  "planWithAiExample": "\"3 days in Kampot, relaxed, two kids\"",
+  "signInToSaveItineraries": "Sign in to save itineraries and edit them any time.",
+  "startFromOne": "Start from one",
+  "curatedJourneys": "Curated journeys",
+  "plannerRules": "Rules planner",
+  "plannerAi": "AI-assisted",
+  "plannerManual": "Manual",
+  "exKampot": "Slow Kampot weekend",
+  "exAngkor": "Angkor for photographers",
+  "exPhnomPenh": "Phnom Penh on $150",
+  "aiTripPlannerCaps": "AI TRIP PLANNER",
+  "describeTrip": "Describe the trip\nyou want.",
+  "plannerModeLlm": "Language-model assisted, grounded in stored places",
+  "plannerModeRules": "Built on stored places by a rules engine. Fast and never invents.",
+  "plannerHint": "e.g. 5 days in Kampot and Siem Reap, 2 adults, $300 total, love food and culture",
+  "planningYourDays": "Planning your days…",
+  "createItinerary": "Create itinerary",
+  "moreDetailPlease": "A little more detail, please",
+  "destinationsICanPlan": "DESTINATIONS I CAN PLAN",
+  "iUnderstood": "I understood",
+  "childrenSuffix": ", {count, plural, =1{1 child} other{{count} children}}",
+  "@childrenSuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetPerDayLabel": "{amount} per day",
+  "@budgetPerDayLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetTotalLabel": "{amount} total",
+  "@budgetTotalLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "saveToMyTrips": "Save to my trips",
+  "signInToSaveTrip": "Sign in to save this trip",
+  "dayN": "Day {n}",
+  "@dayN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "stopsCount": "{count, plural, =1{1 stop} other{{count} stops}}",
+  "@stopsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeline": "Timeline",
+  "routeMap": "Route map",
+  "regenerateDay": "Regenerate day {n}",
+  "@regenerateDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "noStopsYet": "No stops yet",
+  "noStopsHint": "This day has no suggestions.",
+  "dashedLineNote": "The dashed line joins stops in order: straight lines, not driving directions.",
+  "budgetStay": "Stay",
+  "budgetActivities": "Activities",
+  "budgetFood": "Food",
+  "budgetTransport": "Transport",
+  "estimatedTotalCaps": "ESTIMATED TOTAL",
+  "withinBudget": "Within your {amount} budget",
+  "@withinBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overBudget": "Over your {amount} budget",
+  "@overBudget": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "lodgingNights": "{name} · {count, plural, =1{1 night} other{{count} nights}}",
+  "@lodgingNights": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assumptions": "Assumptions",
+  "minutesCompact": "{minutes}m",
+  "@minutesCompact": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "travelMinutes": "~{minutes} min travel",
+  "@travelMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "removeStop": "Remove stop",
+  "copyToMyTrips": "Copy to my trips",
+  "estimateRecalculated": "Estimate recalculated: {amount}",
+  "@estimateRecalculated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recalculate": "Recalculate",
+  "deleteTripQ": "Delete this trip?",
+  "deleteTripBody": "This removes the itinerary from your account.",
+  "delete": "Delete",
+  "addAStop": "Add a stop",
+  "inTrip": "In trip",
+  "addToDay": "Add to day {n}",
+  "@addToDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "starterBestTime": "Best time to go",
+  "starterGettingAround": "Getting around",
+  "starterDailyBudget": "Daily budget",
+  "starterWhatToEat": "What to eat",
+  "starterTempleEtiquette": "Temple etiquette",
+  "starterCancellation": "Cancellation",
+  "somethingWentWrong": "Something went wrong.",
+  "guideName": "Wayfarer Guide",
+  "guideModeLlm": "AI travel assistant · uses our guides",
+  "guideModeRules": "Instant · answers from our guides",
+  "newChat": "New chat",
+  "askMeAnything": "Ask me anything\nabout your trip.",
+  "askIntro": "Ask in your own words. I use WAYFARER's guides when they help and general travel knowledge when they don't, and I show my sources.",
+  "generalKnowledge": "General travel knowledge",
+  "notInGuides": "Not in approved guides",
+  "planWithPlanner": "Plan {name} with the AI planner",
+  "@planWithPlanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesCount": "{count, plural, =1{1 source} other{{count} sources}}",
+  "@sourcesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "demoContentSuffix": " (demo content)",
+  "cardStay": "STAY",
+  "cardPlace": "PLACE",
+  "cardDestination": "DESTINATION",
+  "askHint": "Ask about a destination…",
+  "send": "Send",
+  "checkYourEmail": "Check your email",
+  "verificationSent": "We sent a verification link to {email}. Open it, then sign in.",
+  "@verificationSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "ok": "OK",
+  "googleNotSetUp": "Google sign-in is not set up yet. Use your email and password for now.",
+  "createAnAccountTitle": "Create an\naccount",
+  "welcomeBack": "Welcome\nback",
+  "signUpWithGoogle": "Sign up with Google",
+  "signInWithGoogle": "Sign in with Google",
+  "or": "or",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "required": "Required",
+  "enterValidEmailAddress": "Enter a valid email address",
+  "password": "Password",
+  "passwordHelper": "10+ characters, with letters and a number",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "enterPassword": "Enter your password",
+  "passwordRule": "Use 10+ characters with letters and a number",
+  "forgotPassword": "Forgot password?",
+  "createAccount": "Create account",
+  "termsNotice": "By creating an account you agree to the WAYFARER Terms of Service and Privacy Policy.",
+  "haveAccount": "Have an account? ",
+  "newHere": "New here? ",
+  "logInHere": "Log in here",
+  "createAnAccount": "Create an account",
+  "resetPassword": "Reset password",
+  "resetLinkSent": "If an account exists for {email}, a reset link is on its way.",
+  "@resetLinkSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "sendResetLink": "Send reset link",
+  "verifyEmailFirst": "Please verify your email first. We just sent you a new link: open it, then sign in again.",
+  "authEmailInUse": "An account with this email already exists. Try signing in instead.",
+  "authInvalidEmail": "That email address does not look right.",
+  "authWeakPassword": "Choose a stronger password: at least 10 characters with letters and a number.",
+  "authWrongCredentials": "Email or password is incorrect.",
+  "authDisabled": "This account has been disabled. Contact support.",
+  "authTooMany": "Too many attempts. Please wait a few minutes and try again.",
+  "authNetwork": "No connection. Check your internet and try again.",
+  "authNotAllowed": "This sign-in method is not turned on in Firebase yet.",
+  "authOtherMethod": "This email is already used with another sign-in method.",
+  "authFailed": "Sign-in failed ({code}). Please try again.",
+  "@authFailed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "displayCurrency": "Display currency",
+  "currencyNote": "Prices are stored in USD and converted with documented sample rates, not live market rates.",
+  "accountHero": "Your travel\nlife, in one place.",
+  "accountSignInHint": "Sign in to see bookings, saved trips and your wishlist.",
+  "myBookingsSub": "Tickets, cancellation and receipts",
+  "wishlist": "Wishlist",
+  "wishlistSub": "Saved destinations and stays",
+  "notifications": "Notifications",
+  "notificationsSub": "Booking and payment updates",
+  "exploreMap": "Explore map",
+  "exploreMapSub": "Destinations and stays near you",
+  "administrationSub": "Overview, bookings, payments, reviews, audit log",
+  "partnerPortalSub": "Your properties, bookings and availability",
+  "signOut": "Sign out",
+  "deleteMyAccount": "Delete my account",
+  "deleteAccountQ": "Delete your account?",
+  "deleteAccountBody": "Your profile is anonymised and you will be signed out. Active bookings must be cancelled first. This cannot be undone.",
+  "confirmPassword": "Confirm password",
+  "keepAccount": "Keep account",
+  "nothingSavedYet": "Nothing saved yet",
+  "nothingSavedHint": "Tap the heart on a destination or stay to keep it here.",
+  "savedItem": "Saved item",
+  "stay": "Stay",
+  "markAllRead": "Mark all read",
+  "allCaughtUp": "You're all caught up",
+  "inAppOnlyNote": "In-app notifications only. Push delivery needs Firebase credentials and is not configured.",
+  "language": "Language",
+  "languageSub": "English or Khmer",
+  "languageSystem": "Phone setting",
+  "languageEnglish": "English",
+  "languageKhmer": "ភាសាខ្មែរ",
+  "languageNote": "Places, descriptions and AI answers come from our database and are in English.",
+  "settings": "Settings",
+  "currency": "Currency",
+  "join": "Join",
+  "roleAdmin": "Admin",
+  "roleStaff": "Staff",
+  "rolePartner": "Partner",
+  "roleCustomer": "Traveller",
+  "adminOverview": "Overview",
+  "adminBookings": "Bookings",
+  "adminPayments": "Payments",
+  "adminUsers": "Users",
+  "adminReviews": "Reviews",
+  "adminAuditLog": "Audit log",
+  "adminContent": "Content",
+  "adminAccessRequired": "Admin access required",
+  "adminAccessHint": "This area is only available to staff and administrators. Access is enforced by the server.",
+  "totalCount": "{count} total",
+  "@totalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "previousPage": "Previous page",
+  "nextPage": "Next page",
+  "simulatedNetRevenue": "simulated net revenue",
+  "bookingsByStatus": "Bookings by status",
+  "aiUsage": "AI usage",
+  "noAiCalls": "No AI calls recorded yet.",
+  "aiCallsAvg": "{calls} calls · avg {ms} ms",
+  "@aiCallsAvg": {
+    "placeholders": {
+      "calls": {
+        "type": "String"
+      },
+      "ms": {
+        "type": "String"
+      }
+    }
+  },
+  "searchBookingsHint": "Reference, guest, email",
+  "demoSuffix": " · demo",
+  "actions": "Actions",
+  "cancelBookingRef": "Cancel booking {ref}?",
+  "@cancelBookingRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "adminCancelBody": "The room is released and the guest is notified. Refund rules follow the booking policy.",
+  "markCheckedIn": "Mark checked in",
+  "markCompleted": "Mark completed",
+  "bookingDetail": "Booking detail",
+  "paymentsAndTransactions": "Payments and transactions",
+  "nameOrEmail": "Name or email",
+  "demoAccountSuffix": " · demo account",
+  "changeRoleQ": "Change role?",
+  "changeRoleBody": "Set {email} to \"{role}\". This changes what the account can do.",
+  "@changeRoleBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "changeRole": "Change role",
+  "reviewModeration": "Review moderation",
+  "hide": "Hide",
+  "publish": "Publish",
+  "system": "system",
+  "numberBetween": "Enter a number between {lo} and {hi}",
+  "@numberBetween": {
+    "placeholders": {
+      "lo": {
+        "type": "String"
+      },
+      "hi": {
+        "type": "String"
+      }
+    }
+  },
+  "createDestination": "Create destination",
+  "name": "Name",
+  "atLeast2Chars": "At least 2 characters",
+  "country": "Country",
+  "shortDescription": "Short description (10+ chars)",
+  "atLeast10CharsShort": "At least 10 characters",
+  "longDescription": "Long description (20+ chars)",
+  "atLeast20Chars": "At least 20 characters",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "dailyBudgetUsd": "Daily budget (USD)",
+  "destinationCreated": "Destination created and audited.",
+  "adminHotelsNote": "Hotels, rooms, prices and stock are managed by each partner in the web Partner dashboard (/partner). Administrators can browse them in the web Admin console (/admin).",
+  "partnerAccessRequired": "Partner access required",
+  "partnerAccessHint": "Only partner accounts can manage properties. Access is enforced by the server.",
+  "occupancyNext30": "occupancy, next 30 days",
+  "notApplicable": "n/a",
+  "yourProperties": "Your properties",
+  "noPropertiesAssigned": "No properties assigned to this partner account",
+  "baseRooms": "{price} base · {count} rooms",
+  "@baseRooms": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "availability": "Availability",
+  "incomingBookings": "Incoming bookings",
+  "checkInAction": "Check in",
+  "complete": "Complete",
+  "availabilityFor": "Availability: {name}",
+  "@availabilityFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roomsAvailablePerNight": "Rooms available per night (0–{max})",
+  "@roomsAvailablePerNight": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "nightlyPriceOptional": "Nightly price USD (optional)",
+  "availabilityUpdated": "Availability updated",
+  "offlineMessage": "You appear to be offline, or the server is unreachable.",
+  "timeoutMessage": "The server took too long to respond. Check your connection and try again.",
+  "quickPlaces": "Places",
+  "quickThingsToDo": "Things to do",
+  "saveAsPdf": "Save as PDF",
+  "preparingPdf": "Preparing your PDF…",
+  "pdfFailed": "Could not create the PDF. Please try again.",
+  "pdfBrandLine": "WAYFARER · TRIP ITINERARY",
+  "pdfCreatedOn": "Created on {date}",
+  "@pdfCreatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfDayTitle": "Day {n}",
+  "@pdfDayTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "back": "Back",
+  "exKohRong": "Koh Rong island escape",
+  "exMondulkiri": "Mondulkiri nature",
+  "exBattambang": "Battambang food & culture",
+  "fontCredit": "Khmer typeface: MiSans Khmer by Xiaomi",
+  "dayInCity": "Day {n} · {city}",
+  "@dayInCity": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "transferFromCity": "Transfer from {city}",
+  "@transferFromCity": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "transferInfo": "About {km} km by road · {time} · {price} (estimate)",
+  "@transferInfo": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} h {minutes} min",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} h",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "exTwoCities": "Kampot + Siem Reap"
+}

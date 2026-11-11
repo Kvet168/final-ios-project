@@ -9,10 +9,11 @@ import '../core/widgets/widgets.dart';
 
 const _barHeight = 68.0;
 const _orbSize = 64.0;
-const _orbLift = 22.0;
+const _orbLift = 12.0;
 
 /// Space tab pages must leave at the bottom so content clears the bottom bar and the raised AI button.
-double dockClearance(BuildContext context) => _barHeight + 28 + MediaQuery.paddingOf(context).bottom;
+double dockClearance(BuildContext context) =>
+    _barHeight + 28 + MediaQuery.paddingOf(context).bottom;
 
 class _Tab {
   const _Tab(this.label, this.icon, this.selected, this.path);
@@ -26,7 +27,12 @@ const _tabs = [
   _Tab('Discover', Icons.explore_outlined, Icons.explore_outlined, '/'),
   _Tab('Stays', Icons.bed_outlined, Icons.bed_outlined, '/stays'),
   _Tab('Trips', Icons.route_outlined, Icons.route_outlined, '/trips'),
-  _Tab('Me', Icons.person_outline_rounded, Icons.person_outline_rounded, '/account'),
+  _Tab(
+    'Me',
+    Icons.person_outline_rounded,
+    Icons.person_outline_rounded,
+    '/account',
+  ),
 ];
 
 int _indexFor(String loc) {
@@ -50,12 +56,26 @@ class AppShell extends ConsumerWidget {
       if (data is! Map) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text('${data['title'] ?? 'Update'}: ${data['body'] ?? ''}', maxLines: 2, overflow: TextOverflow.ellipsis)));
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              '${data['title'] ?? 'Update'}: ${data['body'] ?? ''}',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        );
     });
     final idx = _indexFor(location);
     return Scaffold(
       extendBody: true,
-      body: AnnotatedRegion<SystemUiOverlayStyle>(value: SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent), child: child),
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark.copyWith(
+          statusBarColor: Colors.transparent,
+        ),
+        child: child,
+      ),
       bottomNavigationBar: _Dock(index: idx),
     );
   }
@@ -71,31 +91,47 @@ class _Dock extends StatelessWidget {
     // The orb sits inside this widget's own bounds (not overflowing them) so its whole area receives taps.
     return SizedBox(
       height: _barHeight + _orbLift + bottom,
-      child: Stack(alignment: Alignment.topCenter, children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Container(
-            height: _barHeight + bottom,
-            padding: EdgeInsets.only(bottom: bottom),
-            decoration: BoxDecoration(
-              color: Tokens.surface,
-              border: const Border(top: BorderSide(color: Tokens.border)),
-              boxShadow: [BoxShadow(color: Tokens.charcoal.withValues(alpha: .06), blurRadius: 16, offset: const Offset(0, -4))],
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: _barHeight + bottom,
+              padding: EdgeInsets.only(bottom: bottom),
+              decoration: BoxDecoration(
+                color: Tokens.surface,
+                border: const Border(top: BorderSide(color: Tokens.border)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Tokens.charcoal.withValues(alpha: .06),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(child: _item(context, 0)),
+                  Expanded(child: _item(context, 1)),
+                  const SizedBox(width: _orbSize + 8),
+                  Expanded(child: _item(context, 2)),
+                  Expanded(child: _item(context, 3)),
+                ],
+              ),
             ),
-            child: Row(children: [
-              Expanded(child: _item(context, 0)),
-              Expanded(child: _item(context, 1)),
-              const SizedBox(width: _orbSize + 8),
-              Expanded(child: _item(context, 2)),
-              Expanded(child: _item(context, 3)),
-            ]),
           ),
-        ),
-        const Positioned(top: 0, child: _Orb()),
-      ]),
+          const Positioned(top: 0, child: _Orb()),
+        ],
+      ),
     );
+  }
+
+  String _label(BuildContext context, int i) {
+    final l = context.l10n;
+    return [l.tabDiscover, l.tabStays, l.tabTrips, l.tabMe][i];
   }
 
   Widget _item(BuildContext context, int i) {
@@ -110,32 +146,51 @@ class _Dock extends StatelessWidget {
           if (!active) context.go(t.path);
         },
         scale: 0.92,
-        semanticLabel: t.label,
+        semanticLabel: _label(context, i),
         radius: 20,
         child: SizedBox(
           height: _barHeight,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            AnimatedContainer(
-              duration: d,
-              curve: Curves.easeOutCubic,
-              width: active ? 52 : 44,
-              height: 32,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: active ? Tokens.tint : Colors.transparent, borderRadius: BorderRadius.circular(16)),
-              child: AnimatedScale(
-                scale: active ? 1.06 : 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
                 duration: d,
-                curve: Curves.easeOutBack,
-                child: Icon(active ? t.selected : t.icon, size: 24, color: active ? Tokens.primary : Tokens.inkMuted),
+                curve: Curves.easeOutCubic,
+                width: active ? 52 : 44,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: active ? Tokens.tint : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: AnimatedScale(
+                  scale: active ? 1.06 : 1,
+                  duration: d,
+                  curve: Curves.easeOutBack,
+                  child: Icon(
+                    active ? t.selected : t.icon,
+                    size: 24,
+                    color: active ? Tokens.primary : Tokens.inkMuted,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 3),
-            AnimatedDefaultTextStyle(
-              duration: d,
-              style: Type.body(11, weight: active ? FontWeight.w700 : FontWeight.w600, color: active ? Tokens.primaryText : Tokens.inkMuted, height: 1.1),
-              child: Text(t.label, maxLines: 1),
-            ),
-          ]),
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: d,
+                style: Type.body(
+                  11,
+                  weight: active ? FontWeight.w700 : FontWeight.w600,
+                  color: active ? Tokens.primaryText : Tokens.inkMuted,
+                  height: 1.1,
+                ),
+                child: Text(
+                  _label(context, i),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -151,7 +206,10 @@ class _Orb extends StatefulWidget {
 }
 
 class _OrbState extends State<_Orb> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2600));
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2600),
+  );
 
   @override
   void didChangeDependencies() {
@@ -171,34 +229,47 @@ class _OrbState extends State<_Orb> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => Pressable(
-        onTap: () {
-          tick(true);
-          context.push('/assistant');
-        },
-        scale: 0.92,
-        haptic: false,
-        radius: 99,
-        semanticLabel: 'Ask the AI travel guide',
-        child: AnimatedBuilder(
-          animation: _c,
-          builder: (_, child) {
-            final v = Curves.easeInOut.transform(_c.value);
-            return Container(
-              width: _orbSize,
-              height: _orbSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: Tokens.sunrise,
-                border: Border.all(color: Colors.white, width: 4),
-                boxShadow: [
-                  BoxShadow(color: Tokens.accent.withValues(alpha: .40 + .15 * v), blurRadius: 16 + 8 * v, spreadRadius: 0.5 * v, offset: const Offset(0, 6)),
-                  BoxShadow(color: Tokens.charcoal.withValues(alpha: .10), blurRadius: 6, offset: const Offset(0, 2)),
-                ],
+    onTap: () {
+      tick(true);
+      context.push('/assistant');
+    },
+    scale: 0.92,
+    haptic: false,
+    radius: 99,
+    semanticLabel: context.l10n.askAiGuide,
+    child: AnimatedBuilder(
+      animation: _c,
+      builder: (_, child) {
+        final v = Curves.easeInOut.transform(_c.value);
+        return Container(
+          width: _orbSize,
+          height: _orbSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: Tokens.sunrise,
+            border: Border.all(color: Colors.white, width: 4),
+            boxShadow: [
+              BoxShadow(
+                color: Tokens.accent.withValues(alpha: .40 + .15 * v),
+                blurRadius: 16 + 8 * v,
+                spreadRadius: 0.5 * v,
+                offset: const Offset(0, 6),
               ),
-              child: child,
-            );
-          },
-          child: const Icon(Icons.auto_awesome_rounded, color: Tokens.onAccent, size: 28),
-        ),
-      );
+              BoxShadow(
+                color: Tokens.charcoal.withValues(alpha: .10),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+      child: const Icon(
+        Icons.auto_awesome_rounded,
+        color: Tokens.onAccent,
+        size: 28,
+      ),
+    ),
+  );
 }

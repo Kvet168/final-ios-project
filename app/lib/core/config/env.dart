@@ -12,7 +12,9 @@ class Env {
   static String get liveWsUrl {
     if (_wsOverride.isNotEmpty) return _wsOverride;
     final u = Uri.parse(apiBaseUrl);
-    return u.replace(scheme: u.scheme == 'https' ? 'wss' : 'ws', path: '/ws').toString();
+    return u
+        .replace(scheme: u.scheme == 'https' ? 'wss' : 'ws', path: '/ws')
+        .toString();
   }
 
   static const mapsApiKey = String.fromEnvironment('MAPS_API_KEY');
