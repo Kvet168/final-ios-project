@@ -156,6 +156,9 @@ public class AuthService {
         return out;
     }
 
+    /** Signs in a user that another service has just created (advertiser self-registration). */
+    public AuthResponse issueSession(Map<String, Object> u) { return respond(u); }
+
     private AuthResponse respond(Map<String, Object> u) {
         TokenResponse t = issueTokens(Rows.uuid(u, "id"), Rows.str(u, "email"), Rows.str(u, "role"), UUID.randomUUID());
         return new AuthResponse(UserService.toDto(u), t.accessToken(), t.refreshToken(), t.expiresIn(), t.tokenType());

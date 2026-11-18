@@ -44,8 +44,8 @@ export function createDashboard(cfg) {
     const err = h('div', { 'aria-live': 'polite' });
     if (message) showErrors(err, { message });
     const isPartnerPortal = cfg.allowedRoles.includes('partner');
-    const demoEmail = isPartnerPortal ? 'partner.pp@demo.wayfarer.test' : 'admin@demo.wayfarer.test';
-    const email = input({ type: 'email', autocomplete: 'username', required: true, placeholder: isPartnerPortal ? 'partner@example.com' : 'staff@example.com' });
+    const demoEmail = cfg.demoEmail || (isPartnerPortal ? 'partner.pp@demo.wayfarer.test' : 'admin@demo.wayfarer.test');
+    const email = input({ type: 'email', autocomplete: 'username', required: true, placeholder: cfg.demoEmail ? 'you@yourbusiness.com' : isPartnerPortal ? 'partner@example.com' : 'staff@example.com' });
     const pw = input({ type: 'password', autocomplete: 'current-password', required: true, placeholder: 'Enter your password' });
     const submit = h('button', { class: 'btn primary', type: 'submit' }, 'Sign in');
     const demoBtn = h('button', {
@@ -58,7 +58,7 @@ export function createDashboard(cfg) {
         pw.dispatchEvent(new Event('input'));
         clear(err);
       },
-    }, icon('compass'), isPartnerPortal ? 'Try demo partner account' : 'Try demo admin account');
+    }, icon('compass'), cfg.demoLabel || (isPartnerPortal ? 'Try demo partner account' : 'Try demo admin account'));
 
     const form = h('form', {
       class: 'stack',
@@ -91,9 +91,14 @@ export function createDashboard(cfg) {
     field('Password', pw, { required: true }),
     err,
     submit,
-    h('div', { class: 'login-demo-row' }, demoBtn));
+    h('div', { class: 'login-demo-row' }, demoBtn),
+    cfg.register ? h('button', { class: 'btn small', type: 'button', style: 'margin-top:10px;width:100%', onclick: () => cfg.register((r) => {
+      session.save(r);
+      toast(`Welcome, ${r.user.name}`, 'ok');
+      showShell(r.user);
+    }) }, icon('plus'), cfg.registerLabel || 'Create a business account') : null);
 
-    const hint = isPartnerPortal
+    const hint = cfg.hint ? cfg.hint : isPartnerPortal
       ? 'Sign in with your partner account to manage properties, rooms and bookings.'
       : 'Sign in with your staff or administrator account.';
     root.append(h('main', { class: 'login' },

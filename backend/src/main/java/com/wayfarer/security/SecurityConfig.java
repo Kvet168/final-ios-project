@@ -48,14 +48,16 @@ public class SecurityConfig {
                     "/v3/api-docs/**", "/actuator/health/**", "/ws/**").permitAll()
                 // anonymous reads: catalogue, reviews, templates, AI (works signed in or out; signing in adds saving and history)
                 .requestMatchers(HttpMethod.GET, "/api/meta", "/api/home", "/api/documents", "/api/destinations/**", "/api/accommodations/**", "/api/room-types/**",
-                    "/api/attractions/**", "/api/locations/**", "/api/ai/status", "/api/ai/sources", "/api/itineraries/*").permitAll()
+                    "/api/attractions/**", "/api/locations/**", "/api/ai/status", "/api/ai/sources", "/api/itineraries/*", "/api/ads", "/api/ads/*/article").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/business/register", "/api/ads/events").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/routes/estimate", "/api/ai/travel-plan", "/api/ai/assistant", "/api/ai/recommendations").permitAll()
                 // the dashboards are public static files; every API call they make is authorised server-side
-                .requestMatchers(HttpMethod.GET, "/admin", "/admin/**", "/partner", "/partner/**", "/dashboard/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/admin", "/admin/**", "/partner", "/partner/**", "/business", "/business/**", "/dashboard/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/media/*").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/media").hasAnyRole("PARTNER", "STAFF", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/media").hasAnyRole("PARTNER", "BUSINESS", "STAFF", "ADMIN")
                 .requestMatchers("/api/admin/**").hasAnyRole("STAFF", "ADMIN")
                 .requestMatchers("/api/partner/**").hasRole("PARTNER")      // hotel owners only; administrators have read-only views under /api/admin
+                .requestMatchers("/api/business/**").hasAnyRole("BUSINESS", "PARTNER")   // advertisers: business owners and hotel partners
                 .anyRequest().authenticated())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> {
@@ -73,7 +75,7 @@ public class SecurityConfig {
                     json.writeValue(res.getOutputStream(), GlobalExceptionHandler.body("FORBIDDEN", "You do not have permission to perform this action", null));
                 }))
             .headers(h -> h.addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(
-                new OrRequestMatcher(new AntPathRequestMatcher("/admin/**"), new AntPathRequestMatcher("/partner/**"), new AntPathRequestMatcher("/dashboard/**")),
+                new OrRequestMatcher(new AntPathRequestMatcher("/admin/**"), new AntPathRequestMatcher("/partner/**"), new AntPathRequestMatcher("/business/**"), new AntPathRequestMatcher("/dashboard/**")),
                 new StaticHeadersWriter("Content-Security-Policy",
                     "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"))))
             .addFilterBefore(rateLimit, UsernamePasswordAuthenticationFilter.class)

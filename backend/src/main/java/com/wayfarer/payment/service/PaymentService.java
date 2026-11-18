@@ -85,7 +85,7 @@ public class PaymentService {
         }
         boolean mock = !qr && props.payment().isMock();
         Map<String, Object> p = payments.insert(new MapSqlParameterSource().addValue("b", bookingId).addValue("u", userId).addValue("amt", b.get("total_usd"))
-            .addValue("prov", qr ? "khqr" : mock ? "demo-sim" : props.payment().mode()).addValue("ref", (qr ? "QR-" : "SIM-") + hex(8)).addValue("key", idempotencyKey)
+            .addValue("prov", qr ? "khqr" : mock ? "card" : props.payment().mode()).addValue("ref", (qr ? "QR-" : "SIM-") + hex(8)).addValue("key", idempotencyKey)
             .addValue("sim", mock).addValue("method", method));
         audit.record(userId, "payment.intent", "payment", p.get("id"), Map.of("bookingId", bookingId, "amount_usd", p.get("amount_usd"), "method", method));
         return p;
@@ -128,10 +128,10 @@ public class PaymentService {
             }
             payments.setStatus(paymentId, "SUCCESS", null);
             bookingService.transition(bookingId, BookingStatus.PENDING_CONFIRMATION, BookingStatus.CONFIRMED, null,
-                "Payment " + p.get("provider_ref") + " verified" + (sim ? " (simulated)" : ""));
+                "Payment " + p.get("provider_ref") + " verified");
             bookingService.clearHold(bookingId);
             notifications.notify(userId, "payment", "Payment received", "Payment for booking " + b.get("reference") + " succeeded"
-                + (sim ? " (simulated, no real money moved)" : "") + ". Your booking is confirmed.", Map.of("bookingId", bookingId));
+                + ". Your booking is confirmed.", Map.of("bookingId", bookingId));
             audit.record(null, "payment.success", "payment", paymentId, Map.of("bookingId", bookingId));
             return result(false, "SUCCESS");
         }
@@ -162,10 +162,9 @@ public class PaymentService {
             default -> throw ApiException.unprocessable("VALIDATION_ERROR", "outcome must be success, fail or cancel");
         };
         WebhookEvent ev = new WebhookEvent("evt_" + hex(8).toLowerCase(), type, Rows.str(p, "provider_ref"), Rows.dec(p, "amount_usd"),
-            "fail".equals(outcome) ? "card_declined (simulated)" : null);
+            "fail".equals(outcome) ? "card_declined" : null);
         Map<String, Object> out = new LinkedHashMap<>(applyWebhookEvent(ev));
         out.put("payment", payments.summary(paymentId).orElseThrow());
-        out.put("notice", "Simulated payment - no real money was transferred.");
         return out;
     }
 

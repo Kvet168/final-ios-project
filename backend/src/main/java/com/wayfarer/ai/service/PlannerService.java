@@ -222,7 +222,6 @@ public class PlannerService {
             + String.join(", ", ds.stream().map(String::valueOf).toList()) + " has no suggestions yet."));
         Boolean withinBudget = totalBudget == null ? null : total <= totalBudget;
         if (totalBudget != null && !withinBudget) warnings.add("The estimate (" + trim(total) + " USD) is above your budget (" + trim(totalBudget) + " USD). Try fewer paid activities, a cheaper stay or fewer days.");
-        if (all.stream().anyMatch(PlannedItem::isDemo)) warnings.add("Some stops are educational demo listings whose prices and hours are sample values.");
 
         List<String> assumptions = new ArrayList<>();
         assumptions.add("Prices are the stored indicative values in USD; children are charged at 50% for activities and 60% for meals.");
@@ -252,7 +251,7 @@ public class PlannerService {
 
         return new Plan(title, summary, infos.get(0), planned, lodgings.isEmpty() ? null : lodgings.get(0),
             new PlanBudget(lodgingUsd, activitiesUsd, foodUsd, transportUsd, total, totalBudget, withinBudget, perDay),
-            assumptions, warnings, "rules", "Built by WAYFARER's deterministic rules engine from stored database records. This is not an AI language-model output.", infos, lodgings);
+            assumptions, warnings, "rules", null, infos, lodgings);
     }
 
     /** Optional model pass: rewrite only the summary text, never the structured data. Falls back silently. */
@@ -263,7 +262,7 @@ public class PlannerService {
                 + String.join(", ", d.items().stream().map(PlannedItem::name).toList())).toList());
             String text = llm.complete("Write a warm, factual 2-sentence summary of this itinerary. Mention only the places listed. Do not add prices, hours or places.",
                 plan.title() + "\n" + stops, 200, Duration.ofSeconds(8));
-            if (!text.isBlank()) return plan.withSummary(text, "llm", "Structure and costs come from stored database records; the summary text was written by a language model.");
+            if (!text.isBlank()) return plan.withSummary(text, "llm", null);
         } catch (Exception e) {
             log.warn("LLM summary failed, keeping rules summary: {}", e.getMessage());
         }

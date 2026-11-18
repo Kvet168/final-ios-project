@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AssistantService {
     private static final Logger log = LoggerFactory.getLogger(AssistantService.class);
-    private static final String DISCLAIMER = "Answers are drawn from WAYFARER's educational demo guides. Verify prices, opening hours, visas and safety advice with official sources before travelling.";
+    private static final String DISCLAIMER = "Answers are drawn from WAYFARER's travel guides. Verify prices, opening hours, visas and safety advice with official sources before travelling.";
     private static final Pattern SENTENCE = Pattern.compile("[^.!?]+[.!?]+(\\s|$)|[^.!?]+$");
     private static final Map<String, String> ALIASES = Map.of("angkor", "siem-reap", "ubud", "bali", "saigon", "ho-chi-minh-city", "hcmc", "ho-chi-minh-city",
         "george town", "penang", "banlung", "ratanakiri", "kl", "kuala-lumpur");

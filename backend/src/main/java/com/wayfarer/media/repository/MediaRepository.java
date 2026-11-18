@@ -19,5 +19,7 @@ public class MediaRepository {
 
     public Optional<Map<String, Object>> find(UUID id) { return db.one("SELECT content_type, data FROM media WHERE id = :id", Map.of("id", id)); }
 
+    public void deleteOwned(UUID id, UUID ownerId) { db.update("DELETE FROM media WHERE id = :id AND owner_id = :o", Map.of("id", id, "o", ownerId)); }
+
     public boolean ownedBy(UUID id, UUID ownerId) { return db.exists("SELECT 1 FROM media WHERE id = :id AND owner_id = :o", Map.of("id", id, "o", ownerId)); }
 }

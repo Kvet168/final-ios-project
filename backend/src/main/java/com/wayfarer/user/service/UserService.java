@@ -6,6 +6,8 @@ import com.wayfarer.booking.repository.BookingRepository;
 import com.wayfarer.common.ApiException;
 import com.wayfarer.common.Pages;
 import com.wayfarer.common.Rows;
+import com.wayfarer.media.service.MediaService;
+import org.springframework.web.multipart.MultipartFile;
 import com.wayfarer.user.dto.UserDtos.CreateUserRequest;
 import com.wayfarer.user.dto.UserDtos.DeleteAccountRequest;
 import com.wayfarer.user.dto.UserDtos.UpdateProfileRequest;
@@ -29,8 +31,10 @@ public class UserService {
     private final BookingRepository bookings;
     private final PasswordEncoder encoder;
     private final AuditService audit;
+    private final MediaService media;
 
-    public UserService(UserRepository users, RefreshTokenRepository refreshTokens, BookingRepository bookings, PasswordEncoder encoder, AuditService audit) {
+    public UserService(UserRepository users, RefreshTokenRepository refreshTokens, BookingRepository bookings, PasswordEncoder encoder, AuditService audit, MediaService media) {
+        this.media = media;
         this.users = users;
         this.refreshTokens = refreshTokens;
         this.bookings = bookings;
@@ -48,26 +52,53 @@ public class UserService {
 
     public static UserDto toDto(Map<String, Object> u) {
         return new UserDto(Rows.uuid(u, "id"), Rows.str(u, "email"), Rows.str(u, "name"), Rows.str(u, "phone"), Rows.str(u, "role"),
-            Rows.str(u, "preferred_currency"), Boolean.TRUE.equals(u.get("is_demo")), Rows.instant(u, "created_at"), Boolean.TRUE.equals(u.get("must_change_password")));
+            Rows.str(u, "preferred_currency"), Boolean.TRUE.equals(u.get("is_demo")), Rows.instant(u, "created_at"), Boolean.TRUE.equals(u.get("must_change_password")), !Boolean.TRUE.equals(u.get("social_only")), Rows.str(u, "avatar_url"));
+    }
+
+    private UserDto withAuthMethod(Map<String, Object> u) {
+        Map<String, Object> m = new LinkedHashMap<>(u);
+        m.put("social_only", users.hasIdentity(Rows.uuid(u, "id")));
+        return toDto(m);
     }
 
     public UserDto me(UUID id) {
-        return users.findActiveById(id).map(UserService::toDto).orElseThrow(() -> ApiException.unauthorized("UNAUTHENTICATED", "Account no longer exists"));
+        return users.findActiveById(id).map(this::withAuthMethod).orElseThrow(() -> ApiException.unauthorized("UNAUTHENTICATED", "Account no longer exists"));
     }
 
     @Transactional
     public UserDto update(UUID id, UpdateProfileRequest r) {
         String currency = r.preferredCurrency() == null ? null : r.preferredCurrency().toUpperCase();
         if (currency != null && !users.currencyExists(currency)) throw ApiException.unprocessable("VALIDATION_ERROR", "Unsupported currency");
-        return toDto(users.updateProfile(id, r.name(), r.phone(), currency));
+        return withAuthMethod(users.updateProfile(id, r.name(), r.phone(), currency));
+    }
+
+    /** Stores the uploaded image and makes it the profile photo; the previous photo is removed. */
+    @Transactional
+    public UserDto setAvatar(UUID id, MultipartFile file) {
+        Map<String, Object> stored = media.store(id, file);
+        String old = Rows.str(users.findById(id).orElseThrow(), "avatar_url");
+        Map<String, Object> u = users.setAvatar(id, (String) stored.get("url"));
+        media.deleteByUrl(id, old);
+        return withAuthMethod(u);
+    }
+
+    @Transactional
+    public UserDto removeAvatar(UUID id) {
+        String old = Rows.str(users.findById(id).orElseThrow(), "avatar_url");
+        Map<String, Object> u = users.setAvatar(id, null);
+        media.deleteByUrl(id, old);
+        return withAuthMethod(u);
     }
 
     @Transactional
     public void delete(UUID id, DeleteAccountRequest r) {
         Map<String, Object> u = users.findById(id).orElseThrow();
-        if (!encoder.matches(r.password(), Rows.str(u, "password_hash"))) throw ApiException.forbidden("INVALID_CREDENTIALS", "Password is incorrect");
+        boolean socialOnly = users.hasIdentity(id);
+        if (!socialOnly && (r.password() == null || !encoder.matches(r.password(), Rows.str(u, "password_hash")))) throw ApiException.forbidden("INVALID_CREDENTIALS", "Password is incorrect");
         if (bookings.userHasActive(id)) throw ApiException.conflict("ACTIVE_BOOKINGS", "Cancel or complete your active bookings before deleting your account.");
+        String avatar = Rows.str(u, "avatar_url");
         users.anonymise(id);
+        media.deleteByUrl(id, avatar);
         refreshTokens.revokeAllForUser(id);
         audit.record(id, "account.delete", "user", id, Map.of());
     }

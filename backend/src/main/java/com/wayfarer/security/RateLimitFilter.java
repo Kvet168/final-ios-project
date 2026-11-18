@@ -24,12 +24,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
         this.json = json;
     }
 
-    private enum Bucket { AUTH, AI, NONE }
+    private enum Bucket { AUTH, AI, ADS, NONE }
 
     private static Bucket bucket(HttpServletRequest req) {
         String p = req.getRequestURI();
         if (!"POST".equals(req.getMethod())) return Bucket.NONE;
         if (p.startsWith("/api/auth/") && !p.endsWith("/logout")) return Bucket.AUTH;
+        if (p.equals("/api/business/register")) return Bucket.AUTH;
+        if (p.equals("/api/ads/events")) return Bucket.ADS;
         if (p.startsWith("/api/ai/") || (p.startsWith("/api/itineraries/") && p.endsWith("/generate"))) return Bucket.AI;
         return Bucket.NONE;
     }
@@ -40,9 +42,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
         Bucket b = bucket(req);
-        boolean ok = b == Bucket.AUTH
-            ? limiter.allow("rl:auth:" + req.getRemoteAddr(), props.rateLimit().authMax(), props.rateLimit().windowSec())
-            : limiter.allow("rl:ai:" + req.getRemoteAddr(), props.ai().requestsPerMinute(), 60);
+        boolean ok = switch (b) {
+            case AUTH -> limiter.allow("rl:auth:" + req.getRemoteAddr(), props.rateLimit().authMax(), props.rateLimit().windowSec());
+            case ADS -> limiter.allow("rl:ads:" + req.getRemoteAddr(), 120, 60);   // impression/click batches: generous for real use, bounded for abuse
+            default -> limiter.allow("rl:ai:" + req.getRemoteAddr(), props.ai().requestsPerMinute(), 60);
+        };
         if (!ok) {
             res.setStatus(429);
             res.setContentType("application/json");

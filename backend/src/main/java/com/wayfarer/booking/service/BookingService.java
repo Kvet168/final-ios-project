@@ -132,7 +132,7 @@ public class BookingService {
                 .addValue("free", freeUntil == null ? null : java.sql.Timestamp.from(freeUntil)).addValue("hold", java.sql.Timestamp.from(holdUntil)));
         UUID bookingId = Rows.uuid(b, "id");
         for (StayQuote.Night n : q.nightly()) bookings.insertItem(bookingId, n.night(), n.rate(), rooms);
-        bookings.insertEvent(bookingId, null, "PENDING_CONFIRMATION", userId, "Room held until " + holdUntil + " pending payment");
+        bookings.insertEvent(bookingId, null, "PENDING_CONFIRMATION", userId, "Room reserved, pending payment");
         notifications.notify(userId, "booking", "Booking received", "Your booking " + b.get("reference") + " at " + room.get("accommodation_name")
             + " is held for " + props.holdMinutes() + " minutes. Complete payment to confirm it.", Map.of("bookingId", bookingId));
         audit.record(userId, "booking.create", "booking", bookingId, Map.of("reference", b.get("reference"), "total_usd", b.get("total_usd")));
@@ -196,7 +196,6 @@ public class BookingService {
         out.put("paymentStatus", paid.get("status"));
         out.put("paymentReference", paid.get("provider_ref"));
         out.put("simulated", paid.get("simulated"));
-        if (Boolean.TRUE.equals(paid.get("simulated"))) out.put("notice", "SIMULATED PAYMENT - no real money was transferred. This receipt is for demonstration only.");
         return out;
     }
 
@@ -215,13 +214,13 @@ public class BookingService {
 
         boolean refunded = false;
         if (pay != null && free) {
-            transition(bookingId, BookingStatus.CANCELLED, BookingStatus.REFUND_PENDING, actorId, "Refund initiated (simulated provider)");
+            transition(bookingId, BookingStatus.CANCELLED, BookingStatus.REFUND_PENDING, actorId, "Refund initiated");
             payments.markRefunded(Rows.uuid(pay, "id"));
-            transition(bookingId, BookingStatus.REFUND_PENDING, BookingStatus.REFUNDED, actorId, "Refund completed (simulated; no real money moved)");
+            transition(bookingId, BookingStatus.REFUND_PENDING, BookingStatus.REFUNDED, actorId, "Refund completed");
             refunded = true;
         }
         notifications.notify(Rows.uuid(b, "user_id"), "booking", "Booking cancelled", refunded
-            ? "Booking " + b.get("reference") + " was cancelled and a simulated refund of $" + pay.get("amount_usd") + " was recorded."
+            ? "Booking " + b.get("reference") + " was cancelled and a refund of $" + pay.get("amount_usd") + " was issued."
             : "Booking " + b.get("reference") + " was cancelled." + (pay != null ? " It was outside the free-cancellation window, so no refund applies." : ""),
             Map.of("bookingId", bookingId));
         audit.record(actorId, "booking.cancel", "booking", bookingId, Map.of("refunded", refunded, "free", free));

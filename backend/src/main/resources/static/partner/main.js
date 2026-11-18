@@ -2,6 +2,7 @@ import { createDashboard } from '/dashboard/js/app.js';
 import { bookingsPage } from '/dashboard/js/bookings.js';
 import { propertiesPage } from '/dashboard/js/properties.js';
 import { accountPage } from '/dashboard/js/account.js';
+import { adPaymentsPage, adsDashboardPage, businessProfilePage, campaignsPage } from '/dashboard/js/ads.js';
 import { dashboardPage } from './pages/dashboard.js';
 import { paymentsPage } from './pages/payments.js';
 import { reviewsPage } from './pages/reviews.js';
@@ -21,6 +22,12 @@ createDashboard({
     // Reservations & Finance
     { id: 'bookings', group: 'Reservations & Finance', label: 'Bookings', icon: 'ticket', page: (ctx) => bookingsPage({ ...ctx, scope: 'partner' }) },
     { id: 'payments', group: 'Reservations & Finance', label: 'QR payments', icon: 'card', page: paymentsPage },
+
+    // Advertising: hotel partners can promote their properties too
+    { id: 'ads', group: 'Advertising', label: 'Ad performance', icon: 'chart', page: adsDashboardPage },
+    { id: 'campaigns', group: 'Advertising', label: 'My campaigns', icon: 'ticket', page: campaignsPage },
+    { id: 'adpayments', group: 'Advertising', label: 'Spend & payments', icon: 'card', page: adPaymentsPage },
+    { id: 'business', group: 'Advertising', label: 'Business profile', icon: 'home', page: businessProfilePage },
 
     // Account Settings
     { id: 'account', group: 'Settings', label: 'Account', icon: 'users', page: accountPage },

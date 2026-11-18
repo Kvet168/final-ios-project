@@ -56,10 +56,12 @@ public class PropertyService {
 
     private static String trim(String s) { return s == null ? null : s.trim(); }
 
-    private void addRoomRow(UUID actor, UUID accommodationId, RoomRequest r, boolean breakfast) {
+    /** A room always has a photo: its own, or (when the owner added none) the property's cover photo. */
+    private void addRoomRow(UUID actor, UUID accommodationId, RoomRequest r, boolean breakfast, String propertyCover) {
+        String own = media.requireSafeImageUrl(actor, r.coverImage());
         accommodations.insertRoomType(new MapSqlParameterSource().addValue("acc", accommodationId).addValue("name", r.name().trim()).addValue("description", r.description().trim())
             .addValue("bed", r.bedType() == null ? "double" : r.bedType()).addValue("maxAdults", r.maxAdults()).addValue("maxChildren", r.maxChildren() == null ? 0 : r.maxChildren())
-            .addValue("price", r.basePriceUsd()).addValue("units", r.totalUnits()).addValue("breakfast", breakfast).addValue("cover", media.requireSafeImageUrl(actor, r.coverImage())));
+            .addValue("price", r.basePriceUsd()).addValue("units", r.totalUnits()).addValue("breakfast", breakfast).addValue("cover", own != null ? own : propertyCover));
     }
 
     @Transactional
@@ -75,7 +77,8 @@ public class PropertyService {
             .addValue("lat", b.lat()).addValue("lng", b.lng()).addValue("cover", media.requireSafeImageUrl(actor, b.coverImage())).addValue("freeHours", free)
             .addValue("policy", policy(free)).addValue("breakfast", breakfast).addValue("family", Boolean.TRUE.equals(b.familyFriendly())).addValue("fromPrice", cheapest)
             .addValue("partner", partnerId));
-        for (RoomRequest r : b.rooms()) addRoomRow(actor, id, r, breakfast);
+        String propertyCover = media.requireSafeImageUrl(actor, b.coverImage());
+        for (RoomRequest r : b.rooms()) addRoomRow(actor, id, r, breakfast, propertyCover);
         inventory.topUp();      // open the rolling stock window so the new rooms are bookable straight away
         audit.record(actor, "accommodation.create", "accommodation", id, Map.of("name", b.name(), "type", b.type()));
         cache.evictCache();
@@ -113,7 +116,7 @@ public class PropertyService {
     public Map<String, Object> addRoom(UUID actor, UUID accommodationId, RoomRequest r) {
         ownProperty(actor, accommodationId);
         boolean breakfast = Boolean.TRUE.equals(accommodations.findRaw(accommodationId).orElseThrow().get("breakfast_included"));
-        addRoomRow(actor, accommodationId, r, breakfast);
+        addRoomRow(actor, accommodationId, r, breakfast, (String) accommodations.findRaw(accommodationId).orElseThrow().get("cover_image"));
         accommodations.refreshFromPrice(accommodationId);
         inventory.topUp();
         audit.record(actor, "room.create", "accommodation", accommodationId, Map.of("name", r.name()));

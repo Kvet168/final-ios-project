@@ -48,6 +48,13 @@ public class MediaService {
         return Map.of("id", id, "url", urlFor(id), "contentType", type, "size", data.length);
     }
 
+    /** Removes an image the owner uploaded, given its "/api/media/{id}" URL; anything else is ignored. */
+    public void deleteByUrl(UUID ownerId, String url) {
+        if (url == null) return;
+        Matcher m = MEDIA_URL.matcher(url);
+        if (m.matches()) media.deleteOwned(UUID.fromString(m.group(1)), ownerId);
+    }
+
     public Map<String, Object> load(UUID id) { return media.find(id).orElseThrow(() -> ApiException.notFound("Image")); }
 
     /** Accepts only an image the caller uploaded (as "/api/media/{id}") or an https URL; everything else is rejected. */

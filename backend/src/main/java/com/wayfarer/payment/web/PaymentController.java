@@ -47,7 +47,6 @@ public class PaymentController {
     public Map<String, Object> intent(@Valid @RequestBody IntentRequest r) {
         Map<String, Object> p = new LinkedHashMap<>(payments.createIntent(CurrentUser.require().id(), r.bookingId(), r.idempotencyKey(), r.methodOrDefault()));
         if ("qr".equals(p.get("method"))) p.put("notice", "Pay by scanning the property's QR code (see GET /api/bookings/{id}/pay-qr), then call POST /api/payments/{id}/claim.");
-        else if (Boolean.TRUE.equals(p.get("simulated"))) p.put("notice", "Demo payment provider: use /payments/{id}/simulate to act as the provider. No real money moves.");
         return p;
     }
 

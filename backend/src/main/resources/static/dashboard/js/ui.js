@@ -269,6 +269,9 @@ const KM = {
   'Bookings & Payments': 'ការកក់ និងការទូទាត់ប្រាក់',
 };
 
+/** Pages add their own Khmer strings (English text -> Khmer). */
+export function addTranslations(map) { Object.assign(KM, map); }
+
 let currentLang = localStorage.getItem('wf.lang') === 'km' ? 'km' : 'en';
 document.documentElement.lang = currentLang;
 const langListeners = new Set();

@@ -66,8 +66,17 @@ public class UserRepository {
     }
 
     /** Soft delete and anonymise personal data; bookings and payments stay for financial records. */
+    public Map<String, Object> setAvatar(UUID id, String url) {
+        return db.one("UPDATE users SET avatar_url = :u WHERE id = :id AND deleted_at IS NULL RETURNING *", Db.params().addValue("u", url).addValue("id", id)).orElseThrow();
+    }
+
+    public boolean hasIdentity(UUID id) { return db.exists("SELECT 1 FROM user_identities WHERE user_id = :id", Map.of("id", id)); }
+
     public void anonymise(UUID id) {
-        db.update("UPDATE users SET deleted_at = now(), email = :e, name = 'Deleted user', phone = NULL, password_hash = '-' WHERE id = :id",
+        for (String t : new String[] {"user_identities", "wishlist_items", "notifications", "search_history", "ai_conversations", "password_resets"})
+            db.update("DELETE FROM " + t + " WHERE user_id = :id", Map.of("id", id));
+        db.update("DELETE FROM itineraries WHERE user_id = :id", Map.of("id", id));
+        db.update("UPDATE users SET deleted_at = now(), email = :e, name = 'Deleted user', phone = NULL, avatar_url = NULL, password_hash = '-' WHERE id = :id",
             Map.of("e", "deleted+" + id + "@wayfarer.invalid", "id", id));
     }
 
