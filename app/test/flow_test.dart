@@ -38,7 +38,6 @@ void main() {
 
     await t.tap(find.bySemanticsLabel('Ask the AI travel guide'));
     await settle(t, rounds: 4);
-    expect(find.text('Wayfarer Guide'), findsOneWidget);
     expect(find.text('Best time to go'), findsOneWidget);
 
     await t.tap(find.text('Best time to go'));

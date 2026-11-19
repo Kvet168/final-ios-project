@@ -1,4 +1,4 @@
-/* WAYFARER dashboards: shared design system (light + dark), matching the mobile app's Tokens & Typography. */
+/* Travel dashboards: shared design system (light + dark), matching the mobile app's Tokens & Typography. */
 @font-face {
   font-family: "Poppins";
   src: url("/dashboard/fonts/Poppins-Regular.ttf") format("truetype");
@@ -210,7 +210,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* ---------- login ---------- */
 .login {
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -293,6 +294,25 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-size: 15.5px;
   margin-top: 4px;
 }
+/* Laptops and desktops: split the card into a brand panel and the form, so the screen is used. */
+@media (min-width: 960px) {
+  .login { padding: 48px; }
+  .login-card {
+    width: min(980px, 100%);
+    grid-template-columns: 1.05fr 1fr;
+    min-height: 560px;
+  }
+  .login-hero { padding: 48px 44px; align-content: center; gap: 16px; }
+  .login-hero h1 { font-size: 42px; }
+  .login-sub { font-size: 17px; max-width: 34ch; }
+  .login-blob.blob-amber { width: 240px; height: 240px; left: -90px; top: -70px; }
+  .login-blob.blob-mint { width: 220px; height: 220px; right: -70px; bottom: -70px; }
+  .login-sheet { margin-top: 0; border-radius: 0; padding: 48px 44px; align-content: center; }
+}
+@media (min-width: 1600px) {
+  .login-card { width: min(1120px, 100%); min-height: 620px; }
+}
+
 .login-demo-row {
   display: flex;
   justify-content: center;
@@ -762,9 +782,21 @@ td .cselect {
 .toolbar .input { width: auto; min-width: 210px; }
 
 /* ---------- Sortable Tables ---------- */
-.table-wrap { overflow-x: auto; border-radius: var(--radius); }
+/* Tables keep their natural column widths and scroll sideways inside their card, instead of squeezing text into tall narrow cells. */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
 table { width: 100%; border-collapse: collapse; }
-th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+/* Column spacing: the first data column (the name) takes all the free space and every other column hugs its content,
+   so numbers and badges sit next to each other instead of floating far apart on wide screens. */
+table th, table td { width: 1%; }
+table th:nth-child(2), table td:nth-child(2) { width: auto; }
+td .row { flex-wrap: nowrap; gap: 6px; }
+/* Icon-only row actions: compact square buttons; the tooltip is the title attribute, screen readers get aria-label. */
+.btn.icon-only { width: 34px; min-width: 34px; height: 34px; min-height: 34px; padding: 0; justify-content: center; gap: 0; }
+@media (max-width: 560px) { .btn.icon-only { width: 44px; min-width: 44px; height: 44px; min-height: 44px; } }
+td.wrap, td .wrap { white-space: normal; }
+/* Long machine text (audit details, ids) is cut with an ellipsis instead of widening the table. */
+td .mono.muted { display: inline-block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
 th {
   font-size: 11.5px;
   font-weight: 700;
@@ -890,7 +922,18 @@ th.col-no, td.col-no {
 
 /* Hotel cards & rooms */
 .hotel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-.hotel { display: grid; gap: 14px; padding: 16px; }
+.hotel { display: grid; gap: 12px; padding: 14px; min-width: 0; align-content: start; }
+.hotel-media { position: relative; }
+.hotel-cover-empty { display: grid; place-items: center; color: var(--muted); }
+.hotel-tools { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+.hotel-tools .btn { background: rgb(20 20 22 / 62%); color: #FFFFFF; border-color: rgb(255 255 255 / 22%); backdrop-filter: blur(6px); }
+.hotel-tools .btn:hover { background: rgb(20 20 22 / 82%); }
+.hotel-tools .btn.danger:hover { background: var(--danger, #C0392B); }
+.hotel-head { align-items: flex-start; gap: 12px; }
+.hotel-title { min-width: 0; }
+.hotel-title h3 { font-size: 17px; margin: 0 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hotel-price { text-align: right; white-space: nowrap; flex: none; }
+.add-room { justify-self: start; }
 .rooms { display: grid; gap: 8px; }
 .room {
   display: flex;
@@ -901,8 +944,10 @@ th.col-no, td.col-no {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--bg);
-  flex-wrap: wrap;
 }
+.room-info { flex: 1; min-width: 0; }
+.room-info strong, .room-info .small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room-actions { display: flex; gap: 6px; flex: none; }
 .stars { color: var(--accent); letter-spacing: 1px; }
 
 /* ---------- modal + toast ---------- */
@@ -1019,7 +1064,7 @@ th.col-no, td.col-no {
 }
 .img-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .thumb { width: 56px; height: 42px; border-radius: var(--radius-sm); object-fit: cover; background: var(--surface-2); border: 1px solid var(--line); flex: none; }
-.hotel-cover { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line); display: block; }
+.hotel-cover { width: 100%; height: 150px; object-fit: cover; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line); display: block; }
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .gallery figure { margin: 0; display: grid; gap: 6px; }
 .gallery img { width: 100%; height: 104px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--line); }
@@ -1958,3 +2003,42 @@ th.col-no, td.col-no {
 }
 
 
+
+/* Phones: finger-sized controls (44px is the common minimum touch target). */
+@media (max-width: 560px) {
+  .btn, .btn.small { min-height: 44px; }
+  .input, select.input, input.input { min-height: 44px; }
+  .pw-toggle { min-width: 44px; min-height: 44px; }
+}
+
+
+/* Logo: shown as is (transparent PNG) on the white sidebar and the light login panel. */
+.brand-logo { display: inline-flex; align-items: center; text-decoration: none; }
+.brand-logo img { height: 34px; width: auto; display: block; }
+.sidebar .brand-logo { margin: 2px 8px 4px; align-self: flex-start; }
+.login-hero .brand-logo img { height: 40px; }
+
+/* White sidebar (light and dark theme). The active page gets a soft coral highlight with an accent bar. */
+.sidebar { background: #FFFFFF; color: #111111; border-right: 1px solid #E4E6EA; }
+.sidebar .role { color: #111111; }
+.sidebar .nav-group-label { color: #111111; }
+.nav a { color: #111111; }
+.nav a:hover { background: #FFF1F3; color: #C7364B; }
+.nav a[aria-current="page"] { background: #FFEEF0; color: #C7364B; box-shadow: inset 3px 0 0 #E6485C; }
+.sidebar-foot { border-top: 1px solid #E4E6EA; }
+.sidebar-foot .who { color: #111111; }
+.sidebar-foot .who .small { color: #333333; }
+.avatar { border-color: #FFD3D9; }
+
+/* The login brand panel is light too, so the logo needs no background. */
+.login-hero { background: linear-gradient(135deg, #FFF6F7 0%, #FFE2E7 100%); color: #292B2E; }
+.login-hero h1 { color: #292B2E; }
+.login-sub { color: #56575A; }
+.login-lang-btn { background: rgb(199 54 75 / 10%) !important; color: #C7364B !important; border-color: rgb(199 54 75 / 28%) !important; }
+.login-lang-btn:hover { background: rgb(199 54 75 / 18%) !important; }
+
+/* Top bar: one tidy group of icon-only buttons (language, theme, sign out) next to the role badge. */
+.topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.topbar-actions .btn.icon-only { border-radius: 10px; }
+.topbar-actions .btn.icon-only svg { width: 18px; height: 18px; }
+.topbar-actions .btn.signout:hover { background: rgb(214 69 82 / 14%); color: #E6485C; border-color: rgb(230 72 92 / 45%); }

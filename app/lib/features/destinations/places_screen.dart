@@ -106,7 +106,6 @@ void showPlaceSheet(BuildContext context, WidgetRef ref, Json p) {
                   icon: Icons.family_restroom_outlined,
                   color: Tokens.primary,
                 ),
-              if (p['is_demo'] == true) const DemoBadge(),
             ],
           ),
           const SizedBox(height: 16),

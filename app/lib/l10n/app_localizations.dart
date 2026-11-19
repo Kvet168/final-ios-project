@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'WAYFARER'**
+  /// **'Travel'**
   String get appName;
 
   /// No description provided for @tagline.
@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @splashLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading WAYFARER'**
+  /// **'Loading Travel'**
   String get splashLoading;
 
   /// No description provided for @splashReady.
@@ -542,18 +542,6 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get tryAgain;
 
-  /// No description provided for @demoListing.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo listing'**
-  String get demoListing;
-
-  /// No description provided for @demoTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Educational sample data: not a real commercial offer'**
-  String get demoTooltip;
-
   /// No description provided for @ratingNew.
   ///
   /// In en, this message translates to:
@@ -626,11 +614,11 @@ abstract class AppLocalizations {
   /// **'Draft'**
   String get statusDraft;
 
-  /// No description provided for @statusPaidSimulated.
+  /// No description provided for @statusPaid.
   ///
   /// In en, this message translates to:
-  /// **'Paid (simulated)'**
-  String get statusPaidSimulated;
+  /// **'Paid'**
+  String get statusPaid;
 
   /// No description provided for @statusPaymentFailed.
   ///
@@ -1640,6 +1628,48 @@ abstract class AppLocalizations {
   /// **'Choose a room'**
   String get chooseARoom;
 
+  /// No description provided for @bookNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Book now'**
+  String get bookNow;
+
+  /// No description provided for @viewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get viewDetails;
+
+  /// No description provided for @viewMyBookings.
+  ///
+  /// In en, this message translates to:
+  /// **'View my bookings'**
+  String get viewMyBookings;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get backToHome;
+
+  /// No description provided for @selectedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get selectedLabel;
+
+  /// No description provided for @selectARoomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a room to continue'**
+  String get selectARoomHint;
+
+  /// No description provided for @totalForStay.
+  ///
+  /// In en, this message translates to:
+  /// **'total · {count, plural, =1{1 night} other{{count} nights}}'**
+  String totalForStay(int count);
+
   /// No description provided for @chooseYourDates.
   ///
   /// In en, this message translates to:
@@ -1754,12 +1784,6 @@ abstract class AppLocalizations {
   /// **'Guest reviews'**
   String get guestReviews;
 
-  /// No description provided for @sampleDataDemo.
-  ///
-  /// In en, this message translates to:
-  /// **'Sample data in this demo'**
-  String get sampleDataDemo;
-
   /// No description provided for @writeOne.
   ///
   /// In en, this message translates to:
@@ -1777,12 +1801,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Be the first to share your stay.'**
   String get beFirstReview;
-
-  /// No description provided for @demoReview.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo review'**
-  String get demoReview;
 
   /// No description provided for @verifiedStay.
   ///
@@ -1937,7 +1955,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentNotConfirmed.
   ///
   /// In en, this message translates to:
-  /// **'{status} (simulated). Your booking is not confirmed — you can try again before the hold expires.'**
+  /// **'{status}. Your booking is not confirmed — you can try again before the hold expires.'**
   String paymentNotConfirmed(String status);
 
   /// No description provided for @unknownError.
@@ -2054,12 +2072,6 @@ abstract class AppLocalizations {
   /// **'Room held for {time}'**
   String roomHeldFor(String time);
 
-  /// No description provided for @simulatedPaymentNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'Simulated payment. This demo uses a mock payment provider: no card is charged and no real money moves. Choose an outcome to test how the booking reacts.'**
-  String get simulatedPaymentNotice;
-
   /// No description provided for @referenceValue.
   ///
   /// In en, this message translates to:
@@ -2072,17 +2084,11 @@ abstract class AppLocalizations {
   /// **'Amount due'**
   String get amountDue;
 
-  /// No description provided for @payNowSimulate.
+  /// No description provided for @payNow.
   ///
   /// In en, this message translates to:
-  /// **'Pay now (simulate success)'**
-  String get payNowSimulate;
-
-  /// No description provided for @simulateDeclined.
-  ///
-  /// In en, this message translates to:
-  /// **'Simulate a declined card'**
-  String get simulateDeclined;
+  /// **'Pay now'**
+  String get payNow;
 
   /// No description provided for @payLater.
   ///
@@ -2177,7 +2183,7 @@ abstract class AppLocalizations {
   /// No description provided for @cancelFreePaidBody.
   ///
   /// In en, this message translates to:
-  /// **'You are within the free-cancellation window. A simulated refund will be recorded. The room will be released.'**
+  /// **'You are within the free-cancellation window. Your payment will be refunded and the room released.'**
   String get cancelFreePaidBody;
 
   /// No description provided for @cancelNonRefundBody.
@@ -2270,12 +2276,6 @@ abstract class AppLocalizations {
   /// **'Payments'**
   String get payments;
 
-  /// No description provided for @simulatedSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **' (simulated)'**
-  String get simulatedSuffix;
-
   /// No description provided for @youreBooked.
   ///
   /// In en, this message translates to:
@@ -2285,7 +2285,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentVerified.
   ///
   /// In en, this message translates to:
-  /// **'Payment verified by the server. Simulated payment: no real money moved.'**
+  /// **'Payment confirmed.'**
   String get paymentVerified;
 
   /// No description provided for @tripsEyebrowCaps.
@@ -2687,7 +2687,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideName.
   ///
   /// In en, this message translates to:
-  /// **'Wayfarer Guide'**
+  /// **'Travel Guide'**
   String get guideName;
 
   /// No description provided for @guideModeLlm.
@@ -2717,7 +2717,7 @@ abstract class AppLocalizations {
   /// No description provided for @askIntro.
   ///
   /// In en, this message translates to:
-  /// **'Ask in your own words. I use WAYFARER\'s guides when they help and general travel knowledge when they don\'t, and I show my sources.'**
+  /// **'Ask in your own words. I use Travel\'s guides when they help and general travel knowledge when they don\'t, and I show my sources.'**
   String get askIntro;
 
   /// No description provided for @generalKnowledge.
@@ -2743,12 +2743,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 source} other{{count} sources}}'**
   String sourcesCount(int count);
-
-  /// No description provided for @demoContentSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **' (demo content)'**
-  String get demoContentSuffix;
 
   /// No description provided for @cardStay.
   ///
@@ -2909,7 +2903,7 @@ abstract class AppLocalizations {
   /// No description provided for @termsNotice.
   ///
   /// In en, this message translates to:
-  /// **'By creating an account you agree to the WAYFARER Terms of Service and Privacy Policy.'**
+  /// **'By creating an account you agree to the Travel Terms of Service and Privacy Policy.'**
   String get termsNotice;
 
   /// No description provided for @haveAccount.
@@ -3029,7 +3023,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencyNote.
   ///
   /// In en, this message translates to:
-  /// **'Prices are stored in USD and converted with documented sample rates, not live market rates.'**
+  /// **'Prices are shown in USD and converted at indicative exchange rates.'**
   String get currencyNote;
 
   /// No description provided for @accountHero.
@@ -3329,7 +3323,7 @@ abstract class AppLocalizations {
   /// No description provided for @simulatedNetRevenue.
   ///
   /// In en, this message translates to:
-  /// **'simulated net revenue'**
+  /// **'net revenue'**
   String get simulatedNetRevenue;
 
   /// No description provided for @bookingsByStatus.
@@ -3361,12 +3355,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reference, guest, email'**
   String get searchBookingsHint;
-
-  /// No description provided for @demoSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **' · demo'**
-  String get demoSuffix;
 
   /// No description provided for @actions.
   ///
@@ -3415,12 +3403,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name or email'**
   String get nameOrEmail;
-
-  /// No description provided for @demoAccountSuffix.
-  ///
-  /// In en, this message translates to:
-  /// **' · demo account'**
-  String get demoAccountSuffix;
 
   /// No description provided for @changeRoleQ.
   ///
@@ -3683,7 +3665,7 @@ abstract class AppLocalizations {
   /// No description provided for @pdfBrandLine.
   ///
   /// In en, this message translates to:
-  /// **'WAYFARER · TRIP ITINERARY'**
+  /// **'Travel · TRIP ITINERARY'**
   String get pdfBrandLine;
 
   /// No description provided for @pdfCreatedOn.
@@ -3763,6 +3745,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Kampot + Siem Reap'**
   String get exTwoCities;
+
+  /// No description provided for @sponsored.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored'**
+  String get sponsored;
+
+  /// No description provided for @adsFeaturedEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Local businesses'**
+  String get adsFeaturedEyebrow;
+
+  /// No description provided for @adsFeaturedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored places to explore'**
+  String get adsFeaturedTitle;
+
+  /// No description provided for @adsFestivalEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Special promotions'**
+  String get adsFestivalEyebrow;
+
+  /// No description provided for @adsFestivalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Festival and holiday offers'**
+  String get adsFestivalTitle;
+
+  /// No description provided for @adsStoriesEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel notes'**
+  String get adsStoriesEyebrow;
+
+  /// No description provided for @adsStoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored stories'**
+  String get adsStoriesTitle;
+
+  /// No description provided for @adsCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get adsCall;
+
+  /// No description provided for @adsVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit website'**
+  String get adsVisit;
+
+  /// No description provided for @adsViewStay.
+  ///
+  /// In en, this message translates to:
+  /// **'View stay'**
+  String get adsViewStay;
+
+  /// No description provided for @adsPromotedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Promoted by'**
+  String get adsPromotedBy;
+
+  /// No description provided for @adsPaidNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid placement from a local business.'**
+  String get adsPaidNote;
+
+  /// No description provided for @adsReadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the story'**
+  String get adsReadMore;
+
+  /// No description provided for @adsSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored results'**
+  String get adsSearchTitle;
+
+  /// No description provided for @accountSectionActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'My activity'**
+  String get accountSectionActivity;
+
+  /// No description provided for @accountSectionManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get accountSectionManage;
+
+  /// No description provided for @accountSectionPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get accountSectionPreferences;
+
+  /// No description provided for @accountSectionGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get accountSectionGeneral;
+
+  /// No description provided for @accountSectionAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountSectionAccount;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// No description provided for @editProfileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the name and phone number we use on your bookings.'**
+  String get editProfileHint;
+
+  /// No description provided for @profileName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get profileName;
+
+  /// No description provided for @profilePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get profilePhone;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @profileEmailNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email is your sign-in and can\'t be changed here.'**
+  String get profileEmailNote;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileSaved;
+
+  /// No description provided for @nameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 2 characters'**
+  String get nameTooShort;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account is permanent. Please read what happens first.'**
+  String get deleteIntro;
+
+  /// No description provided for @deleteRemovedHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed for good'**
+  String get deleteRemovedHeading;
+
+  /// No description provided for @deleteRemoved1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name, phone number and email address'**
+  String get deleteRemoved1;
+
+  /// No description provided for @deleteRemoved2.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wishlist, saved trips, notifications and assistant chats'**
+  String get deleteRemoved2;
+
+  /// No description provided for @deleteRemoved3.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sign-in on every device'**
+  String get deleteRemoved3;
+
+  /// No description provided for @deleteKeptHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept without your name'**
+  String get deleteKeptHeading;
+
+  /// No description provided for @deleteKept1.
+  ///
+  /// In en, this message translates to:
+  /// **'Past bookings and payments, as financial records require. They no longer link to you.'**
+  String get deleteKept1;
+
+  /// No description provided for @deleteActiveNote.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have active bookings, cancel them first. We can\'t delete the account until they are done.'**
+  String get deleteActiveNote;
+
+  /// No description provided for @deleteTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to confirm'**
+  String get deleteTypeLabel;
+
+  /// No description provided for @deleteTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get deleteTypeHint;
+
+  /// No description provided for @deletePasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password'**
+  String get deletePasswordLabel;
+
+  /// No description provided for @deleteForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteForever;
+
+  /// No description provided for @deleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my account'**
+  String get deleteCancel;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted'**
+  String get accountDeleted;
+
+  /// No description provided for @browseDestinations.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse destinations'**
+  String get browseDestinations;
+
+  /// No description provided for @signOutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out of your Travel account?'**
+  String get signOutConfirm;
+
+  /// No description provided for @notificationsEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking and payment updates will show up here.'**
+  String get notificationsEmptyHint;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get changePhoto;
+
+  /// No description provided for @chooseFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from library'**
+  String get chooseFromLibrary;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
+  /// No description provided for @removePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get removePhoto;
+
+  /// No description provided for @photoUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo updated'**
+  String get photoUpdated;
+
+  /// No description provided for @photoRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo removed'**
+  String get photoRemoved;
+
+  /// No description provided for @photoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That photo could not be used. Try another one.'**
+  String get photoFailed;
 }
 
 class _AppLocalizationsDelegate

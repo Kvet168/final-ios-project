@@ -1,0 +1,44 @@
+-- Real room photos for the sample hotels. Until now every room reused a photo of its hotel building or a landmark.
+-- These are freely licensed photographs of real hotel and hostel rooms from Wikimedia Commons, assigned by room type;
+-- the author and licence are stored in image_credit. Partner-created rooms are not touched.
+ALTER TABLE room_types ADD COLUMN IF NOT EXISTS image_credit text;
+
+WITH photos(kind, n, url, credit) AS (VALUES
+    ('standard', 0, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Bedroom%2C_Westin_Canal_Place_-_New_Orleans.jpg/960px-Bedroom%2C_Westin_Canal_Place_-_New_Orleans.jpg', 'Bedroom, Westin Canal Place - New Orleans by TravelingOtter, CC BY-SA 2.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Bedroom,_Westin_Canal_Place_-_New_Orleans.jpg)'),
+    ('standard', 1, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Hotel_Lutetia_Paris_Room_419.jpg/960px-Hotel_Lutetia_Paris_Room_419.jpg', 'Hotel Lutetia Paris Room 419 by Gary Bembridge from London, UK, CC BY 2.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Hotel_Lutetia_Paris_Room_419.jpg)'),
+    ('standard', 2, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Hotel_Room.jpg/960px-Hotel_Room.jpg', 'Hotel Room by VasoPlevneshi, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Hotel_Room.jpg)'),
+    ('standard', 3, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Mercure_hotel_taksim.jpg/960px-Mercure_hotel_taksim.jpg', 'Mercure hotel taksim by Amin, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Mercure_hotel_taksim.jpg)'),
+    ('standard', 4, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Oba_Hotel_istanbul_DBL_room_%2831%29.jpg/960px-Oba_Hotel_istanbul_DBL_room_%2831%29.jpg', 'Oba Hotel istanbul DBL room (31) by Ismailcaliskan, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Oba_Hotel_istanbul_DBL_room_(31).jpg)'),
+    ('standard', 5, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Hotel_Gillow_Room.jpg/960px-Hotel_Gillow_Room.jpg', 'Hotel Gillow Room by RobertoGlezV, CC0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Hotel_Gillow_Room.jpg)'),
+    ('standard', 6, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Double_room.jpg/960px-Double_room.jpg', 'Double room by Jony1988, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Double_room.jpg)'),
+    ('standard', 7, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Hotel_room_at_Sokos_Hotel_Viru%2C_Tallinn%2C_Estonia.jpg/960px-Hotel_room_at_Sokos_Hotel_Viru%2C_Tallinn%2C_Estonia.jpg', 'Hotel room at Sokos Hotel Viru, Tallinn, Estonia by JIP, CC BY-SA 3.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Hotel_room_at_Sokos_Hotel_Viru,_Tallinn,_Estonia.jpg)'),
+    ('deluxe', 0, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Deluxe_harbour_view_room.jpg/960px-Deluxe_harbour_view_room.jpg', 'Deluxe harbour view room by Ksl.communications, CC BY-SA 3.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Deluxe_harbour_view_room.jpg)'),
+    ('deluxe', 1, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Deluxe_room_with_Marina_Bay_view%2C_The_Ritz-Carlton_Millenia_Singapore_-_20110722.jpg/960px-Deluxe_room_with_Marina_Bay_view%2C_The_Ritz-Carlton_Millenia_Singapore_-_20110722.jpg', 'Deluxe room with Marina Bay view, The Ritz-Carlton Millenia Singapore - 20110722 by Cherylsh.ng for The Ritz-Carlton, Millenia Singapore., CC BY-SA 3.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Deluxe_room_with_Marina_Bay_view,_The_Ritz-Carlton_Millenia_Singapore_-_20110722.jpg)'),
+    ('deluxe', 2, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Kyoto_Yura_Hotel_MGallery_Deluxe_Room_Twin_20201102-001.jpg/960px-Kyoto_Yura_Hotel_MGallery_Deluxe_Room_Twin_20201102-001.jpg', 'Kyoto Yura Hotel MGallery Deluxe Room Twin 20201102-001 by J o, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Kyoto_Yura_Hotel_MGallery_Deluxe_Room_Twin_20201102-001.jpg)'),
+    ('deluxe', 3, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/The_Bentley_London_Deluxe_King_room.jpg/960px-The_Bentley_London_Deluxe_King_room.jpg', 'The Bentley London Deluxe King room by Mastcraft, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:The_Bentley_London_Deluxe_King_room.jpg)'),
+    ('deluxe', 4, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Intourist_Onego_Palace_Hotel_de_Luxe_bedroom.jpg/960px-Intourist_Onego_Palace_Hotel_de_Luxe_bedroom.jpg', 'Intourist Onego Palace Hotel de Luxe bedroom by ООО «Онега Палас», CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Intourist_Onego_Palace_Hotel_de_Luxe_bedroom.jpg)'),
+    ('deluxe', 5, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Deluxe_Room_-_Twin_beds.jpg/960px-Deluxe_Room_-_Twin_beds.jpg', 'Deluxe Room - Twin beds by Holidayinnklg, CC BY-SA 3.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Deluxe_Room_-_Twin_beds.jpg)'),
+    ('family', 0, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/2022_-_Americus_Hotel_-_Double_Room_2_-_Allentown_PA.jpg/960px-2022_-_Americus_Hotel_-_Double_Room_2_-_Allentown_PA.jpg', '2022 - Americus Hotel - Double Room 2 - Allentown PA by Atwngirl, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:2022_-_Americus_Hotel_-_Double_Room_2_-_Allentown_PA.jpg)'),
+    ('family', 1, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/2022_-_Americus_Hotel_-_Double_Room_-_Allentown_PA.jpg/960px-2022_-_Americus_Hotel_-_Double_Room_-_Allentown_PA.jpg', '2022 - Americus Hotel - Double Room - Allentown PA by Atwngirl, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:2022_-_Americus_Hotel_-_Double_Room_-_Allentown_PA.jpg)'),
+    ('family', 2, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Double_room_at_Marriott_Courtyard_Atlanta_Executive_Park.JPG/960px-Double_room_at_Marriott_Courtyard_Atlanta_Executive_Park.JPG', 'Double room at Marriott Courtyard Atlanta Executive Park by Michael Rivera, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Double_room_at_Marriott_Courtyard_Atlanta_Executive_Park.JPG)'),
+    ('family', 3, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-01.2024-11-04.jpg/960px-Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-01.2024-11-04.jpg', 'Interior of the Double Room of H₂O Hotel-01.2024-11-04 by 阿道, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-01.2024-11-04.jpg)'),
+    ('family', 4, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-02.2024-11-04.jpg/960px-Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-02.2024-11-04.jpg', 'Interior of the Double Room of H₂O Hotel-02.2024-11-04 by 阿道, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Interior_of_the_Double_Room_of_H%E2%82%82O_Hotel-02.2024-11-04.jpg)'),
+    ('twin', 0, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/N1_Hotel_Bulawayo_Twin.jpg/960px-N1_Hotel_Bulawayo_Twin.jpg', 'N1 Hotel Bulawayo Twin by Rufouslark, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:N1_Hotel_Bulawayo_Twin.jpg)'),
+    ('twin', 1, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Twin_room.jpg/960px-Twin_room.jpg', 'Twin room by Hawksapsan, CC BY-SA 3.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Twin_room.jpg)'),
+    ('twin', 2, 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Hotel_Kasererbr%C3%A4u%2C_Salzburg_-_Zimmer_323_%2805%29.jpg/960px-Hotel_Kasererbr%C3%A4u%2C_Salzburg_-_Zimmer_323_%2805%29.jpg', 'Hotel Kasererbräu, Salzburg - Zimmer 323 (05) by © 1971markus, CC BY-SA 4.0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Hotel_Kasererbr%C3%A4u,_Salzburg_-_Zimmer_323_(05).jpg)')
+),
+counts AS (SELECT kind, count(*)::int AS c FROM photos GROUP BY kind),
+targets AS (
+  SELECT r.id,
+         CASE r.name WHEN 'Standard Room' THEN 'standard' WHEN 'Deluxe Room' THEN 'deluxe'
+                     WHEN 'Family Room' THEN 'family' WHEN 'Private Twin Room' THEN 'twin' END AS kind,
+         abs(hashtext(r.id::text)) AS h
+  FROM room_types r JOIN accommodations a ON a.id = r.accommodation_id
+  WHERE COALESCE(a.is_demo, false) = true
+)
+UPDATE room_types r
+SET cover_image = p.url, image_credit = p.credit
+FROM targets t
+JOIN counts c ON c.kind = t.kind
+JOIN photos p ON p.kind = t.kind AND p.n = t.h % c.c
+WHERE r.id = t.id;

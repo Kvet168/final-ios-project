@@ -29,7 +29,7 @@ const ROLE_META = {
     singular: 'administrator',
     createLabel: 'Create administrator account',
     modalTitle: 'Create administrator account',
-    modalDesc: 'Creates a full-access administrator login for the WAYFARER Admin Console.',
+    modalDesc: 'Creates a full-access administrator login for the Travel Admin Console.',
     emailLabel: 'Administrator email (login)',
     namePlaceholder: 'e.g. Sokha Chan',
     emailPlaceholder: 'admin.name@wayfarer.com',
@@ -70,7 +70,7 @@ const ROLE_META = {
     singular: 'customer',
     createLabel: 'Create customer account',
     modalTitle: 'Create customer account',
-    modalDesc: 'Creates a traveler account for the WAYFARER mobile app.',
+    modalDesc: 'Creates a traveler account for the Travel mobile app.',
     emailLabel: 'Customer email (login)',
     namePlaceholder: 'e.g. Sophea Sok',
     emailPlaceholder: 'traveler@example.com',
@@ -191,7 +191,8 @@ export function usersPage({ api, user }) {
   const openPartner = (p) => partnerDetailModal({ api, id: p.id, isAdmin, onChanged: () => load() });
 
   function createButtonForRole(role, small = false) {
-    if (!isAdmin) return null;
+    // Customers sign up in the app, so admins do not need a button for them.
+    if (!isAdmin || role === 'customer') return null;
     const meta = ROLE_META[role] || ROLE_META.customer;
     return h('button', {
       class: `btn ${small ? 'small ' : ''}primary`.trim(),
@@ -206,17 +207,35 @@ export function usersPage({ api, user }) {
         h('span', { class: 'muted small' }, 'Only administrators can create accounts or change roles.'));
       return;
     }
-    if (state.mode === 'grouped') {
-      // When viewing All Categories (Grouped), provide separate role-specific create buttons
-      toolbarActionSlot.replaceChildren(
-        createButtonForRole('admin', true),
-        createButtonForRole('staff', true),
-        createButtonForRole('partner', true),
-        createButtonForRole('customer', true));
-      return;
-    }
-    // When on a specific category tab (Administrators, Staff, Hotel Partners, Customers), show ONLY that category's dedicated create button
-    toolbarActionSlot.replaceChildren(createButtonForRole(state.mode, false));
+    // Each category card has its own "Create ..." button, so the toolbar stays empty to avoid repeating them.
+    toolbarActionSlot.replaceChildren();
+  }
+
+  // Soft delete on the server: personal data is erased and sign-in stops; bookings stay for records.
+  function deleteButton(u) {
+    return h('button', {
+      class: 'btn small danger icon-only',
+      type: 'button',
+      title: 'Delete account',
+      'aria-label': `Delete account of ${u.name}`,
+      onclick: async (ev) => {
+        ev.stopPropagation();
+        const ok = await confirmDialog({
+          title: 'Delete account',
+          message: `Delete ${u.name} (${u.email})? Their personal details are erased and they can no longer sign in. Past bookings are kept for records. This cannot be undone.`,
+          confirmLabel: 'Delete account',
+          danger: true,
+        });
+        if (!ok) return;
+        try {
+          await api.del(`/admin/users/${u.id}`);
+          await load();
+          toast(`${u.name} was deleted`, 'ok');
+        } catch (ex) {
+          toast(ex.message, 'bad');
+        }
+      },
+    }, icon('trash'));
   }
 
   function userColumns() {
@@ -296,9 +315,11 @@ export function usersPage({ api, user }) {
         label: 'Action',
         render: (u) => (u.id === user.id
           ? h('span', { class: 'muted small' }, 'You')
-          : h('button', {
-            class: 'btn small',
+          : h('div', { class: 'row', style: 'gap:6px;flex-wrap:nowrap' }, h('button', {
+            class: 'btn small icon-only',
             type: 'button',
+            title: 'Reset password',
+            'aria-label': `Reset password of ${u.name}`,
             onclick: async (ev) => {
               ev.stopPropagation();
               const ok = await confirmDialog({
@@ -323,7 +344,7 @@ export function usersPage({ api, user }) {
                 toast(ex.message, 'bad');
               }
             },
-          }, 'Reset password')),
+          }, icon('key')), deleteButton(u))),
       });
     }
 

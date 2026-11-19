@@ -192,12 +192,6 @@ class StayCard extends ConsumerWidget {
                 size: grid ? 32 : 38,
               ),
             ),
-          if (s['is_demo'] == true)
-            Positioned(
-              left: edge,
-              bottom: grid ? 8 : 10,
-              child: const DemoBadge(onImage: true),
-            ),
         ],
       ),
     );
@@ -459,11 +453,6 @@ class PlaceTile extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  if (p['is_demo'] == true)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6),
-                      child: DemoBadge(),
-                    ),
                 ],
               ),
             ),

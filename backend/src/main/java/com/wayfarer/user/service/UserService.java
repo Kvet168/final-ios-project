@@ -117,6 +117,29 @@ public class UserService {
         audit.record(actorId, "user.role_change", "user", targetId, Map.of("role", role));
     }
 
+    /**
+     * Administrator deletes an account. Same soft delete as a user deleting their own account: personal data is erased
+     * and sign-in stops, while bookings and payments stay for financial records.
+     */
+    @Transactional
+    public void deleteByAdmin(UUID actorId, UUID targetId) {
+        if (actorId.equals(targetId)) throw ApiException.conflict("SELF_DELETE", "You cannot delete your own account.");
+        Map<String, Object> u = users.findActiveById(targetId).orElseThrow(() -> ApiException.notFound("User"));
+        String role = Rows.str(u, "role");
+        String email = Rows.str(u, "email");
+        if ("admin".equals(role) && users.countActiveAdmins() <= 1)
+            throw ApiException.conflict("LAST_ADMIN", "This is the last administrator account, so it cannot be deleted.");
+        if (bookings.userHasActive(targetId))
+            throw ApiException.conflict("ACTIVE_BOOKINGS", "This user has active bookings. Cancel or complete them before deleting the account.");
+        if ("partner".equals(role) && users.partnerHasProperties(targetId))
+            throw ApiException.conflict("PARTNER_HAS_PROPERTIES", "This partner still has properties. Remove their properties first, then delete the account.");
+        String avatar = Rows.str(u, "avatar_url");
+        users.anonymise(targetId);
+        media.deleteByUrl(targetId, avatar);
+        refreshTokens.revokeAllForUser(targetId);
+        audit.record(actorId, "user.delete", "user", targetId, Map.of("email", email, "role", role));
+    }
+
     @Transactional
     public Map<String, Object> createByAdmin(UUID actorId, CreateUserRequest r) {
         String email = r.email().trim();

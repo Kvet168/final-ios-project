@@ -18,23 +18,32 @@ export function propertiesPage({ api }) {
   }
   const reload = () => load().catch((e) => toast(e.message, 'bad'));
 
+  // Icon-only action: the tooltip is the title, screen readers read the aria-label.
+  const iconBtn = (name, label, onclick, danger = false) => h('button', {
+    class: `btn small icon-only${danger ? ' danger' : ''}`, type: 'button', title: label, 'aria-label': label, onclick,
+  }, icon(name));
+
   const card = (a) => h('article', { class: 'card hotel' },
-    a.cover_image ? h('img', { class: 'hotel-cover', src: a.cover_image, alt: `${a.name}` }) : null,
-    h('div', { class: 'row between' }, h('div', {}, h('h3', {}, a.name), h('div', { class: 'muted small' }, `${typeLabel(a.type)} · `, stars(a.stars))),
-      h('div', { class: 'right' }, h('div', { class: 'small muted' }, 'from'), h('strong', {}, money(a.from_price_usd)))),
-    h('div', { class: 'small muted' }, `Rating ${Number(a.rating_avg).toFixed(1)} (${num(a.review_count)} reviews) · ${(a.images || []).length} photos`),
+    h('div', { class: 'hotel-media' },
+      a.cover_image
+        ? h('img', { class: 'hotel-cover', src: a.cover_image, alt: `${a.name}` })
+        : h('div', { class: 'hotel-cover hotel-cover-empty' }, icon('bed')),
+      h('div', { class: 'hotel-tools' },
+        iconBtn('edit', `Edit details of ${a.name}`, () => propertyForm(a.id)),
+        iconBtn('image', `Photos of ${a.name} (${(a.images || []).length})`, () => photosForm(a)),
+        iconBtn('trash', `Delete ${a.name}`, () => deleteProperty(a), true))),
+    h('div', { class: 'row between hotel-head' },
+      h('div', { class: 'hotel-title' }, h('h3', {}, a.name),
+        h('div', { class: 'muted small' }, `${typeLabel(a.type)} · `, stars(a.stars), ` · ${Number(a.rating_avg).toFixed(1)} (${num(a.review_count)})`)),
+      h('div', { class: 'hotel-price' }, h('span', { class: 'small muted' }, 'from '), h('strong', {}, money(a.from_price_usd)))),
     h('div', { class: 'rooms' }, (a.rooms || []).map((r) => h('div', { class: 'room' },
-      h('div', { class: 'row' }, r.cover_image ? h('img', { class: 'thumb', src: r.cover_image, alt: '' }) : null,
-        h('div', {}, h('strong', {}, r.name), h('div', { class: 'small muted' }, `${money(r.base_price_usd)} / night · ${r.total_units} rooms`))),
-      h('div', { class: 'row' },
-        h('button', { class: 'btn small', type: 'button', onclick: () => inventoryForm(r) }, icon('calendar'), 'Stock & price'),
-        h('button', { class: 'btn small', type: 'button', onclick: () => roomForm({ accommodationId: a.id, roomId: r.id }) }, icon('edit'), 'Edit'),
-        h('button', { class: 'btn small danger', type: 'button', 'aria-label': `Delete ${r.name}`, onclick: () => deleteRoom(r) }, icon('trash'), 'Delete'))))),
-    h('div', { class: 'row' },
-      h('button', { class: 'btn small primary', type: 'button', onclick: () => roomForm({ accommodationId: a.id }) }, icon('plus'), 'Add room'),
-      h('button', { class: 'btn small', type: 'button', onclick: () => propertyForm(a.id) }, icon('edit'), 'Edit details'),
-      h('button', { class: 'btn small', type: 'button', onclick: () => photosForm(a) }, 'Photos'),
-      h('button', { class: 'btn small danger', type: 'button', onclick: () => deleteProperty(a) }, icon('trash'), 'Delete')));
+      r.cover_image ? h('img', { class: 'thumb', src: r.cover_image, alt: '' }) : null,
+      h('div', { class: 'room-info' }, h('strong', {}, r.name), h('div', { class: 'small muted' }, `${money(r.base_price_usd)} / night · ${r.total_units} rooms`)),
+      h('div', { class: 'room-actions' },
+        iconBtn('calendar', `Stock and price of ${r.name}`, () => inventoryForm(r)),
+        iconBtn('edit', `Edit ${r.name}`, () => roomForm({ accommodationId: a.id, roomId: r.id })),
+        iconBtn('trash', `Delete ${r.name}`, () => deleteRoom(r), true))))),
+    h('button', { class: 'btn small add-room', type: 'button', onclick: () => roomForm({ accommodationId: a.id }) }, icon('plus'), 'Add room'));
 
   async function deleteProperty(a) {
     if (!(await confirmDialog({ title: 'Delete property', message: `Remove ${a.name} and all its rooms from the catalogue? Properties with pending, confirmed or in-house bookings cannot be deleted.`, confirmLabel: 'Delete', danger: true }))) return;
@@ -146,7 +155,7 @@ export function propertiesPage({ api }) {
         await successDialog({
           title: editing ? 'Property updated' : 'Property created & open for booking',
           message: editing
-            ? `Your changes to ${name.value.trim()} are now live in the WAYFARER app.`
+            ? `Your changes to ${name.value.trim()} are now live in the Travel app.`
             : `${name.value.trim()} is live and open for guest bookings across the next 180 days.`,
           details: [
             ['Property', name.value.trim()],
@@ -225,7 +234,7 @@ export function propertiesPage({ api }) {
           try { await api.patch(`/partner/accommodations/${a.id}`, { coverImage: i.url }); toast('Cover photo set', 'ok'); await refresh(); } catch (e) { showErrors(errors, e); }
         } }, 'Set cover'), h('button', { class: 'btn small danger', type: 'button', 'aria-label': 'Delete photo', onclick: async () => {
           try { await api.del(`/partner/accommodations/${a.id}/images/${i.id}`); await refresh(); } catch (e) { showErrors(errors, e); }
-        } }, icon('trash'), 'Delete'))))) : [h('div', { class: 'muted' }, 'No photos yet. Add some so guests can see your property.')]));
+        } }, icon('trash'), 'Delete')))) : [h('div', { class: 'muted' }, 'No photos yet. Add some so guests can see your property.')]));
     };
     async function refresh() { const d = await api.get(`/accommodations/${a.id}`); draw(d.images || [], d.cover_image); await load(); }
     const picker = imagePicker({ label: 'Add a photo', upload: up });

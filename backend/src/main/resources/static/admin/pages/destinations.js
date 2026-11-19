@@ -14,12 +14,12 @@ export function destinationsPage({ api, user }) {
       { label: 'Daily budget', num: true, render: (d) => money(d.daily_budget_usd) }, { label: 'Hotels', num: true, render: (d) => d.accommodation_count }, { label: 'Places', num: true, render: (d) => d.place_count },
       { label: 'Featured', render: (d) => (d.is_featured ? h('span', { class: 'badge ok' }, 'featured') : '') },
       { label: '', render: (d) => h('div', { class: 'row' },
-        h('button', { class: 'btn small', type: 'button', onclick: () => form(d.id) }, icon('edit'), 'Edit'),
-        isAdmin ? h('button', { class: 'btn small danger', type: 'button', 'aria-label': `Delete ${d.name}`, onclick: async () => {
+        h('button', { class: 'btn small icon-only', type: 'button', title: 'Edit', 'aria-label': `Edit ${d.name}`, onclick: () => form(d.id) }, icon('edit')),
+        isAdmin ? h('button', { class: 'btn small danger icon-only', type: 'button', title: 'Delete', 'aria-label': `Delete ${d.name}`, onclick: async () => {
           if (await confirmDialog({ title: 'Delete destination', message: `Remove ${d.name} from the catalogue?`, confirmLabel: 'Delete', danger: true })) {
             try { await api.del(`/admin/destinations/${d.id}`); toast('Destination deleted', 'ok'); await load(); } catch (e) { toast(e.message, 'bad'); }
           }
-        } }, icon('trash'), 'Delete') : null) }], rows: r.items }),
+        } }, icon('trash')) : null) }], rows: r.items }),
     pager({ page: r.page, pageSize: r.pageSize, total: r.total, onChange: (p) => { state.page = p; load(); } }));
   }
 
@@ -77,7 +77,7 @@ export function destinationsPage({ api, user }) {
           await load();
           await successDialog({
             title: editing ? 'Destination updated' : 'Destination created',
-            message: editing ? `${name.value.trim()} has been updated in the WAYFARER catalogue.` : `${name.value.trim()} is now live in the WAYFARER catalogue and trip planner.`,
+            message: editing ? `${name.value.trim()} has been updated in the Travel catalogue.` : `${name.value.trim()} is now live in the Travel catalogue and trip planner.`,
             details: [
               ['Destination', `${name.value.trim()}, ${country.value.trim()}`],
               ['Daily budget', budget.value ? money(budget.value) : null],

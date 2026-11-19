@@ -1,4 +1,4 @@
-// Executive analytics chart & animation toolkit for WAYFARER Admin and Partner dashboards.
+// Executive analytics chart & animation toolkit for Travel Admin and Partner dashboards.
 // Built strictly with createElement / createElementNS (never innerHTML) to satisfy strict CSP.
 
 import { h, icon, money, num, t } from './ui.js';
@@ -463,7 +463,7 @@ export function currencyExchangeCard({ baseUsd = 132.16, delay = 260 }) {
  * Mini Circular Progress KPI Card (matches bottom-right "Inprogress 60% / 49%" cards in the reference image).
  */
 export function miniProgressCard({
-  eyebrow = 'WAYFARER Metric',
+  eyebrow = 'Travel Metric',
   title = 'In progress',
   amountLabel = 'Earnings',
   amountValue = '$132.16',

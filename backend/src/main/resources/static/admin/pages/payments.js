@@ -27,7 +27,7 @@ export function paymentsPage({ api }) {
     const cards = [
       { id: '', label: 'All Transactions', val: num(total || items.length), sub: 'Card & KHQR payments', color: '#E6485C', icon: 'card' },
       { id: 'SUCCESS', label: 'Gross Booking Value (GBV)', val: money(grossCollected), sub: 'Confirmed guest payments', color: '#10B981', icon: 'chart' },
-      { id: 'SUCCESS', label: 'WAYFARER OTA Commission', val: money(platformCommission), sub: 'Platform service fees (5%)', color: '#6347F9', icon: 'compass' },
+      { id: 'SUCCESS', label: 'Travel OTA Commission', val: money(platformCommission), sub: 'Platform service fees (5%)', color: '#6347F9', icon: 'compass' },
       { id: 'SUCCESS', label: 'Net Partner Payouts', val: money(partnerPayout), sub: 'Settled to hotel partners', color: '#3B82F6', icon: 'bed' },
       { id: 'REFUNDED', label: 'Customer Refunds', val: money(refundedTotal), sub: 'Free-cancellation refunds', color: '#F59E0B', icon: 'refresh' },
     ];
@@ -58,7 +58,7 @@ export function paymentsPage({ api }) {
       h('div', { class: 'card-head' },
         h('div', {},
           h('h2', {}, 'OTA Payment Ledger, Commission & Partner Payouts'),
-          h('p', { class: 'muted small' }, 'Agoda / Booking.com financial flow: tracks gross traveler payments, WAYFARER platform commission fees, net hotel partner payouts, and customer refunds.')),
+          h('p', { class: 'muted small' }, 'Agoda / Booking.com financial flow: tracks gross traveler payments, Travel platform commission fees, net hotel partner payouts, and customer refunds.')),
         h('span', { class: 'badge neutral' }, `${num(r.total)} transactions`)),
       table({
         empty: 'No payments match this filter',

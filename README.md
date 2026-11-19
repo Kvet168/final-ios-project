@@ -7,6 +7,7 @@ A Flutter mobile app (iOS and Android) backed by a **Java 21 / Spring Boot** RES
 | Mobile app | `app/` (Flutter, Riverpod, go_router, Dio) |
 | Admin console | `http://localhost:8080/admin` (web, served by the backend) |
 | Partner dashboard | `http://localhost:8080/partner` (web, served by the backend) |
+| Business advertising portal | `http://localhost:8080/business` (web, served by the backend) |
 | Backend | `backend/` (Spring Boot 3.3, Flyway, JWT, Redis, WebSocket) |
 | API docs | Swagger UI at `http://localhost:8080/api/docs`; reference in [backend/docs/API.md](backend/docs/API.md) |
 | ERD / schema / SQL | [backend/docs/ERD.md](backend/docs/ERD.md), [backend/sql](backend/sql), Flyway scripts in `backend/src/main/resources/db` |
@@ -17,6 +18,7 @@ A Flutter mobile app (iOS and Android) backed by a **Java 21 / Spring Boot** RES
 - **Booking**: held rooms with a countdown, simulated payment (clearly labelled), cancellation with refund rules, receipts, tickets, reviews from verified stays, live status updates over WebSocket.
 - **AI trip planner**: "three days in Phnom Penh and $150" becomes a day-by-day plan (sights, restaurants, a stay, budget split, travel times, route links) built only from stored records, optimised for budget, distance, opening hours, travel time and interests. Without an LLM key it uses a transparent rules engine and says so.
 - **AI travel guide**: intent- and destination-aware assistant grounded in approved guides, with sources, tappable cards and follow-ups; it declines rather than guesses.
+- **Advertising and sponsored listings**: local businesses buy Featured Destination, Top Search, Homepage Banner, Sponsored Article and Festival packages (prices and durations editable by an admin), pay by KHQR or bank transfer in USD or KHR, and travellers see clearly labelled *Sponsored* placements. See [docs/ADVERTISING.md](docs/ADVERTISING.md).
 - Wishlist, notifications, and two **web dashboards** served by the same backend:
   - **Admin console** (`/admin`): creates partner accounts and hands over credentials, and *views* partners and every hotel, hostel, bungalow and resort (read-only: no prices, rooms or stock). Also bookings, payments, destinations, reviews, users and roles, audit log, AI usage.
   - **Partner dashboard** (`/partner`): each hotel owner creates and sells their own hotels, resorts, bungalows or hostels with photos, adds rooms, sets stock and prices, manages their payment QR code and confirms guest QR payments, and handles check-in.

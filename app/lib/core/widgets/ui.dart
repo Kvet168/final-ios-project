@@ -393,7 +393,7 @@ class SectionTitle extends StatelessWidget {
                 ),
               Semantics(
                 header: true,
-                child: Text(title, style: Type.display(25)),
+                child: Text(title, style: Type.display(22)),
               ),
             ],
           ),

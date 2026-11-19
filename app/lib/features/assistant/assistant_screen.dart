@@ -427,7 +427,7 @@ class _Empty extends StatelessWidget {
                         s.title(context.l10n),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Type.body(14.5, weight: FontWeight.w800),
+                        style: Type.body(14.5, weight: FontWeight.w600),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -577,7 +577,7 @@ class _AssistantBubbleState extends State<_AssistantBubble>
         out.add(
           TextSpan(
             text: mt.group(1),
-            style: const TextStyle(fontWeight: FontWeight.w800),
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         );
         continue;
@@ -747,7 +747,7 @@ class _AssistantBubbleState extends State<_AssistantBubble>
                                   Padding(
                                     padding: const EdgeInsets.only(top: 6),
                                     child: Text(
-                                      '[${i + 1}] ${s['title']} · ${s['source']}${s['isDemo'] == true ? context.l10n.demoContentSuffix : ''}',
+                                      '[${i + 1}] ${s['title']} · ${s['source']}',
                                       style: Type.body(
                                         12,
                                         color: Tokens.inkMuted,

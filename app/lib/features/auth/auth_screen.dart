@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/data/providers.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/theme.dart';
+import '../../core/widgets/google_logo.dart';
 import '../../core/widgets/widgets.dart';
 import 'auth_controller.dart';
 import 'firebase_sign_in.dart';
@@ -250,11 +249,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CustomPaint(painter: _GoogleG()),
-                                  ),
+                                  const GoogleLogo(size: 20),
                                   const SizedBox(width: 12),
                                   Text(
                                     reg
@@ -561,60 +556,4 @@ class _Blob extends StatelessWidget {
     height: size,
     decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
-}
-
-/// The multi-colour Google "G".
-class _GoogleG extends CustomPainter {
-  const _GoogleG();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = size.center(Offset.zero);
-    final r = size.width / 2;
-    final stroke = size.width * 0.2;
-    final rect = Rect.fromCircle(center: c, radius: r - stroke / 2);
-    Paint arc(Color col) => Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..color = col;
-    const red = Color(0xFFEA4335),
-        yellow = Color(0xFFFBBC05),
-        green = Color(0xFF34A853),
-        blue = Color(0xFF4285F4);
-    canvas.drawArc(
-      rect,
-      -math.pi * 0.84,
-      math.pi * 0.62,
-      false,
-      arc(red),
-    ); // top
-    canvas.drawArc(
-      rect,
-      math.pi * 0.78,
-      math.pi * 0.62,
-      false,
-      arc(yellow),
-    ); // left
-    canvas.drawArc(
-      rect,
-      math.pi * 0.28,
-      math.pi * 0.5,
-      false,
-      arc(green),
-    ); // bottom
-    canvas.drawArc(
-      rect,
-      -math.pi * 0.22,
-      math.pi * 0.5,
-      false,
-      arc(blue),
-    ); // right, down to the bar
-    canvas.drawRect(
-      Rect.fromLTWH(c.dx, c.dy - stroke / 2, r - 0.5, stroke),
-      Paint()..color = blue,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
 }

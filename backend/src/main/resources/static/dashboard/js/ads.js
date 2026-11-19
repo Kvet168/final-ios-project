@@ -20,7 +20,7 @@ export function registerBusinessModal(onDone) {
   const m = modal({
     title: 'Create a business account', width: 560,
     body: h('div', { class: 'stack' },
-      h('p', { class: 'muted small' }, 'Hotels, restaurants, cafés, camping sites, tour operators and other travel businesses can promote themselves inside WAYFARER. Our team verifies every business before its first campaign goes live.'),
+      h('p', { class: 'muted small' }, 'Hotels, restaurants, cafés, camping sites, tour operators and other travel businesses can promote themselves inside Travel. Our team verifies every business before its first campaign goes live.'),
       h('div', { class: 'form-grid' },
         field('Business name', business, { required: true, full: true }),
         field('Business type', category),
@@ -152,7 +152,7 @@ async function campaignForm({ api, refresh, existing }) {
   const titleKm = input({ value: e.title_km || '', maxlength: 90 });
   const body = textarea({ maxlength: 300, rows: 2 }); body.value = e.body_en || '';
   const bodyKm = textarea({ maxlength: 300, rows: 2 }); bodyKm.value = e.body_km || '';
-  const offer = input({ value: e.offer_en || '', maxlength: 120, placeholder: 'e.g. 10% off for WAYFARER travellers' });
+  const offer = input({ value: e.offer_en || '', maxlength: 120, placeholder: 'e.g. 10% off for travellers' });
   const offerKm = input({ value: e.offer_km || '', maxlength: 120 });
   const link = input({ value: e.cta_url || '', maxlength: 500, placeholder: 'https://...' });
   const article = textarea({ maxlength: 6000, rows: 8 }); article.value = e.article_en || '';

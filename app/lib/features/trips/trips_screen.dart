@@ -954,33 +954,6 @@ class _PlanViewState extends ConsumerState<PlanView> {
               style: Type.body(14.5, color: Tokens.inkSoft, height: 1.55),
             ),
           ),
-        if (plan['modeNote'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  plan['mode'] == 'llm'
-                      ? Icons.auto_awesome_rounded
-                      : Icons.rule_rounded,
-                  size: 15,
-                  color: Tokens.primary,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    plan['modeNote'] as String,
-                    style: Type.body(
-                      11.5,
-                      color: Tokens.primaryText,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         for (final w in warnings)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -1496,12 +1469,6 @@ class _Stop extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                              if (item['isDemo'] == true ||
-                                  item['is_demo'] == true)
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 8),
-                                  child: DemoBadge(),
-                                ),
                               if (editing)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6),
@@ -1575,10 +1542,6 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     return {
       'title': it['title'],
       'summary': it['summary'],
-      'modeNote':
-          it['generated_by'] == 'rules' || it['generated_by'] == 'curated'
-          ? "Built by WAYFARER's deterministic rules engine from stored records, not an AI model."
-          : null,
       'days': days,
       'assumptions': (it['assumptions'] as List?) ?? const [],
       'budget': {

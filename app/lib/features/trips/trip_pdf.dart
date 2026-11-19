@@ -208,9 +208,9 @@ Future<Uint8List> _buildPdf(
   List<List<Uint8List>> images,
 ) async {
   final doc = pw.Document(
-    title: 'WAYFARER itinerary',
-    author: 'WAYFARER',
-    creator: 'WAYFARER',
+    title: 'Travel itinerary',
+    author: 'Travel',
+    creator: 'Travel',
   );
   const format = _pdfFormat;
   const margin = _pdfMargin;
@@ -239,7 +239,7 @@ Future<Uint8List> _buildPdf(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                'WAYFARER',
+                'Travel',
                 style: pw.TextStyle(
                   fontSize: 8,
                   color: PdfColor.fromInt(0xFFC7364B),
@@ -340,33 +340,6 @@ class _PdfCover extends StatelessWidget {
             child: Text(
               plan['summary'] as String,
               style: Type.body(13.5, color: Tokens.inkSoft, height: 1.55),
-            ),
-          ),
-        if (plan['modeNote'] != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  plan['mode'] == 'llm'
-                      ? Icons.auto_awesome_rounded
-                      : Icons.rule_rounded,
-                  size: 14,
-                  color: Tokens.primary,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    plan['modeNote'] as String,
-                    style: Type.body(
-                      11,
-                      color: Tokens.primaryText,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         for (final w in warnings)

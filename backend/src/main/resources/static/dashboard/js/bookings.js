@@ -147,32 +147,38 @@ export function bookingsPage({ api, scope }) {
         render: (b) => {
           if (b.status === 'CONFIRMED') {
             return h('button', {
-              class: 'btn small primary',
+              class: 'btn small primary icon-only',
               type: 'button',
+              title: 'Check guest in',
+              'aria-label': `Check in ${b.guest_name || 'guest'}`,
               onclick: (ev) => {
                 ev.stopPropagation();
                 quickTransition(b, 'CHECKED_IN', 'Check guest in');
               },
-            }, 'Check guest in');
+            }, icon('bed'));
           }
           if (b.status === 'CHECKED_IN') {
             return h('button', {
-              class: 'btn small primary',
+              class: 'btn small primary icon-only',
               type: 'button',
+              title: 'Complete stay',
+              'aria-label': `Complete the stay of ${b.guest_name || 'guest'}`,
               onclick: (ev) => {
                 ev.stopPropagation();
                 quickTransition(b, 'COMPLETED', 'Complete stay');
               },
-            }, 'Complete stay');
+            }, icon('check'));
           }
           return h('button', {
-            class: 'btn small',
+            class: 'btn small icon-only',
             type: 'button',
+            title: 'View booking and voucher',
+            'aria-label': `View booking ${b.reference || ''}`.trim(),
             onclick: (ev) => {
               ev.stopPropagation();
               openDetail(b.id);
             },
-          }, 'View voucher');
+          }, icon('eye'));
         },
       },
     ];
@@ -303,7 +309,7 @@ export function bookingsPage({ api, scope }) {
           h('dt', {}, 'Room & Occupancy'), h('dd', {}, `${b.room_name} × ${b.rooms} room(s) · ${b.adults} adults, ${b.children} children`),
           h('dt', {}, 'Check-In / Out'), h('dd', {}, `${date(b.check_in)} to ${date(b.check_out)} (${b.nights} nights)`),
           h('dt', {}, 'Gross Charge'), h('dd', {}, `${money(total)} (Room rate ${money(subtotal)} + Taxes ${money(taxes)} + OTA Service Fee ${money(fees)})`),
-          h('dt', {}, 'OTA Settlement'), h('dd', {}, `Partner Net Payout: ${money(netPartner)} · WAYFARER Platform Fee: ${money(fees)}`),
+          h('dt', {}, 'OTA Settlement'), h('dd', {}, `Partner Net Payout: ${money(netPartner)} · Travel Platform Fee: ${money(fees)}`),
           h('dt', {}, 'Cancellation Policy'), h('dd', {}, b.cancellation_policy || 'Standard policy'),
           b.special_requests ? [h('dt', {}, 'Guest Requests'), h('dd', {}, b.special_requests)] : null),
         h('div', {}, h('h3', {}, 'Payment Transactions'),

@@ -11,7 +11,7 @@ import '../../core/theme/theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../auth/auth_controller.dart';
 
-/// Two-step checkout: (1) guest details + price review creates a held booking, (2) simulated payment.
+/// Two-step checkout: (1) guest details + price review creates a held booking, (2) payment.
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({
     super.key,
@@ -69,7 +69,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Future<void> _load() async {
-    final l = context.l10n;
     setState(() {
       loading = true;
       error = null;
@@ -80,6 +79,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         final b = await ref
             .read(apiProvider)
             .getJson('/bookings/$existingBooking');
+        if (!mounted) return;
+        final l = context.l10n;
         if (b['status'] != 'PENDING_CONFIRMATION') {
           error = ApiException(
             '${statusLabel(l, b['status'] as String)}. ${l.bookingNotPayable}',
@@ -540,30 +541,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               icon: Icons.timer_outlined,
             ),
             const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Tokens.promo,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.science_outlined,
-                    size: 20,
-                    color: Tokens.warning,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      context.l10n.simulatedPaymentNotice,
-                      style: Type.body(13, height: 1.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 18),
             Text(
               context.l10n.referenceValue('${booking!['reference']}'),
@@ -593,19 +570,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               child: FilledButton.icon(
                 onPressed: busy || expired ? null : () => _pay('success'),
                 icon: const Icon(Icons.lock_outline_rounded),
-                label: Text(context.l10n.payNowSimulate),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: busy || expired ? null : () => _pay('fail'),
-                child: Text(context.l10n.simulateDeclined),
+                label: Text(context.l10n.payNow),
               ),
             ),
             const SizedBox(height: 4),
-            Center(
+            Align(
+              alignment: Alignment.centerLeft,
               child: TextButton(
                 onPressed: busy
                     ? null

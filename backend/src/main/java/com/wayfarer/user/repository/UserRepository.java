@@ -80,6 +80,16 @@ public class UserRepository {
             Map.of("e", "deleted+" + id + "@wayfarer.invalid", "id", id));
     }
 
+    /** Used to stop the last administrator from being deleted. */
+    public int countActiveAdmins() {
+        return ((Number) db.one("SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND deleted_at IS NULL", Map.of()).orElseThrow().get("n")).intValue();
+    }
+
+    /** True while the partner still owns a live property; those must be removed or reassigned first. */
+    public boolean partnerHasProperties(UUID userId) {
+        return db.exists("SELECT 1 FROM accommodations a JOIN partners p ON p.id = a.partner_id WHERE p.user_id = :id AND a.deleted_at IS NULL", Map.of("id", userId));
+    }
+
     public Optional<Map<String, Object>> setRole(UUID id, String role) {
         return db.one("UPDATE users SET role = :r WHERE id = :id AND deleted_at IS NULL RETURNING id, email, name, role", Map.of("r", role, "id", id));
     }

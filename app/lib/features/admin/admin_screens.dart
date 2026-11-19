@@ -46,22 +46,8 @@ class _PortalHeader extends ConsumerWidget {
                     context.canPop() ? context.pop() : context.go('/account'),
               ),
               const SizedBox(width: 12),
-              const Icon(
-                Icons.explore_rounded,
-                color: Tokens.onDarkAccent,
-                size: 22,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'WAYFARER',
-                style: Type.display(
-                  14,
-                  color: Colors.white,
-                  spacing: 2.8,
-                  weight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
+              Image.asset('assets/logo.png', height: 24),
+ const Spacer(),
               GestureDetector(
                 onTap: () => ref
                     .read(localeProvider.notifier)
@@ -108,7 +94,7 @@ class _PortalHeader extends ConsumerWidget {
                     final ok = await confirm(
                       context,
                       title: '${context.l10n.signOut}?',
-                      message: 'Are you sure you want to sign out of your WAYFARER account?',
+                      message: 'Are you sure you want to sign out of your Travel account?',
                       confirmLabel: context.l10n.signOut,
                       destructive: true,
                     );
@@ -755,7 +741,7 @@ class _BookingsState extends ConsumerState<_Bookings> {
                   style: Type.body(15, weight: FontWeight.w700),
                 ),
                 subtitle: Text(
-                  '${b['accommodation_name']}\n${fmtDate(b['check_in'] as String)} → ${fmtDate(b['check_out'] as String)} · ${money(b['total_usd'] as num)}${b['is_demo'] == true ? c.l10n.demoSuffix : ''}',
+                  '${b['accommodation_name']}\n${fmtDate(b['check_in'] as String)} → ${fmtDate(b['check_out'] as String)} · ${money(b['total_usd'] as num)}',
                   style: Type.body(12.5, color: Tokens.inkMuted, height: 1.4),
                 ),
                 isThreeLine: true,
@@ -880,7 +866,7 @@ class _BookingDialog extends ConsumerWidget {
                   const SizedBox(height: 4),
                   for (final p in pay)
                     Text(
-                      '• ${statusLabel(context.l10n, p['status'] as String)} \$${p['amount_usd']} ${p['provider_ref']}${p['simulated'] == true ? context.l10n.simulatedSuffix : ''}',
+                      '• ${statusLabel(context.l10n, p['status'] as String)} \$${p['amount_usd']} ${p['provider_ref']}',
                       style: Type.body(13, color: Tokens.inkSoft),
                     ),
                 ],
@@ -934,7 +920,7 @@ class _Payments extends ConsumerWidget {
               style: Type.body(15, weight: FontWeight.w700),
             ),
             subtitle: Text(
-              '${p['provider_ref']} · ${p['provider']}${p['simulated'] == true ? c.l10n.simulatedSuffix : ''}${p['failure_reason'] != null ? ' · ${p['failure_reason']}' : ''}',
+              '${p['provider_ref']} · ${p['provider']}${p['failure_reason'] != null ? ' · ${p['failure_reason']}' : ''}',
               style: Type.body(12.5, color: Tokens.inkMuted),
             ),
             trailing: StatusPill(p['status'] as String),
@@ -1037,7 +1023,7 @@ class _UsersState extends ConsumerState<_Users> {
                     style: Type.body(15, weight: FontWeight.w700),
                   ),
                   subtitle: Text(
-                    '${u['email']}${u['is_demo'] == true ? c.l10n.demoAccountSuffix : ''}',
+                    '${u['email']}',
                     style: Type.body(12.5, color: Tokens.inkMuted),
                   ),
                   trailing: widget.canChangeRole

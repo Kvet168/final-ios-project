@@ -84,6 +84,14 @@ export async function partnerDetailModal({ api, id, isAdmin, onChanged }) {
   const dm = modal({
     title: p.name, width: 780,
     actions: isAdmin ? [h('button', { class: 'btn danger', type: 'button', onclick: async () => {
+      if (!(await confirmDialog({ title: 'Delete partner account', message: `Delete the account for ${p.owner_email}? Their login is erased and they can no longer sign in. A partner who still has properties cannot be deleted. This cannot be undone.`, confirmLabel: 'Delete account', danger: true }))) return;
+      try {
+        await api.del(`/admin/users/${p.user_id}`);
+        dm.close();
+        await onChanged?.();
+        toast('Partner account deleted', 'ok');
+      } catch (e) { toast(e.message, 'bad'); }
+    } }, 'Delete account'), h('button', { class: 'btn danger', type: 'button', onclick: async () => {
       if (!(await confirmDialog({ title: 'Reset password', message: `Reset the password for ${p.owner_email}? They are signed out everywhere and must choose a new one.`, confirmLabel: 'Reset password', danger: true }))) return;
       try {
         const r = await api.post(`/admin/partners/${id}/reset-password`);

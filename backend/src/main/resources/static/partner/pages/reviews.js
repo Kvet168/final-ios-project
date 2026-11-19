@@ -12,5 +12,5 @@ export function reviewsPage({ api }) {
     pager({ page: r.page, pageSize: r.pageSize, total: r.total, onChange: (p) => { state.page = p; load(); } }));
   }
   load().catch((e) => box.replaceChildren(h('div', { class: 'empty' }, e.message)));
-  return h('div', { class: 'stack' }, h('p', { class: 'muted' }, 'Published reviews from guests who stayed at your hotels. Moderation is handled by WAYFARER staff.'), box);
+  return h('div', { class: 'stack' }, h('p', { class: 'muted' }, 'Published reviews from guests who stayed at your hotels. Moderation is handled by Travel staff.'), box);
 }

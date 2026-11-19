@@ -23,11 +23,12 @@ createDashboard({
     { id: 'bookings', group: 'Reservations & Finance', label: 'Bookings', icon: 'ticket', page: (ctx) => bookingsPage({ ...ctx, scope: 'partner' }) },
     { id: 'payments', group: 'Reservations & Finance', label: 'QR payments', icon: 'card', page: paymentsPage },
 
-    // Advertising: hotel partners can promote their properties too
-    { id: 'ads', group: 'Advertising', label: 'Ad performance', icon: 'chart', page: adsDashboardPage },
-    { id: 'campaigns', group: 'Advertising', label: 'My campaigns', icon: 'ticket', page: campaignsPage },
-    { id: 'adpayments', group: 'Advertising', label: 'Spend & payments', icon: 'card', page: adPaymentsPage },
-    { id: 'business', group: 'Advertising', label: 'Business profile', icon: 'home', page: businessProfilePage },
+    // Advertising: hidden from the menu to keep the demo focused.
+    // To bring it back, uncomment these four lines (the pages and the API are untouched).
+    // { id: 'ads', group: 'Advertising', label: 'Ad performance', icon: 'chart', page: adsDashboardPage },
+    // { id: 'campaigns', group: 'Advertising', label: 'My campaigns', icon: 'ticket', page: campaignsPage },
+    // { id: 'adpayments', group: 'Advertising', label: 'Spend & payments', icon: 'card', page: adPaymentsPage },
+    // { id: 'business', group: 'Advertising', label: 'Business profile', icon: 'home', page: businessProfilePage },
 
     // Account Settings
     { id: 'account', group: 'Settings', label: 'Account', icon: 'users', page: accountPage },

@@ -104,7 +104,7 @@ Future<void> loadAssets() async {
         (call) async => Directory.systemTemp.path,
       );
 
-  await font('Spinnaker', 'assets/fonts/Spinnaker-Regular.ttf');
+  await font('Poppins', 'assets/fonts/Poppins-Regular.ttf');
   await font('MiSansKhmer', 'assets/fonts/MiSansKhmer-Regular.ttf');
   await font('MiSansKhmer', 'assets/fonts/MiSansKhmer-Semibold.ttf');
   // Material icons ship with the Flutter SDK; find them relative to the running flutter tool.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/shell.dart';
+import '../ads/ads.dart';
 import '../../core/data/providers.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/theme.dart';
@@ -337,6 +338,9 @@ class _StaysScreenState extends ConsumerState<StaysScreen> {
                   ],
                 ),
               ),
+            ),
+            SliverToBoxAdapter(
+              child: SponsoredSearchBlock(q: q.q, destination: q.destination),
             ),
             SliverToBoxAdapter(
               child: Padding(

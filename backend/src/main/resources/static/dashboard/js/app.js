@@ -12,7 +12,7 @@ import { forcePasswordChange } from './account.js';
  */
 export function createDashboard(cfg) {
   const root = document.getElementById('app');
-  document.title = `WAYFARER ${t(cfg.name)}`;
+  document.title = `Travel ${t(cfg.name)}`;
   const theme = localStorage.getItem('wf.theme');
   if (theme) document.documentElement.dataset.theme = theme;
 
@@ -26,7 +26,7 @@ export function createDashboard(cfg) {
 
   async function handleSignOut() {
     const ok = await confirmDialog({
-      title: 'Sign out of WAYFARER?',
+      title: 'Sign out of Travel?',
       message: `Are you sure you want to sign out of the ${cfg.name}? Any unsaved changes on this page will be lost.`,
       confirmLabel: 'Sign out',
       danger: true,
@@ -44,21 +44,9 @@ export function createDashboard(cfg) {
     const err = h('div', { 'aria-live': 'polite' });
     if (message) showErrors(err, { message });
     const isPartnerPortal = cfg.allowedRoles.includes('partner');
-    const demoEmail = cfg.demoEmail || (isPartnerPortal ? 'partner.pp@demo.wayfarer.test' : 'admin@demo.wayfarer.test');
-    const email = input({ type: 'email', autocomplete: 'username', required: true, placeholder: cfg.demoEmail ? 'you@yourbusiness.com' : isPartnerPortal ? 'partner@example.com' : 'staff@example.com' });
+    const email = input({ type: 'email', autocomplete: 'username', required: true, placeholder: cfg.register ? 'you@yourbusiness.com' : isPartnerPortal ? 'partner@example.com' : 'staff@example.com' });
     const pw = input({ type: 'password', autocomplete: 'current-password', required: true, placeholder: 'Enter your password' });
     const submit = h('button', { class: 'btn primary', type: 'submit' }, 'Sign in');
-    const demoBtn = h('button', {
-      class: 'btn small demo-fill-btn',
-      type: 'button',
-      onclick: () => {
-        email.value = demoEmail;
-        pw.value = 'Wayfarer#Demo2026';
-        email.dispatchEvent(new Event('input'));
-        pw.dispatchEvent(new Event('input'));
-        clear(err);
-      },
-    }, icon('compass'), cfg.demoLabel || (isPartnerPortal ? 'Try demo partner account' : 'Try demo admin account'));
 
     const form = h('form', {
       class: 'stack',
@@ -91,7 +79,6 @@ export function createDashboard(cfg) {
     field('Password', pw, { required: true }),
     err,
     submit,
-    h('div', { class: 'login-demo-row' }, demoBtn),
     cfg.register ? h('button', { class: 'btn small', type: 'button', style: 'margin-top:10px;width:100%', onclick: () => cfg.register((r) => {
       session.save(r);
       toast(`Welcome, ${r.user.name}`, 'ok');
@@ -107,7 +94,7 @@ export function createDashboard(cfg) {
           h('span', { class: 'login-blob blob-amber', 'aria-hidden': 'true' }),
           h('span', { class: 'login-blob blob-mint', 'aria-hidden': 'true' }),
           h('div', { class: 'row between', style: 'position:relative;z-index:2' },
-            h('div', { class: 'brand' }, h('span', { class: 'brand-mark' }, icon('compass')), 'WAYFARER'),
+            h('a', { class: 'brand-logo', href: location.pathname, 'aria-label': 'Travel' }, h('img', { src: '/dashboard/img/logo.png', alt: 'Travel', height: 30 })),
             langSwitchButton('login-lang-btn')),
           h('h1', {}, cfg.name),
           h('p', { class: 'login-sub' }, hint)),
@@ -145,31 +132,28 @@ export function createDashboard(cfg) {
   function showShell(u) {
     clear(root);
     const nav = buildCategorizedNav();
-    eyebrowEl = h('div', { class: 'eyebrow' }, `WAYFARER · ${t(cfg.name)}`);
+    eyebrowEl = h('div', { class: 'eyebrow' }, `Travel · ${t(cfg.name)}`);
     title = h('h1', {});
     content = h('div', { class: 'content', id: 'content', tabindex: -1 });
     const initial = (u.name || u.email || 'W').trim().charAt(0).toUpperCase();
     shell = h('div', { class: 'shell' },
       h('aside', { class: 'sidebar' },
-        h('div', { class: 'brand' }, h('span', { class: 'brand-mark' }, icon('compass')), 'WAYFARER'),
+        h('a', { class: 'brand-logo', href: location.pathname, 'aria-label': 'Travel' }, h('img', { src: '/dashboard/img/logo.png', alt: 'Travel', height: 30 })),
         h('div', { class: 'role' }, cfg.roleLabel), nav,
         h('div', { class: 'sidebar-foot' },
           h('div', { class: 'user-card' },
             h('span', { class: 'avatar', 'aria-hidden': 'true' }, initial),
-            h('div', { class: 'who' }, h('strong', {}, u.name), h('br'), h('span', { class: 'small' }, u.email))),
-          h('div', { class: 'row' },
-            langSwitchButton('grow'),
-            h('button', { class: 'btn small grow', type: 'button', onclick: toggleTheme }, icon('moon'), 'Theme')),
-          h('button', { class: 'btn small danger', type: 'button', onclick: handleSignOut }, icon('out'), 'Sign out'))),
+            h('div', { class: 'who' }, h('strong', {}, u.name), h('br'), h('span', { class: 'small' }, u.email))))),
       h('div', { class: 'main' },
         h('header', { class: 'topbar' },
           h('div', { class: 'row' },
             h('button', { class: 'btn small menu-btn', type: 'button', 'aria-label': 'Open menu', onclick: () => shell.classList.toggle('open') }, icon('menu')),
             h('div', {}, eyebrowEl, title)),
-          h('div', { class: 'row' },
-            langSwitchButton(),
+          h('div', { class: 'topbar-actions' },
+            langSwitchButton('', { iconOnly: true }),
+            h('button', { class: 'btn small icon-only', type: 'button', title: 'Light / dark theme', 'aria-label': 'Switch light or dark theme', onclick: toggleTheme }, icon('moon')),
             h('span', { class: 'role-pill' }, u.role),
-            h('button', { class: 'btn small', type: 'button', title: 'Sign out', onclick: handleSignOut }, icon('out'), 'Sign out'))),
+            h('button', { class: 'btn small icon-only signout', type: 'button', title: 'Sign out', 'aria-label': 'Sign out', onclick: handleSignOut }, icon('out')))),
         content));
     root.append(shell);
     if (!location.hash) location.hash = `#/${cfg.nav[0].id}`;
@@ -192,11 +176,11 @@ export function createDashboard(cfg) {
     shell.querySelectorAll('.nav a').forEach((a) => (a.dataset.id === entry.id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
     if (eyebrowEl) {
       eyebrowEl.textContent = entry.group
-        ? `WAYFARER · ${t(cfg.name)} · ${t(entry.group)}`
-        : `WAYFARER · ${t(cfg.name)}`;
+        ? `Travel · ${t(cfg.name)} · ${t(entry.group)}`
+        : `Travel · ${t(cfg.name)}`;
     }
     title.textContent = t(entry.label);
-    document.title = `${t(entry.label)} | WAYFARER ${t(cfg.name)}`;
+    document.title = `${t(entry.label)} | Travel ${t(cfg.name)}`;
     const mine = ++token;
     clear(content).append(skeleton());
     try {

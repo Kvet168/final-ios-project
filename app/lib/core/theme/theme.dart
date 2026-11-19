@@ -109,13 +109,13 @@ class Tokens {
   ];
 }
 
-/// Typography. English is set in Spinnaker (bundled, single weight; heavier weights are synthesized). Khmer is set in
+/// Typography. English is set in Poppins (bundled, Regular to ExtraBold plus italics). Khmer is set in
 /// MiSans Khmer by Xiaomi (bundled Regular and Semibold): weights up to 500 use Regular, heavier ones Semibold.
 /// Every style names the fallback so Khmer text anywhere in the app uses MiSans Khmer.
 enum Script { latin, khmer }
 
 class Type {
-  static const _en = 'Spinnaker';
+  static const _en = 'Poppins';
   static const _km = ['MiSansKhmer'];
 
   /// Set from the app's locale. In Khmer, MiSans Khmer leads (so numbers and punctuation match the Khmer text) and
@@ -124,6 +124,10 @@ class Type {
   static bool get _isKm => script == Script.khmer;
   static String get _family => _isKm ? 'MiSansKhmer' : _en;
   static List<String> get _fallback => _isKm ? const [_en] : _km;
+
+  /// Nothing is set heavier than SemiBold: Bold and ExtraBold requests render as SemiBold.
+  static FontWeight _w(FontWeight w) => w.value > 600 ? FontWeight.w600 : w;
+
   static double _h(double latin) => _isKm ? latin + 0.35 : latin;
 
   static TextStyle display(
@@ -137,13 +141,13 @@ class Type {
     fontFamily: _family,
     fontFamilyFallback: _fallback,
     fontSize: size,
-    fontWeight: weight,
+    fontWeight: _w(weight),
     fontStyle: italic ? FontStyle.italic : FontStyle.normal,
     color: color,
     height: _h(height ?? 1.1),
-    letterSpacing: _isKm ? 0 : spacing ?? -size * 0.024,
+    letterSpacing: _isKm ? 0 : spacing ?? -size * 0.008,
     fontVariations: [
-      FontVariation('wght', weight.value.toDouble()),
+      FontVariation('wght', _w(weight).value.toDouble()),
       FontVariation('opsz', size.clamp(14, 32).toDouble()),
     ],
   );
@@ -158,12 +162,12 @@ class Type {
     fontFamily: _family,
     fontFamilyFallback: _fallback,
     fontSize: size,
-    fontWeight: weight,
+    fontWeight: _w(weight),
     color: color,
     height: _h(height ?? 1.4),
     letterSpacing: _isKm ? 0 : spacing,
     fontVariations: [
-      FontVariation('wght', weight.value.toDouble()),
+      FontVariation('wght', _w(weight).value.toDouble()),
       FontVariation('opsz', size.clamp(14, 32).toDouble()),
     ],
   );
@@ -199,6 +203,14 @@ class WayfarerTheme {
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: Tokens.pageBg,
+      // The full-screen range picker paints its own background (and the strip under the last month) from the colour
+      // scheme's container colour, which is pink here. Pin it to the page colour so no band shows under the calendar.
+      datePickerTheme: const DatePickerThemeData(
+        backgroundColor: Tokens.pageBg,
+        rangePickerBackgroundColor: Tokens.pageBg,
+        rangePickerSurfaceTintColor: Colors.transparent,
+        rangeSelectionBackgroundColor: Tokens.tint,
+      ),
       fontFamily: Type._family,
       fontFamilyFallback: Type._fallback,
     );
@@ -278,6 +290,7 @@ class WayfarerTheme {
         suffixIconColor: Tokens.inkMuted,
         border: ob(Tokens.border),
         enabledBorder: ob(Tokens.border),
+        disabledBorder: ob(Tokens.border),
         focusedBorder: ob(Tokens.primary, 1.6),
         errorBorder: ob(Tokens.danger),
         focusedErrorBorder: ob(Tokens.danger, 1.6),

@@ -35,7 +35,7 @@ const KM = {
   'Try demo admin account': 'សាកល្បងគណនីអភិបាលគំរូ',
   'Sign in with your partner account to manage properties, rooms and bookings.': 'ចូលប្រើដោយគណនីដៃគូរបស់អ្នក ដើម្បីគ្រប់គ្រងសណ្ឋាគារ បន្ទប់ និងការកក់។',
   'Sign in with your staff or administrator account.': 'ចូលប្រើដោយគណនីបុគ្គលិក ឬអ្នកគ្រប់គ្រងរបស់អ្នក។',
-  'Sign out of WAYFARER?': 'ចាកចេញពី WAYFARER ឬ?',
+  'Sign out of Travel?': 'ចាកចេញពី Travel ឬ?',
   'Cancel': 'បោះបង់',
   'Confirm': 'បញ្ជាក់',
   'Done': 'រួចរាល់',
@@ -92,7 +92,7 @@ const KM = {
   'Completed Stays': 'ការស្នាក់នៅបានបញ្ចប់',
   'All Transactions': 'ប្រតិបត្តិការទាំងអស់',
   'Gross Booking Value (GBV)': 'ទឹកប្រាក់កក់សរុប (GBV)',
-  'WAYFARER OTA Commission': 'កម្រៃជើងសារ WAYFARER',
+  'Travel OTA Commission': 'កម្រៃជើងសារ Travel',
   'Net Partner Payouts': 'ប្រាក់ទូទាត់ជូនដៃគូសណ្ឋាគារ',
   'Customer Refunds': 'ប្រាក់បង្វិលជូនភ្ញៀវវិញ',
   'All Property Payments': 'ការទូទាត់ទាំងអស់',
@@ -295,15 +295,15 @@ export function t(str) {
   return str;
 }
 
-export function langSwitchButton(extraClass = '') {
+export function langSwitchButton(extraClass = '', { iconOnly = false } = {}) {
   const isKm = currentLang === 'km';
   return h('button', {
-    class: `btn small lang-btn ${extraClass}`.trim(),
+    class: `btn small lang-btn${iconOnly ? ' icon-only' : ''} ${extraClass}`.trim(),
     type: 'button',
     title: isKm ? 'Switch to English' : 'ប្តូរទៅភាសាខ្មែរ',
     'aria-label': isKm ? 'Switch to English' : 'ប្តូរទៅភាសាខ្មែរ',
     onclick: () => setLang(isKm ? 'en' : 'km'),
-  }, icon('globe'), isKm ? 'ខ្មែរ · EN' : 'EN · ខ្មែរ');
+  }, icon('globe'), iconOnly ? null : (isKm ? 'ខ្មែរ · EN' : 'EN · ខ្មែរ'));
 }
 
 export function h(tag, props, ...children) {
@@ -345,6 +345,8 @@ const ICONS = {
   chart: 'M4 20V10M10 20V4M16 20v-8M22 20H2',
   out: 'M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10',
   plus: 'M12 5v14M5 12h14',
+  image: 'M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M8.5 9.5h.01',
+  key: 'M14.5 10a4.5 4.5 0 10-4.2-3M10.5 9.5L3 17v4h4v-2h2v-2h2l2.5-2.5',
   menu: 'M4 7h16M4 12h16M4 17h16',
   x: 'M6 6l12 12M18 6L6 18',
   edit: 'M4 20h4L19 9l-4-4L4 16zM13 7l4 4',

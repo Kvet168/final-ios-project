@@ -259,6 +259,19 @@ class ApiClient {
     }
   }
 
+  /// Uploads the profile photo (multipart field "file") and returns the updated user.
+  Future<Json> uploadAvatar(List<int> bytes, String filename) => _wrap<Json>(
+    () => _dio.post(
+      '/users/me/avatar',
+      data: FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: filename),
+      }),
+    ),
+  );
+
+  Future<Json> removeAvatar() =>
+      _wrap<Json>(() => _dio.delete('/users/me/avatar'));
+
   Future<void> putEmpty(String path) async {
     try {
       await _dio.put(path);

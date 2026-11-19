@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,17 +29,24 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
         onRefresh: () async => ref.refresh(bookingsProvider.future),
         child: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              pinned: true,
-              expandedHeight: 120,
-              backgroundColor: Tokens.pageBg,
-              surfaceTintColor: Colors.transparent,
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsetsDirectional.only(
-                  start: 56,
-                  bottom: 14,
+            SliverToBoxAdapter(
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: Row(
+                    children: [
+                      const _RoundBack(),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          context.l10n.myBookings,
+                          style: Type.display(26),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                title: Text(context.l10n.myBookings, style: Type.display(26)),
               ),
             ),
             SliverToBoxAdapter(
@@ -54,13 +62,16 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                 data: (r) {
                   final all = (r['items'] as List).cast<Json>();
                   if (all.isEmpty) {
-                    return EmptyState(
-                      icon: Icons.luggage_outlined,
-                      title: 'No bookings yet',
-                      message: 'When you book a stay it will appear here as a ticket.',
-                      action: FilledButton(
-                        onPressed: () => context.go('/stays'),
-                        child: const Text('Find a stay'),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _LeftEmpty(
+                        icon: Icons.luggage_outlined,
+                        title: 'No bookings yet',
+                        message: 'When you book a stay it will appear here as a ticket.',
+                        action: FilledButton(
+                          onPressed: () => context.go('/stays'),
+                          child: const Text('Find a stay'),
+                        ),
                       ),
                     );
                   }
@@ -97,7 +108,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                         ),
                         const SizedBox(height: 18),
                         if (items.isEmpty)
-                          EmptyState(
+                          _LeftEmpty(
                             icon: Icons.confirmation_number_outlined,
                             title: past
                                 ? context.l10n.nothingHereYet
@@ -139,8 +150,8 @@ class _TicketCard extends StatelessWidget {
       onTap: () => context.push('/bookings/${b['id']}'),
       child: Container(
         decoration: BoxDecoration(boxShadow: Tokens.softShadow(0.10)),
-        child: ClipPath(
-          clipper: const TicketShape(notchY: 0.64, radius: 24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
           child: Container(
             color: Tokens.surface,
             child: Column(
@@ -247,6 +258,28 @@ class _TicketCard extends StatelessWidget {
                       Text(
                         money(b['total_usd'] as num),
                         style: Type.display(22),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, color: Tokens.border),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 14, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          context.l10n.viewDetails,
+                          style: Type.body(
+                            14,
+                            weight: FontWeight.w700,
+                            color: Tokens.primaryText,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: Tokens.primaryText,
                       ),
                     ],
                   ),
@@ -447,13 +480,8 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
               children: [
                 Row(
                   children: [
-                    IconButton(
-                      tooltip: 'Back to bookings',
-                      onPressed: () => context.canPop()
-                          ? context.pop()
-                          : context.go('/bookings'),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                    ),
+                    const _RoundBack(fallback: '/bookings'),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Text(
                         context.l10n.yourBooking,
@@ -462,13 +490,32 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                     ),
                   ],
                 ),
-                if (widget.justPaid && status == 'CONFIRMED')
+                if (widget.justPaid && status == 'CONFIRMED') ...[
                   const _Confirmed(),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () => context.go('/bookings'),
+                          child: Text(context.l10n.viewMyBookings),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => context.go('/'),
+                          child: Text(context.l10n.backToHome),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
                 Container(
                   decoration: BoxDecoration(boxShadow: Tokens.softShadow(0.14)),
-                  child: ClipPath(
-                    clipper: const TicketShape(notchY: 0.66),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(26),
                     child: Container(
                       color: Tokens.surface,
                       child: Column(
@@ -622,12 +669,15 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Text(
-                                  '${b['reference']}',
-                                  style: Type.body(
-                                    14,
-                                    weight: FontWeight.w800,
-                                    spacing: 4,
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    '${b['reference']}',
+                                    style: Type.body(
+                                      14,
+                                      weight: FontWeight.w800,
+                                      spacing: 4,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -670,6 +720,40 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                       ),
                   ],
                 ),
+                if ((b['address'] as String?)?.isNotEmpty == true) ...[
+                  const SizedBox(height: 14),
+                  Pressable(
+                    onTap: () => launchUrl(
+                      Uri.https('www.google.com', '/maps/search/', {
+                        'api': '1',
+                        'query': '${b['accommodation_name']} ${b['address']}',
+                      }),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    child: _panel(
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.place_outlined,
+                            color: Tokens.primaryText,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '${b['address']}',
+                              style: Type.body(13.5, height: 1.4),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.open_in_new_rounded,
+                            size: 18,
+                            color: Tokens.inkMuted,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 22),
                 _panel(
                   Column(
@@ -835,7 +919,11 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${money(p['amount_usd'] as num)} · ${p['provider']}${p['simulated'] == true ? context.l10n.simulatedSuffix : ''}',
+                                        '${money(p['amount_usd'] as num)} · ${p['provider'] == 'demo-sim' || p['provider'] == 'card'
+                                            ? 'Card'
+                                            : p['provider'] == 'khqr'
+                                            ? 'KHQR'
+                                            : p['provider']}',
                                         style: Type.body(
                                           14,
                                           weight: FontWeight.w700,
@@ -946,6 +1034,75 @@ class _Confirmed extends StatelessWidget {
             ],
           ),
         ),
+      ],
+    ),
+  );
+}
+
+/// Round back button for pushed screens; falls back to [fallback] when there is nothing to pop.
+class _RoundBack extends StatelessWidget {
+  const _RoundBack({this.fallback = '/'});
+  final String fallback;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Tokens.surface,
+    shape: const CircleBorder(side: BorderSide(color: Tokens.border)),
+    child: InkWell(
+      customBorder: const CircleBorder(),
+      onTap: () => context.canPop() ? context.pop() : context.go(fallback),
+      child: Semantics(
+        button: true,
+        label: MaterialLocalizations.of(context).backButtonTooltip,
+        child: const SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 17,
+            color: Tokens.ink,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Left-aligned empty state: icon, heading and hint share the page's left margin.
+class _LeftEmpty extends StatelessWidget {
+  const _LeftEmpty({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.action,
+  });
+  final IconData icon;
+  final String title, message;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(0, 8, 0, 40),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 64,
+          height: 64,
+          decoration: const BoxDecoration(
+            color: Tokens.tint,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 28, color: Tokens.primary),
+        ),
+        const SizedBox(height: 16),
+        Text(title, style: Type.display(22)),
+        const SizedBox(height: 6),
+        Text(
+          message,
+          style: Type.body(14.5, color: Tokens.inkMuted, height: 1.5),
+        ),
+        if (action != null) ...[const SizedBox(height: 20), action!],
       ],
     ),
   );

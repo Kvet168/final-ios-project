@@ -60,7 +60,7 @@ class WayfarerApp extends ConsumerWidget {
         ? 'km'
         : 'en'; // dates, times and numbers follow the app language
     return MaterialApp.router(
-      title: 'WAYFARER',
+      title: 'Travel',
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
       theme: WayfarerTheme.light(),

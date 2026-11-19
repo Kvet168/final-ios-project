@@ -30,6 +30,8 @@ dependencies:
   firebase_auth: ^7.0.1
   pdf: ^3.13.1
   printing: ^5.15.1
+  google_sign_in: ^7.2.0
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:
@@ -40,16 +42,38 @@ flutter:
   uses-material-design: true
   generate: true
 
-  # Every photo and both typefaces (Spinnaker, with MiSans Khmer for Khmer) ship inside the app, so the UI never waits on (or breaks without) a web host.
+  # Every photo and both typefaces (Poppins, with MiSans Khmer for Khmer) ship inside the app, so the UI never waits on (or breaks without) a web host.
   assets:
     - assets/img/
     - assets/img/t/
     - assets/icons3d/
+    - assets/logo.png
 
   fonts:
-    - family: Spinnaker
+    - family: Poppins
       fonts:
-        - asset: assets/fonts/Spinnaker-Regular.ttf
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Poppins-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Poppins-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Poppins-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Poppins-BoldItalic.ttf
+          weight: 700
+          style: italic
     # Khmer: MiSans Khmer by Xiaomi (see assets/fonts/NOTICE-MiSans.txt), two weights only. Bolder requests use Semibold.
     - family: MiSansKhmer
       fonts:

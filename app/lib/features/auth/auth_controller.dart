@@ -56,6 +56,9 @@ class AuthController extends AsyncNotifier<Json?> {
     state = AsyncData(r['user'] as Json);
   }
 
+  /// Replaces the signed-in user with the server's latest copy (after a photo change, for example).
+  void setUser(Json user) => state = AsyncData(user);
+
   Future<void> logout() async {
     final store = ref.read(tokenStoreProvider);
     final rt = await store.refresh();

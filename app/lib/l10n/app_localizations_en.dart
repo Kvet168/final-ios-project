@@ -10,13 +10,13 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'WAYFARER';
+  String get appName => 'Travel';
 
   @override
   String get tagline => 'Travel, planned beautifully';
 
   @override
-  String get splashLoading => 'Loading WAYFARER';
+  String get splashLoading => 'Loading Travel';
 
   @override
   String get splashReady => 'Getting things ready';
@@ -251,13 +251,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try again';
 
   @override
-  String get demoListing => 'Demo listing';
-
-  @override
-  String get demoTooltip =>
-      'Educational sample data: not a real commercial offer';
-
-  @override
   String get ratingNew => 'New';
 
   @override
@@ -298,7 +291,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusDraft => 'Draft';
 
   @override
-  String get statusPaidSimulated => 'Paid (simulated)';
+  String get statusPaid => 'Paid';
 
   @override
   String get statusPaymentFailed => 'Payment failed';
@@ -929,6 +922,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseARoom => 'Choose a room';
 
   @override
+  String get bookNow => 'Book now';
+
+  @override
+  String get viewDetails => 'View details';
+
+  @override
+  String get viewMyBookings => 'View my bookings';
+
+  @override
+  String get backToHome => 'Back to home';
+
+  @override
+  String get selectedLabel => 'Selected';
+
+  @override
+  String get selectARoomHint => 'Select a room to continue';
+
+  @override
+  String totalForStay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nights',
+      one: '1 night',
+    );
+    return 'total · $_temp0';
+  }
+
+  @override
   String get chooseYourDates => 'Choose your dates';
 
   @override
@@ -1024,9 +1046,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestReviews => 'Guest reviews';
 
   @override
-  String get sampleDataDemo => 'Sample data in this demo';
-
-  @override
   String get writeOne => 'Write one';
 
   @override
@@ -1034,9 +1053,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get beFirstReview => 'Be the first to share your stay.';
-
-  @override
-  String get demoReview => 'Demo review';
 
   @override
   String get verifiedStay => 'Verified stay';
@@ -1124,7 +1140,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String paymentNotConfirmed(String status) {
-    return '$status (simulated). Your booking is not confirmed — you can try again before the hold expires.';
+    return '$status. Your booking is not confirmed — you can try again before the hold expires.';
   }
 
   @override
@@ -1196,10 +1212,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get simulatedPaymentNotice =>
-      'Simulated payment. This demo uses a mock payment provider: no card is charged and no real money moves. Choose an outcome to test how the booking reacts.';
-
-  @override
   String referenceValue(String ref) {
     return 'Reference $ref';
   }
@@ -1208,10 +1220,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get amountDue => 'Amount due';
 
   @override
-  String get payNowSimulate => 'Pay now (simulate success)';
-
-  @override
-  String get simulateDeclined => 'Simulate a declined card';
+  String get payNow => 'Pay now';
 
   @override
   String get payLater => 'Pay later from My bookings';
@@ -1262,7 +1271,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancelFreePaidBody =>
-      'You are within the free-cancellation window. A simulated refund will be recorded. The room will be released.';
+      'You are within the free-cancellation window. Your payment will be refunded and the room released.';
 
   @override
   String get cancelNonRefundBody =>
@@ -1315,14 +1324,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get payments => 'Payments';
 
   @override
-  String get simulatedSuffix => ' (simulated)';
-
-  @override
   String get youreBooked => 'You\'re booked!';
 
   @override
-  String get paymentVerified =>
-      'Payment verified by the server. Simulated payment: no real money moved.';
+  String get paymentVerified => 'Payment confirmed.';
 
   @override
   String get tripsEyebrowCaps => 'TRIPS';
@@ -1572,7 +1577,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get somethingWentWrong => 'Something went wrong.';
 
   @override
-  String get guideName => 'Wayfarer Guide';
+  String get guideName => 'Travel Guide';
 
   @override
   String get guideModeLlm => 'AI travel assistant · uses our guides';
@@ -1588,7 +1593,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get askIntro =>
-      'Ask in your own words. I use WAYFARER\'s guides when they help and general travel knowledge when they don\'t, and I show my sources.';
+      'Ask in your own words. I use Travel\'s guides when they help and general travel knowledge when they don\'t, and I show my sources.';
 
   @override
   String get generalKnowledge => 'General travel knowledge';
@@ -1611,9 +1616,6 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
-
-  @override
-  String get demoContentSuffix => ' (demo content)';
 
   @override
   String get cardStay => 'STAY';
@@ -1698,7 +1700,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get termsNotice =>
-      'By creating an account you agree to the WAYFARER Terms of Service and Privacy Policy.';
+      'By creating an account you agree to the Travel Terms of Service and Privacy Policy.';
 
   @override
   String get haveAccount => 'Have an account? ';
@@ -1769,7 +1771,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currencyNote =>
-      'Prices are stored in USD and converted with documented sample rates, not live market rates.';
+      'Prices are shown in USD and converted at indicative exchange rates.';
 
   @override
   String get accountHero => 'Your travel\nlife, in one place.';
@@ -1928,7 +1930,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextPage => 'Next page';
 
   @override
-  String get simulatedNetRevenue => 'simulated net revenue';
+  String get simulatedNetRevenue => 'net revenue';
 
   @override
   String get bookingsByStatus => 'Bookings by status';
@@ -1946,9 +1948,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchBookingsHint => 'Reference, guest, email';
-
-  @override
-  String get demoSuffix => ' · demo';
 
   @override
   String get actions => 'Actions';
@@ -1976,9 +1975,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nameOrEmail => 'Name or email';
-
-  @override
-  String get demoAccountSuffix => ' · demo account';
 
   @override
   String get changeRoleQ => 'Change role?';
@@ -2125,7 +2121,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pdfFailed => 'Could not create the PDF. Please try again.';
 
   @override
-  String get pdfBrandLine => 'WAYFARER · TRIP ITINERARY';
+  String get pdfBrandLine => 'Travel · TRIP ITINERARY';
 
   @override
   String pdfCreatedOn(String date) {
@@ -2179,4 +2175,171 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exTwoCities => 'Kampot + Siem Reap';
+
+  @override
+  String get sponsored => 'Sponsored';
+
+  @override
+  String get adsFeaturedEyebrow => 'Local businesses';
+
+  @override
+  String get adsFeaturedTitle => 'Sponsored places to explore';
+
+  @override
+  String get adsFestivalEyebrow => 'Special promotions';
+
+  @override
+  String get adsFestivalTitle => 'Festival and holiday offers';
+
+  @override
+  String get adsStoriesEyebrow => 'Travel notes';
+
+  @override
+  String get adsStoriesTitle => 'Sponsored stories';
+
+  @override
+  String get adsCall => 'Call';
+
+  @override
+  String get adsVisit => 'Visit website';
+
+  @override
+  String get adsViewStay => 'View stay';
+
+  @override
+  String get adsPromotedBy => 'Promoted by';
+
+  @override
+  String get adsPaidNote => 'Paid placement from a local business.';
+
+  @override
+  String get adsReadMore => 'Read the story';
+
+  @override
+  String get adsSearchTitle => 'Sponsored results';
+
+  @override
+  String get accountSectionActivity => 'My activity';
+
+  @override
+  String get accountSectionManage => 'Manage';
+
+  @override
+  String get accountSectionPreferences => 'Preferences';
+
+  @override
+  String get accountSectionGeneral => 'General';
+
+  @override
+  String get accountSectionAccount => 'Account';
+
+  @override
+  String get editProfile => 'Edit profile';
+
+  @override
+  String get editProfileHint =>
+      'This is the name and phone number we use on your bookings.';
+
+  @override
+  String get profileName => 'Full name';
+
+  @override
+  String get profilePhone => 'Phone number';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profileEmailNote =>
+      'Your email is your sign-in and can\'t be changed here.';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
+  String get profileSaved => 'Profile updated';
+
+  @override
+  String get nameTooShort => 'Enter at least 2 characters';
+
+  @override
+  String get deleteAccountTitle => 'Delete account';
+
+  @override
+  String get deleteIntro =>
+      'Deleting your account is permanent. Please read what happens first.';
+
+  @override
+  String get deleteRemovedHeading => 'Removed for good';
+
+  @override
+  String get deleteRemoved1 => 'Your name, phone number and email address';
+
+  @override
+  String get deleteRemoved2 =>
+      'Your wishlist, saved trips, notifications and assistant chats';
+
+  @override
+  String get deleteRemoved3 => 'Your sign-in on every device';
+
+  @override
+  String get deleteKeptHeading => 'Kept without your name';
+
+  @override
+  String get deleteKept1 =>
+      'Past bookings and payments, as financial records require. They no longer link to you.';
+
+  @override
+  String get deleteActiveNote =>
+      'If you have active bookings, cancel them first. We can\'t delete the account until they are done.';
+
+  @override
+  String get deleteTypeLabel => 'Type DELETE to confirm';
+
+  @override
+  String get deleteTypeHint => 'DELETE';
+
+  @override
+  String get deletePasswordLabel => 'Your password';
+
+  @override
+  String get deleteForever => 'Delete my account';
+
+  @override
+  String get deleteCancel => 'Keep my account';
+
+  @override
+  String get accountDeleted => 'Your account has been deleted';
+
+  @override
+  String get browseDestinations => 'Browse destinations';
+
+  @override
+  String get signOutConfirm =>
+      'Are you sure you want to sign out of your Travel account?';
+
+  @override
+  String get notificationsEmptyHint =>
+      'Booking and payment updates will show up here.';
+
+  @override
+  String get changePhoto => 'Change profile photo';
+
+  @override
+  String get chooseFromLibrary => 'Choose from library';
+
+  @override
+  String get takePhoto => 'Take photo';
+
+  @override
+  String get removePhoto => 'Remove photo';
+
+  @override
+  String get photoUpdated => 'Profile photo updated';
+
+  @override
+  String get photoRemoved => 'Profile photo removed';
+
+  @override
+  String get photoFailed => 'That photo could not be used. Try another one.';
 }

@@ -1,8 +1,8 @@
 {
   "@@locale": "en",
-  "appName": "WAYFARER",
+  "appName": "Travel",
   "tagline": "Travel, planned beautifully",
-  "splashLoading": "Loading WAYFARER",
+  "splashLoading": "Loading Travel",
   "splashReady": "Getting things ready",
   "splashSlow": "Waking the server, this can take a moment",
   "tabDiscover": "Discover",
@@ -112,8 +112,6 @@
   "noConnection": "No connection",
   "didntLoad": "That didn't load",
   "tryAgain": "Try again",
-  "demoListing": "Demo listing",
-  "demoTooltip": "Educational sample data: not a real commercial offer",
   "ratingNew": "New",
   "starProperty": "{stars} star property",
   "@starProperty": {
@@ -146,7 +144,7 @@
   "statusRefundPending": "Refund pending",
   "statusRefunded": "Refunded",
   "statusDraft": "Draft",
-  "statusPaidSimulated": "Paid (simulated)",
+  "statusPaid": "Paid",
   "statusPaymentFailed": "Payment failed",
   "statusPaymentPending": "Payment pending",
   "confirm": "Confirm",
@@ -535,6 +533,20 @@
   "similarStays": "Similar stays nearby",
   "fromCaps": "FROM",
   "chooseARoom": "Choose a room",
+  "bookNow": "Book now",
+  "viewDetails": "View details",
+  "viewMyBookings": "View my bookings",
+  "backToHome": "Back to home",
+  "selectedLabel": "Selected",
+  "selectARoomHint": "Select a room to continue",
+  "totalForStay": "total · {count, plural, =1{1 night} other{{count} nights}}",
+  "@totalForStay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "chooseYourDates": "Choose your dates",
   "nightsTapToChange": "{count, plural, =1{1 night} other{{count} nights}} · tap to change",
   "@nightsTapToChange": {
@@ -606,11 +618,9 @@
   },
   "total": "Total",
   "guestReviews": "Guest reviews",
-  "sampleDataDemo": "Sample data in this demo",
   "writeOne": "Write one",
   "noReviewsYet": "No reviews yet",
   "beFirstReview": "Be the first to share your stay.",
-  "demoReview": "Demo review",
   "verifiedStay": "Verified stay",
   "writeAReview": "Write a review",
   "starsCount": "{count, plural, =1{1 star} other{{count} stars}}",
@@ -643,7 +653,7 @@
   "amenLaundry": "Laundry",
   "amenKitchen": "Kitchen",
   "bookingNotPayable": "This booking can no longer be paid.",
-  "paymentNotConfirmed": "{status} (simulated). Your booking is not confirmed — you can try again before the hold expires.",
+  "paymentNotConfirmed": "{status}. Your booking is not confirmed — you can try again before the hold expires.",
   "@paymentNotConfirmed": {
     "placeholders": {
       "status": {
@@ -684,7 +694,6 @@
       }
     }
   },
-  "simulatedPaymentNotice": "Simulated payment. This demo uses a mock payment provider: no card is charged and no real money moves. Choose an outcome to test how the booking reacts.",
   "referenceValue": "Reference {ref}",
   "@referenceValue": {
     "placeholders": {
@@ -694,8 +703,7 @@
     }
   },
   "amountDue": "Amount due",
-  "payNowSimulate": "Pay now (simulate success)",
-  "simulateDeclined": "Simulate a declined card",
+  "payNow": "Pay now",
   "payLater": "Pay later from My bookings",
   "checkoutTitle": "Checkout",
   "stepRoom": "Room",
@@ -711,7 +719,7 @@
   "reference": "Reference",
   "cancelBookingQ": "Cancel this booking?",
   "cancelFreeBody": "You are within the free-cancellation window. The room will be released.",
-  "cancelFreePaidBody": "You are within the free-cancellation window. A simulated refund will be recorded. The room will be released.",
+  "cancelFreePaidBody": "You are within the free-cancellation window. Your payment will be refunded and the room released.",
   "cancelNonRefundBody": "The free-cancellation window has passed, so this booking is non-refundable. The room will be released.",
   "cancelBooking": "Cancel booking",
   "bookingCancelled": "Booking cancelled.",
@@ -744,9 +752,8 @@
   },
   "statusHistory": "Status history",
   "payments": "Payments",
-  "simulatedSuffix": " (simulated)",
   "youreBooked": "You're booked!",
-  "paymentVerified": "Payment verified by the server. Simulated payment: no real money moved.",
+  "paymentVerified": "Payment confirmed.",
   "tripsEyebrowCaps": "TRIPS",
   "tripsHero": "Tell us where.\nWe build the days.",
   "planWithAi": "Plan with AI",
@@ -907,12 +914,12 @@
   "starterTempleEtiquette": "Temple etiquette",
   "starterCancellation": "Cancellation",
   "somethingWentWrong": "Something went wrong.",
-  "guideName": "Wayfarer Guide",
+  "guideName": "Travel Guide",
   "guideModeLlm": "AI travel assistant · uses our guides",
   "guideModeRules": "Instant · answers from our guides",
   "newChat": "New chat",
   "askMeAnything": "Ask me anything\nabout your trip.",
-  "askIntro": "Ask in your own words. I use WAYFARER's guides when they help and general travel knowledge when they don't, and I show my sources.",
+  "askIntro": "Ask in your own words. I use Travel's guides when they help and general travel knowledge when they don't, and I show my sources.",
   "generalKnowledge": "General travel knowledge",
   "notInGuides": "Not in approved guides",
   "planWithPlanner": "Plan {name} with the AI planner",
@@ -931,7 +938,6 @@
       }
     }
   },
-  "demoContentSuffix": " (demo content)",
   "cardStay": "STAY",
   "cardPlace": "PLACE",
   "cardDestination": "DESTINATION",
@@ -965,7 +971,7 @@
   "passwordRule": "Use 10+ characters with letters and a number",
   "forgotPassword": "Forgot password?",
   "createAccount": "Create account",
-  "termsNotice": "By creating an account you agree to the WAYFARER Terms of Service and Privacy Policy.",
+  "termsNotice": "By creating an account you agree to the Travel Terms of Service and Privacy Policy.",
   "haveAccount": "Have an account? ",
   "newHere": "New here? ",
   "logInHere": "Log in here",
@@ -999,7 +1005,7 @@
     }
   },
   "displayCurrency": "Display currency",
-  "currencyNote": "Prices are stored in USD and converted with documented sample rates, not live market rates.",
+  "currencyNote": "Prices are shown in USD and converted at indicative exchange rates.",
   "accountHero": "Your travel\nlife, in one place.",
   "accountSignInHint": "Sign in to see bookings, saved trips and your wishlist.",
   "myBookingsSub": "Tickets, cancellation and receipts",
@@ -1056,7 +1062,7 @@
   },
   "previousPage": "Previous page",
   "nextPage": "Next page",
-  "simulatedNetRevenue": "simulated net revenue",
+  "simulatedNetRevenue": "net revenue",
   "bookingsByStatus": "Bookings by status",
   "aiUsage": "AI usage",
   "noAiCalls": "No AI calls recorded yet.",
@@ -1072,7 +1078,6 @@
     }
   },
   "searchBookingsHint": "Reference, guest, email",
-  "demoSuffix": " · demo",
   "actions": "Actions",
   "cancelBookingRef": "Cancel booking {ref}?",
   "@cancelBookingRef": {
@@ -1088,7 +1093,6 @@
   "bookingDetail": "Booking detail",
   "paymentsAndTransactions": "Payments and transactions",
   "nameOrEmail": "Name or email",
-  "demoAccountSuffix": " · demo account",
   "changeRoleQ": "Change role?",
   "changeRoleBody": "Set {email} to \"{role}\". This changes what the account can do.",
   "@changeRoleBody": {
@@ -1176,7 +1180,7 @@
   "saveAsPdf": "Save as PDF",
   "preparingPdf": "Preparing your PDF…",
   "pdfFailed": "Could not create the PDF. Please try again.",
-  "pdfBrandLine": "WAYFARER · TRIP ITINERARY",
+  "pdfBrandLine": "Travel · TRIP ITINERARY",
   "pdfCreatedOn": "Created on {date}",
   "@pdfCreatedOn": {
     "placeholders": {
@@ -1250,5 +1254,58 @@
       }
     }
   },
-  "exTwoCities": "Kampot + Siem Reap"
+  "exTwoCities": "Kampot + Siem Reap",
+  "sponsored": "Sponsored",
+  "adsFeaturedEyebrow": "Local businesses",
+  "adsFeaturedTitle": "Sponsored places to explore",
+  "adsFestivalEyebrow": "Special promotions",
+  "adsFestivalTitle": "Festival and holiday offers",
+  "adsStoriesEyebrow": "Travel notes",
+  "adsStoriesTitle": "Sponsored stories",
+  "adsCall": "Call",
+  "adsVisit": "Visit website",
+  "adsViewStay": "View stay",
+  "adsPromotedBy": "Promoted by",
+  "adsPaidNote": "Paid placement from a local business.",
+  "adsReadMore": "Read the story",
+  "adsSearchTitle": "Sponsored results",
+  "accountSectionActivity": "My activity",
+  "accountSectionManage": "Manage",
+  "accountSectionPreferences": "Preferences",
+  "accountSectionGeneral": "General",
+  "accountSectionAccount": "Account",
+  "editProfile": "Edit profile",
+  "editProfileHint": "This is the name and phone number we use on your bookings.",
+  "profileName": "Full name",
+  "profilePhone": "Phone number",
+  "profileEmail": "Email",
+  "profileEmailNote": "Your email is your sign-in and can't be changed here.",
+  "saveChanges": "Save changes",
+  "profileSaved": "Profile updated",
+  "nameTooShort": "Enter at least 2 characters",
+  "deleteAccountTitle": "Delete account",
+  "deleteIntro": "Deleting your account is permanent. Please read what happens first.",
+  "deleteRemovedHeading": "Removed for good",
+  "deleteRemoved1": "Your name, phone number and email address",
+  "deleteRemoved2": "Your wishlist, saved trips, notifications and assistant chats",
+  "deleteRemoved3": "Your sign-in on every device",
+  "deleteKeptHeading": "Kept without your name",
+  "deleteKept1": "Past bookings and payments, as financial records require. They no longer link to you.",
+  "deleteActiveNote": "If you have active bookings, cancel them first. We can't delete the account until they are done.",
+  "deleteTypeLabel": "Type DELETE to confirm",
+  "deleteTypeHint": "DELETE",
+  "deletePasswordLabel": "Your password",
+  "deleteForever": "Delete my account",
+  "deleteCancel": "Keep my account",
+  "accountDeleted": "Your account has been deleted",
+  "browseDestinations": "Browse destinations",
+  "signOutConfirm": "Are you sure you want to sign out of your Travel account?",
+  "notificationsEmptyHint": "Booking and payment updates will show up here.",
+  "changePhoto": "Change profile photo",
+  "chooseFromLibrary": "Choose from library",
+  "takePhoto": "Take photo",
+  "removePhoto": "Remove photo",
+  "photoUpdated": "Profile photo updated",
+  "photoRemoved": "Profile photo removed",
+  "photoFailed": "That photo could not be used. Try another one."
 }

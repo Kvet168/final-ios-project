@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../ads/ads.dart';
 import '../../core/data/providers.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/theme.dart';
@@ -145,6 +146,8 @@ class _DestinationsScreenState extends ConsumerState<DestinationsScreen> {
               ),
             ),
           ),
+          if (q.q == null && q.tag == null)
+            const SliverToBoxAdapter(child: SponsoredStrip()),
           res.when(
             loading: () => const SliverToBoxAdapter(
               child: Padding(
@@ -547,6 +550,7 @@ class _DestinationDetailScreenState
                 ),
               ),
             ),
+            SliverToBoxAdapter(child: SponsoredStrip(destination: widget.slug)),
             SliverToBoxAdapter(
               child: SectionTitle(
                 context.l10n.thingsToDo,

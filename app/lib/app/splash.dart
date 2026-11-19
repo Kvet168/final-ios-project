@@ -9,8 +9,11 @@ import '../l10n/app_localizations.dart';
 
 /// Draws the WAYFARER compass. [t] in 0..1 drives the reveal: ring, ticks, star, then the needle swinging into place.
 class CompassPainter extends CustomPainter {
-  CompassPainter(this.t);
+  CompassPainter(this.t, {this.sway = 0});
   final double t;
+
+  /// Small continuous swing of the needle once it has settled (radians).
+  final double sway;
 
   double _seg(double a, double b) => ((t - a) / (b - a)).clamp(0.0, 1.0);
 
@@ -66,7 +69,7 @@ class CompassPainter extends CustomPainter {
     }
 
     final needleT = Curves.elasticOut.transform(_seg(0.6, 1));
-    final angle = math.pi / 4 + (1 - needleT) * math.pi * 1.1;
+    final angle = math.pi / 4 + (1 - needleT) * math.pi * 1.1 + sway * needleT;
     canvas.save();
     canvas.translate(c.dx, c.dy);
     canvas.rotate(angle);
@@ -93,7 +96,8 @@ class CompassPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CompassPainter old) => old.t != t;
+  bool shouldRepaint(covariant CompassPainter old) =>
+      old.t != t || old.sway != sway;
 }
 
 /// Launch screen that doubles as a warm-up: while it shows, the app wakes the API and loads the home feed, so the first
@@ -188,132 +192,101 @@ class _SplashGateState extends ConsumerState<SplashGate>
                     builder: (_, _) {
                       final mark = _step(0, 0.45);
                       final text = _step(0.3, 0.8);
-                      return SafeArea(
-                        child: Column(
-                          children: [
-                            const Spacer(flex: 5),
-                            Opacity(
-                              opacity: mark,
-                              child: Transform.scale(
-                                scale: 0.9 + 0.1 * mark,
-                                child: Container(
-                                  width: 96,
-                                  height: 96,
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(28),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFE6485C),
-                                        Color(0xFFC7364B),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Tokens.primary.withValues(
-                                          alpha: 0.28,
+                      return Container(
+                        color: Colors.white,
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              const Spacer(flex: 5),
+                              Opacity(
+                                opacity: mark,
+                                child: Transform.scale(
+                                  scale: 0.9 + 0.1 * mark,
+                                  child: Image.asset('assets/logo.png', width: 240, fit: BoxFit.contain),
+                                ),
+                              ),
+                              const SizedBox(height: 28),
+                              Opacity(
+                                opacity: text,
+                                child: Transform.translate(
+                                  offset: Offset(0, 8 * (1 - text)),
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        l.tagline,
+                                        textAlign: TextAlign.center,
+                                        style: Type.body(
+                                          14,
+                                          color: Tokens.inkMuted,
                                         ),
-                                        blurRadius: 28,
-                                        offset: const Offset(0, 12),
                                       ),
                                     ],
                                   ),
-                                  child: CustomPaint(
-                                    painter: CompassPainter(_c.value),
-                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 28),
-                            Opacity(
-                              opacity: text,
-                              child: Transform.translate(
-                                offset: Offset(0, 8 * (1 - text)),
+                              const Spacer(flex: 6),
+                              Opacity(
+                                opacity: text,
                                 child: Column(
                                   children: [
-                                    Text(
-                                      l.appName,
-                                      style: Type.display(
-                                        26,
-                                        color: Tokens.ink,
-                                        weight: FontWeight.w700,
-                                        spacing: 6,
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(2),
+                                      child: SizedBox(
+                                        width: 120,
+                                        height: 3,
+                                        child: Stack(
+                                          children: [
+                                            Container(color: Tokens.tint),
+                                            FractionallySizedBox(
+                                              widthFactor: 0.35,
+                                              alignment: Alignment(
+                                                _loop.value * 2.7 - 1.35,
+                                                0,
+                                              ),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Tokens.primary,
+                                                  borderRadius:
+                                                      BorderRadius.circular(2),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      l.tagline,
-                                      textAlign: TextAlign.center,
-                                      style: Type.body(
-                                        14,
-                                        color: Tokens.inkMuted,
+                                    const SizedBox(height: 14),
+                                    SizedBox(
+                                      height: 40,
+                                      child: AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        child: Padding(
+                                          key: ValueKey(_slow),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 32,
+                                          ),
+                                          child: Text(
+                                            _slow
+                                                ? l.splashSlow
+                                                : l.splashReady,
+                                            textAlign: TextAlign.center,
+                                            style: Type.body(
+                                              12.5,
+                                              color: Tokens.inkMuted,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            const Spacer(flex: 6),
-                            Opacity(
-                              opacity: text,
-                              child: Column(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(2),
-                                    child: SizedBox(
-                                      width: 120,
-                                      height: 3,
-                                      child: Stack(
-                                        children: [
-                                          Container(color: Tokens.tint),
-                                          FractionallySizedBox(
-                                            widthFactor: 0.35,
-                                            alignment: Alignment(
-                                              _loop.value * 2.7 - 1.35,
-                                              0,
-                                            ),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Tokens.primary,
-                                                borderRadius:
-                                                    BorderRadius.circular(2),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  SizedBox(
-                                    height: 40,
-                                    child: AnimatedSwitcher(
-                                      duration: const Duration(
-                                        milliseconds: 300,
-                                      ),
-                                      child: Padding(
-                                        key: ValueKey(_slow),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 32,
-                                        ),
-                                        child: Text(
-                                          _slow ? l.splashSlow : l.splashReady,
-                                          textAlign: TextAlign.center,
-                                          style: Type.body(
-                                            12.5,
-                                            color: Tokens.inkMuted,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 28),
-                          ],
+                              const SizedBox(height: 28),
+                            ],
+                          ),
                         ),
                       );
                     },

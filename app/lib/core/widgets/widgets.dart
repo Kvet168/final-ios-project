@@ -478,31 +478,6 @@ class AsyncView<T> extends StatelessWidget {
 
 /* ------------------------------------------------------------------ small pieces */
 
-class DemoBadge extends StatelessWidget {
-  const DemoBadge({super.key, this.text, this.onImage = false});
-  final String? text;
-  final bool onImage;
-  @override
-  Widget build(BuildContext context) => Tooltip(
-    message: context.l10n.demoTooltip,
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: onImage ? const Color(0xCC292B2E) : Tokens.promo,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text ?? context.l10n.demoListing,
-        style: Type.body(
-          10.5,
-          weight: FontWeight.w700,
-          color: onImage ? Tokens.onDarkAccent : Tokens.warning,
-        ),
-      ),
-    ),
-  );
-}
-
 class Pill extends StatelessWidget {
   const Pill(
     this.text, {
@@ -644,11 +619,7 @@ class StatusPill extends StatelessWidget {
       ),
       'REFUNDED' => (l.statusRefunded, Tokens.inkMuted, Icons.undo_rounded),
       'DRAFT' => (l.statusDraft, Tokens.inkMuted, Icons.edit_outlined),
-      'SUCCESS' => (
-        l.statusPaidSimulated,
-        Tokens.success,
-        Icons.check_circle_outline,
-      ),
+      'SUCCESS' => (l.statusPaid, Tokens.success, Icons.check_circle_outline),
       'FAILED' => (l.statusPaymentFailed, Tokens.danger, Icons.error_outline),
       'PENDING' => (
         l.statusPaymentPending,
@@ -731,6 +702,7 @@ Future<bool> confirm(
           style: destructive
               ? FilledButton.styleFrom(
                   backgroundColor: Tokens.danger,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(0, 46),
                 )
               : FilledButton.styleFrom(minimumSize: const Size(0, 46)),

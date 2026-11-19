@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../core/data/providers.dart';
 import '../core/widgets/widgets.dart';
 import '../features/account/account_screens.dart';
+import '../features/account/profile_screens.dart';
+import '../features/ads/ads.dart';
 import '../features/admin/admin_screens.dart';
 import '../features/assistant/assistant_screen.dart';
 import '../features/auth/auth_controller.dart';
@@ -25,6 +27,7 @@ const _protectedPrefixes = [
   '/book/',
   '/wishlist',
   '/notifications',
+  '/account/',
   '/admin',
   '/partner',
 ];
@@ -98,6 +101,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/welcome',
         parentNavigatorKey: rootKey,
         pageBuilder: (_, s) => _fade(s, const WelcomeScreen()),
+      ),
+      push(
+        '/sponsored/:id',
+        (s) => SponsoredArticleScreen(id: s.pathParameters['id']!),
       ),
       push(
         '/destinations',
@@ -180,6 +187,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         (s) => AuthScreen(register: true, next: s.uri.queryParameters['next']),
         rise: true,
       ),
+      push('/account/edit', (s) => const EditProfileScreen()),
+      push('/account/delete', (s) => const DeleteAccountScreen()),
       push('/wishlist', (s) => const WishlistScreen()),
       push('/notifications', (s) => const NotificationsScreen()),
       push('/admin', (s) => const AdminScreen()),

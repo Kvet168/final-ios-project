@@ -54,6 +54,12 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
   int _img = 0;
   final _roomsKey = GlobalKey();
 
+  /// Room the guest tapped; null means "cheapest bookable room".
+  String? _roomId;
+
+  /// The last loaded page. Changing rooms or dates reloads the quote, and showing this meanwhile keeps the scroll position.
+  Json? _last;
+
   StayKey get key =>
       (slug: widget.slug, checkIn: ci, checkOut: co, rooms: rooms);
 
@@ -78,42 +84,59 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final res = ref.watch(stayDetailProvider(key));
+    final fresh = res.value;
+    if (fresh != null) _last = fresh;
+    final shown = fresh ?? (res.isLoading ? _last : null);
     return StatusTone.light(
       child: Scaffold(
-        body: res.when(
-          loading: () => Column(
-            children: [
-              Container(
-                height: 380,
-                decoration: const BoxDecoration(gradient: Tokens.dusk),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(20),
-                child: SkeletonList(count: 3, itemHeight: 90),
-              ),
-            ],
-          ),
-          error: (e, _) => SafeArea(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: BackButton(onPressed: () => context.pop()),
+        body: shown != null
+            ? Stack(
+                children: [
+                  _content(shown),
+                  if (res.isLoading)
+                    const Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: LinearProgressIndicator(minHeight: 3),
+                    ),
+                ],
+              )
+            : res.when(
+                loading: () => Column(
+                  children: [
+                    Container(
+                      height: 380,
+                      decoration: const BoxDecoration(gradient: Tokens.dusk),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: SkeletonList(count: 3, itemHeight: 90),
+                    ),
+                  ],
+                ),
+                error: (e, _) => SafeArea(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: BackButton(onPressed: () => context.pop()),
+                        ),
+                      ),
+                      Expanded(
+                        child: ErrorState(
+                          error: e,
+                          onRetry: () =>
+                              ref.invalidate(stayDetailProvider(key)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: ErrorState(
-                    error: e,
-                    onRetry: () => ref.invalidate(stayDetailProvider(key)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          data: _content,
-        ),
+                data: _content,
+              ),
       ),
     );
   }
@@ -171,406 +194,431 @@ class _StayDetailScreenState extends ConsumerState<StayDetailScreen> {
       ),
     );
 
-    final from = roomsList.isEmpty
-        ? (a['from_price_usd'] as num)
-        : roomsList
-              .map((r) => r['base_price_usd'] as num)
-              .reduce((x, y) => x < y ? x : y);
+    bool bookable(Json r) {
+      final q = r['quote'] as Json?;
+      return q != null &&
+          q['available'] == true &&
+          adults <= (r['max_adults'] as int) * rooms &&
+          children <= (r['max_children'] as int) * rooms;
+    }
 
-    return Stack(
+    Json? selected;
+    for (final r in roomsList) {
+      if (r['id'] == _roomId && bookable(r)) selected = r;
+    }
+    if (selected == null) {
+      for (final r in roomsList.where(bookable)) {
+        if (selected == null ||
+            (r['quote']['total_usd'] as num) <
+                (selected['quote']['total_usd'] as num)) {
+          selected = r;
+        }
+      }
+    }
+    final selectedQuote = selected?['quote'] as Json?;
+
+    void book() {
+      final r = selected!;
+      final qp = {
+        'checkIn': ci!,
+        'checkOut': co!,
+        'rooms': '$rooms',
+        'adults': '$adults',
+        'children': '$children',
+        'stay': a['slug'] as String,
+      };
+      context.push(
+        Uri(path: '/book/${r['id']}', queryParameters: qp).toString(),
+      );
+    }
+
+    return Column(
       children: [
-        CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              stretch: true,
-              expandedHeight: 360,
-              systemOverlayStyle: SystemUiOverlayStyle.light,
-              automaticallyImplyLeading: false,
-              backgroundColor: Tokens.primaryText,
-              surfaceTintColor: Colors.transparent,
-              toolbarHeight: 64,
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-                child: GlassIconButton(
-                  icon: Icons.arrow_back_rounded,
-                  tooltip: 'Back',
-                  onTap: () =>
-                      context.canPop() ? context.pop() : context.go('/stays'),
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
-                  child: SaveHeart(
-                    kind: 'accommodation',
-                    id: a['id'] as String,
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                stretch: true,
+                expandedHeight: 360,
+                systemOverlayStyle: SystemUiOverlayStyle.light,
+                automaticallyImplyLeading: false,
+                backgroundColor: Tokens.primaryText,
+                surfaceTintColor: Colors.transparent,
+                toolbarHeight: 64,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
+                  child: GlassIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    tooltip: 'Back',
+                    onTap: () =>
+                        context.canPop() ? context.pop() : context.go('/stays'),
                   ),
                 ),
-              ],
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.parallax,
-                stretchModes: const [StretchMode.zoomBackground],
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    gallery.isEmpty
-                        ? WImage(
-                            null,
-                            height: double.infinity,
-                            width: double.infinity,
-                            fallbackIcon: Icons.hotel_outlined,
-                          )
-                        : PageView.builder(
-                            itemCount: gallery.length,
-                            onPageChanged: (i) => setState(() => _img = i),
-                            itemBuilder: (_, i) => WImage(
-                              gallery[i],
-                              full: true,
-                              width: double.infinity,
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: 16,
+                      top: 8,
+                      bottom: 8,
+                    ),
+                    child: SaveHeart(
+                      kind: 'accommodation',
+                      id: a['id'] as String,
+                    ),
+                  ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.parallax,
+                  stretchModes: const [StretchMode.zoomBackground],
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      gallery.isEmpty
+                          ? WImage(
+                              null,
                               height: double.infinity,
-                              label: context.l10n.photoNofM(
-                                i + 1,
-                                gallery.length,
-                                '${a['name']}',
-                              ),
+                              width: double.infinity,
                               fallbackIcon: Icons.hotel_outlined,
-                            ),
-                          ),
-                    const Scrim(top: true, strength: 0.3),
-                    if (gallery.length > 1)
-                      Positioned(
-                        bottom: 44,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (var i = 0; i < gallery.length; i++)
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 2.5,
+                            )
+                          : PageView.builder(
+                              itemCount: gallery.length,
+                              onPageChanged: (i) => setState(() => _img = i),
+                              itemBuilder: (_, i) => WImage(
+                                gallery[i],
+                                full: true,
+                                width: double.infinity,
+                                height: double.infinity,
+                                label: context.l10n.photoNofM(
+                                  i + 1,
+                                  gallery.length,
+                                  '${a['name']}',
                                 ),
-                                width: i == _img ? 18 : 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                  color: i == _img
-                                      ? Colors.white
-                                      : Colors.white54,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
+                                fallbackIcon: Icons.hotel_outlined,
                               ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(28),
-                child: Container(
-                  height: 28,
-                  decoration: const BoxDecoration(
-                    color: Tokens.pageBg,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(32),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        StarRow(a['stars'] as int),
-                        const SizedBox(width: 8),
-                        Text(
-                          stayTypeLabel(
-                            context.l10n,
-                            a['type'] as String?,
-                          ).toUpperCase(),
-                          style: Type.label(11),
-                        ),
-                        const SizedBox(width: 8),
-                        if (a['is_demo'] == true) const DemoBadge(),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      a['name'] as String,
-                      style: Type.display(34, height: 1.05),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.place_outlined,
-                          size: 17,
-                          color: Tokens.inkMuted,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '${a['address']}',
-                            style: Type.body(13.5, color: Tokens.inkMuted),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    RatingBadge(
-                      rating: (a['rating_avg'] ?? 0) as num,
-                      count: (a['review_count'] ?? 0) as int,
-                    ),
-                    if (a['data_notice'] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14),
-                        child: Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Tokens.promo,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            a['data_notice'] as String,
-                            style: Type.body(12.5, height: 1.5),
-                          ),
-                        ),
-                      ),
-                    if (a['image_credit'] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          a['image_credit'] as String,
-                          style: Type.body(12, color: Tokens.inkMuted),
-                        ),
-                      ),
-                    const SizedBox(height: 18),
-                    Text(
-                      a['description'] as String,
-                      style: Type.body(
-                        15.5,
-                        height: 1.65,
-                        color: Tokens.inkSoft,
-                      ),
-                    ),
-                    SectionHeader(context.l10n.whatThisPlaceOffers),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        for (final m in amenities)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
                             ),
-                            decoration: BoxDecoration(
-                              color: Tokens.surface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Tokens.border),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  amenityIcon(m['code'] as String),
-                                  size: 18,
-                                  color: Tokens.primary,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  amenityLabel(
-                                    context.l10n,
-                                    m['code'] as String?,
-                                    m['label'] as String,
+                      const Scrim(top: true, strength: 0.3),
+                      if (gallery.length > 1)
+                        Positioned(
+                          bottom: 44,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var i = 0; i < gallery.length; i++)
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 2.5,
                                   ),
-                                  style: Type.body(13, weight: FontWeight.w600),
+                                  width: i == _img ? 18 : 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: i == _img
+                                        ? Colors.white
+                                        : Colors.white54,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
                                 ),
-                              ],
-                            ),
+                            ],
                           ),
-                      ],
-                    ),
-                    SectionHeader(context.l10n.goodToKnow),
-                    policy(
-                      Icons.event_available_outlined,
-                      context.l10n.cancellation,
-                      a['cancellation_policy'] as String,
-                    ),
-                    policy(
-                      Icons.login_rounded,
-                      context.l10n.checkIn,
-                      context.l10n.fromTime('${a['check_in_from']}'),
-                    ),
-                    policy(
-                      Icons.logout_rounded,
-                      context.l10n.checkOut,
-                      context.l10n.byTime('${a['check_out_until']}'),
-                    ),
-                    policy(
-                      Icons.receipt_long_outlined,
-                      context.l10n.taxesAndFees,
-                      context.l10n.taxesAndFeesBody(
-                        ((a['tax_rate'] as num) * 100).toStringAsFixed(0),
-                        ((a['service_fee_rate'] as num) * 100).toStringAsFixed(
-                          0,
                         ),
-                      ),
-                    ),
-                    SectionHeader(context.l10n.location),
-                    PlaceMap(
-                      height: 220,
-                      radius: 24,
-                      points: [
-                        MapPoint(
-                          lat: lat,
-                          lng: lng,
-                          title: a['name'] as String,
-                          subtitle: a['address'] as String?,
-                          kind: 'stay',
-                        ),
-                      ],
-                    ),
-                    Container(
-                      key: _roomsKey,
-                      child: SectionHeader(context.l10n.chooseYourRoom),
-                    ),
-                    _DateCard(
-                      ci: ci,
-                      co: co,
-                      nights: nights,
-                      adults: adults,
-                      children: children,
-                      rooms: rooms,
-                      onDates: _pickDates,
-                      onRooms: (v) => setState(() => rooms = v),
-                    ),
-                    const SizedBox(height: 14),
-                    for (final r in roomsList)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: _RoomCard(
-                          room: r,
-                          money: money,
-                          nights: nights,
-                          guestsFit:
-                              adults <= (r['max_adults'] as int) * rooms &&
-                              children <= (r['max_children'] as int) * rooms,
-                          onReserve: () {
-                            final qp = {
-                              'checkIn': ci!,
-                              'checkOut': co!,
-                              'rooms': '$rooms',
-                              'adults': '$adults',
-                              'children': '$children',
-                              'stay': a['slug'] as String,
-                            };
-                            context.push(
-                              Uri(
-                                path: '/book/${r['id']}',
-                                queryParameters: qp,
-                              ).toString(),
-                            );
-                          },
-                          onNeedDates: _pickDates,
-                        ),
-                      ),
-                    _Reviews(slug: a['slug'] as String),
-                    if ((a['related'] as List).isNotEmpty) ...[
-                      SectionHeader(context.l10n.similarStays),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            if ((a['related'] as List).isNotEmpty)
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 372,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: (a['related'] as List).length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 16),
-                    itemBuilder: (_, i) {
-                      final r = (a['related'] as List).cast<Json>()[i];
-                      return StayCard(
-                        {
-                          ...r,
-                          'price_from': r['from_price_usd'],
-                          'destination_name': a['destination_name'],
-                        },
-                        compact: true,
-                        width: 272,
-                      );
-                    },
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(28),
+                  child: Container(
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      color: Tokens.pageBg,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(32),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 130 + MediaQuery.paddingOf(context).bottom,
-              ),
-            ),
-          ],
-        ),
-        Positioned(
-          left: 16,
-          right: 16,
-          bottom: 12 + MediaQuery.paddingOf(context).bottom,
-          child: Glass(
-            radius: 26,
-            blur: 22,
-            tint: const Color(0xE6FFFFFF),
-            border: Colors.white,
-            padding: const EdgeInsets.fromLTRB(20, 10, 10, 10),
-            child: Row(
-              children: [
-                Expanded(
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(context.l10n.fromCaps, style: Type.label(11)),
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          StarRow(a['stars'] as int),
+                          const SizedBox(width: 8),
                           Text(
-                            money(from),
-                            style: Type.display(26, height: 1.1),
+                            stayTypeLabel(
+                              context.l10n,
+                              a['type'] as String?,
+                            ).toUpperCase(),
+                            style: Type.label(11),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 3, left: 4),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        a['name'] as String,
+                        style: Type.display(34, height: 1.05),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.place_outlined,
+                            size: 17,
+                            color: Tokens.inkMuted,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
                             child: Text(
-                              context.l10n.perNight,
-                              style: Type.body(12.5, color: Tokens.inkMuted),
+                              '${a['address']}',
+                              style: Type.body(13.5, color: Tokens.inkMuted),
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      RatingBadge(
+                        rating: (a['rating_avg'] ?? 0) as num,
+                        count: (a['review_count'] ?? 0) as int,
+                      ),
+                      if (a['data_notice'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 14),
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Tokens.promo,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              a['data_notice'] as String,
+                              style: Type.body(12.5, height: 1.5),
+                            ),
+                          ),
+                        ),
+                      if (a['image_credit'] != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            a['image_credit'] as String,
+                            style: Type.body(12, color: Tokens.inkMuted),
+                          ),
+                        ),
+                      const SizedBox(height: 18),
+                      Text(
+                        a['description'] as String,
+                        style: Type.body(
+                          15.5,
+                          height: 1.65,
+                          color: Tokens.inkSoft,
+                        ),
+                      ),
+                      SectionHeader(context.l10n.whatThisPlaceOffers),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          for (final m in amenities)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Tokens.surface,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Tokens.border),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    amenityIcon(m['code'] as String),
+                                    size: 18,
+                                    color: Tokens.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    amenityLabel(
+                                      context.l10n,
+                                      m['code'] as String?,
+                                      m['label'] as String,
+                                    ),
+                                    style: Type.body(
+                                      13,
+                                      weight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      SectionHeader(context.l10n.goodToKnow),
+                      policy(
+                        Icons.event_available_outlined,
+                        context.l10n.cancellation,
+                        a['cancellation_policy'] as String,
+                      ),
+                      policy(
+                        Icons.login_rounded,
+                        context.l10n.checkIn,
+                        context.l10n.fromTime('${a['check_in_from']}'),
+                      ),
+                      policy(
+                        Icons.logout_rounded,
+                        context.l10n.checkOut,
+                        context.l10n.byTime('${a['check_out_until']}'),
+                      ),
+                      policy(
+                        Icons.receipt_long_outlined,
+                        context.l10n.taxesAndFees,
+                        context.l10n.taxesAndFeesBody(
+                          ((a['tax_rate'] as num) * 100).toStringAsFixed(0),
+                          ((a['service_fee_rate'] as num) * 100)
+                              .toStringAsFixed(0),
+                        ),
+                      ),
+                      SectionHeader(context.l10n.location),
+                      PlaceMap(
+                        height: 220,
+                        radius: 24,
+                        points: [
+                          MapPoint(
+                            lat: lat,
+                            lng: lng,
+                            title: a['name'] as String,
+                            subtitle: a['address'] as String?,
+                            kind: 'stay',
+                          ),
+                        ],
+                      ),
+                      Container(
+                        key: _roomsKey,
+                        child: SectionHeader(context.l10n.chooseYourRoom),
+                      ),
+                      _DateCard(
+                        ci: ci,
+                        co: co,
+                        nights: nights,
+                        adults: adults,
+                        children: children,
+                        rooms: rooms,
+                        onDates: _pickDates,
+                        onRooms: (v) => setState(() => rooms = v),
+                      ),
+                      const SizedBox(height: 14),
+                      for (final (ri, r) in roomsList.indexed)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: _RoomCard(
+                            room: r,
+                            image:
+                                (r['cover_image'] as String?) ??
+                                (gallery.isEmpty
+                                    ? null
+                                    : gallery[ri % gallery.length]),
+                            money: money,
+                            nights: nights,
+                            guestsFit:
+                                adults <= (r['max_adults'] as int) * rooms &&
+                                children <= (r['max_children'] as int) * rooms,
+                            selected:
+                                selected != null && selected['id'] == r['id'],
+                            onSelect: () =>
+                                setState(() => _roomId = r['id'] as String),
+                            onNeedDates: _pickDates,
+                          ),
+                        ),
+                      _Reviews(slug: a['slug'] as String),
+                      if ((a['related'] as List).isNotEmpty) ...[
+                        SectionHeader(context.l10n.similarStays),
+                      ],
                     ],
                   ),
                 ),
-                FilledButton(
-                  onPressed: () => Scrollable.ensureVisible(
-                    _roomsKey.currentContext!,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutCubic,
+              ),
+              if ((a['related'] as List).isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 372,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: (a['related'] as List).length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 16),
+                      itemBuilder: (_, i) {
+                        final r = (a['related'] as List).cast<Json>()[i];
+                        return StayCard(
+                          {
+                            ...r,
+                            'price_from': r['from_price_usd'],
+                            'destination_name': a['destination_name'],
+                          },
+                          compact: true,
+                          width: 272,
+                        );
+                      },
+                    ),
                   ),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(150, 54),
-                  ),
-                  child: Text(context.l10n.chooseARoom),
                 ),
-              ],
-            ),
+              SliverToBoxAdapter(child: SizedBox(height: 24)),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            10,
+            16,
+            10 + MediaQuery.paddingOf(context).bottom,
+          ),
+          decoration: const BoxDecoration(
+            color: Tokens.surface,
+            border: Border(top: BorderSide(color: Tokens.border)),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x14000000),
+                blurRadius: 16,
+                offset: Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (selectedQuote != null) ...[
+                      Text(
+                        money(selectedQuote['total_usd'] as num),
+                        style: Type.display(26, height: 1.1),
+                      ),
+                      Text(
+                        context.l10n.totalForStay(nights),
+                        style: Type.body(12.5, color: Tokens.inkMuted),
+                      ),
+                    ] else
+                      Text(
+                        context.l10n.selectARoomHint,
+                        style: Type.body(13.5, color: Tokens.inkMuted),
+                      ),
+                  ],
+                ),
+              ),
+              FilledButton(
+                onPressed: selected == null ? null : book,
+                style: FilledButton.styleFrom(minimumSize: const Size(150, 54)),
+                child: Text(context.l10n.bookNow),
+              ),
+            ],
           ),
         ),
       ],
@@ -696,40 +744,40 @@ class _DateCard extends StatelessWidget {
 class _RoomCard extends StatelessWidget {
   const _RoomCard({
     required this.room,
+    required this.image,
     required this.money,
     required this.nights,
     required this.guestsFit,
-    required this.onReserve,
+    required this.selected,
+    required this.onSelect,
     required this.onNeedDates,
   });
   final Json room;
+
+  /// The room's own photo, or a photo of the property when the owner has not added one, so every room shows an image.
+  final String? image;
   final String Function(num) money;
   final int nights;
   final bool guestsFit;
-  final VoidCallback onReserve, onNeedDates;
+  final bool selected;
+  final VoidCallback onSelect, onNeedDates;
 
   @override
   Widget build(BuildContext context) {
     final quote = room['quote'] as Json?;
     final available = quote?['available'] == true;
     final reason = quote?['reason'] as String?;
-    Widget action;
+    final canSelect = quote != null && guestsFit && available;
+    Widget? status;
     if (quote == null) {
-      action = OutlinedButton(
+      status = OutlinedButton(
         onPressed: onNeedDates,
         child: Text(context.l10n.selectDates),
       );
     } else if (!guestsFit) {
-      action = Pill(context.l10n.tooSmallForParty, color: Tokens.danger);
+      status = Pill(context.l10n.tooSmallForParty, color: Tokens.danger);
     } else if (!available) {
-      action = Pill(context.l10n.notAvailable, color: Tokens.danger);
-    } else {
-      action = FilledButton.icon(
-        onPressed: onReserve,
-        icon: const Icon(Icons.lock_outline_rounded, size: 18),
-        label: Text(context.l10n.reserve),
-        style: FilledButton.styleFrom(minimumSize: const Size(140, 50)),
-      );
+      status = Pill(context.l10n.notAvailable, color: Tokens.danger);
     }
     Widget meta(IconData i, String t) => Row(
       mainAxisSize: MainAxisSize.min,
@@ -746,102 +794,149 @@ class _RoomCard extends StatelessWidget {
         ),
       ],
     );
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Tokens.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Tokens.border),
-        boxShadow: Tokens.softShadow(0.06),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  room['name'] as String,
-                  style: Type.display(22, height: 1.1),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: canSelect ? onSelect : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Tokens.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: selected ? Tokens.primary : Tokens.border,
+            width: selected ? 2 : 1,
+          ),
+          boxShadow: Tokens.softShadow(0.06),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    WImage(
+                      image,
+                      full: true,
+                      width: double.infinity,
+                      height: double.infinity,
+                      label: room['name'] as String,
+                      fallbackIcon: Icons.bed_outlined,
+                    ),
+                    if (selected)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Tokens.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.check_rounded,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                context.l10n.selectedLabel,
+                                style: Type.body(
+                                  12,
+                                  weight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    money(room['base_price_usd'] as num),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    room['name'] as String,
                     style: Type.display(22, height: 1.1),
                   ),
-                  Text(
-                    context.l10n.basePerNight,
-                    style: Type.body(12, color: Tokens.inkMuted),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            room['description'] as String,
-            style: Type.body(13.5, color: Tokens.inkMuted, height: 1.5),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 14,
-            runSpacing: 6,
-            children: [
-              meta(Icons.bed_outlined, room['bed_type'] as String),
-              meta(
-                Icons.people_outline,
-                '${context.l10n.upToAdults(room['max_adults'] as int)}${(room['max_children'] as int) > 0 ? context.l10n.plusChildren(room['max_children'] as int) : ''}',
-              ),
-              if (room['size_sqm'] != null)
-                meta(Icons.square_foot_rounded, '${room['size_sqm']} m²'),
-              if (room['breakfast_included'] == true)
-                meta(
-                  Icons.free_breakfast_outlined,
-                  context.l10n.breakfastIncluded,
                 ),
-            ],
-          ),
-          if (quote != null && available && guestsFit) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
-              child: DashedLine(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      money(room['base_price_usd'] as num),
+                      style: Type.display(22, height: 1.1),
+                    ),
+                    Text(
+                      context.l10n.basePerNight,
+                      style: Type.body(12, color: Tokens.inkMuted),
+                    ),
+                    if (quote != null && canSelect) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        '${money(quote['total_usd'] as num)} ${context.l10n.totalForStay(nights)}',
+                        style: Type.body(
+                          12,
+                          weight: FontWeight.w700,
+                          color: Tokens.primaryText,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
-            PriceRow(
-              '${context.l10n.avgTimesNights(money((quote['subtotal_usd'] as num) / (quote['rooms'] as int) / (quote['nights'] as int)), quote['nights'] as int)}${(quote['rooms'] as int) > 1 ? context.l10n.timesRooms(quote['rooms'] as int) : ''}',
-              money(quote['subtotal_usd'] as num),
+            const SizedBox(height: 6),
+            Text(
+              room['description'] as String,
+              style: Type.body(13.5, color: Tokens.inkMuted, height: 1.5),
             ),
-            PriceRow(
-              context.l10n.taxesPercent(
-                ((quote['tax_rate'] as num) * 100).toStringAsFixed(0),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 14,
+              runSpacing: 6,
+              children: [
+                meta(Icons.bed_outlined, room['bed_type'] as String),
+                meta(
+                  Icons.people_outline,
+                  '${context.l10n.upToAdults(room['max_adults'] as int)}${(room['max_children'] as int) > 0 ? context.l10n.plusChildren(room['max_children'] as int) : ''}',
+                ),
+                if (room['size_sqm'] != null)
+                  meta(Icons.square_foot_rounded, '${room['size_sqm']} m²'),
+                if (room['breakfast_included'] == true)
+                  meta(
+                    Icons.free_breakfast_outlined,
+                    context.l10n.breakfastIncluded,
+                  ),
+              ],
+            ),
+            if (quote != null && !available && reason != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(reason, style: Type.body(13, color: Tokens.danger)),
               ),
-              money(quote['taxes_usd'] as num),
-              muted: true,
-            ),
-            PriceRow(
-              context.l10n.serviceFeePercent(
-                ((quote['service_fee_rate'] as num) * 100).toStringAsFixed(0),
+            if (status != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: Align(alignment: Alignment.centerRight, child: status),
               ),
-              money(quote['fees_usd'] as num),
-              muted: true,
-            ),
-            PriceRow(
-              context.l10n.total,
-              money(quote['total_usd'] as num),
-              bold: true,
-            ),
           ],
-          if (quote != null && !available && reason != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Text(reason, style: Type.body(13, color: Tokens.danger)),
-            ),
-          const SizedBox(height: 14),
-          Align(alignment: Alignment.centerRight, child: action),
-        ],
+        ),
       ),
     );
   }
@@ -860,7 +955,6 @@ class _Reviews extends ConsumerWidget {
       children: [
         SectionHeader(
           context.l10n.guestReviews,
-          subtitle: context.l10n.sampleDataDemo,
           action: context.l10n.writeOne,
           onAction: () {
             if (!signedIn) {
@@ -968,9 +1062,7 @@ class _Reviews extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        if (v['is_demo'] == true)
-                          DemoBadge(text: context.l10n.demoReview)
-                        else if (v['verified_stay'] == true)
+                        if (v['verified_stay'] == true)
                           Pill(
                             context.l10n.verifiedStay,
                             icon: Icons.verified_outlined,

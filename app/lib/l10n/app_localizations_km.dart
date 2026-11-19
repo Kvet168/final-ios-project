@@ -10,13 +10,13 @@ class AppLocalizationsKm extends AppLocalizations {
   AppLocalizationsKm([String locale = 'km']) : super(locale);
 
   @override
-  String get appName => 'WAYFARER';
+  String get appName => 'Travel';
 
   @override
   String get tagline => 'រៀបចំដំណើរកម្សាន្ត យ៉ាងងាយស្រួល';
 
   @override
-  String get splashLoading => 'កំពុងបើក WAYFARER';
+  String get splashLoading => 'កំពុងបើក Travel';
 
   @override
   String get splashReady => 'កំពុងរៀបចំ...';
@@ -245,13 +245,6 @@ class AppLocalizationsKm extends AppLocalizations {
   String get tryAgain => 'ព្យាយាមម្តងទៀត';
 
   @override
-  String get demoListing => 'ទិន្នន័យគំរូ';
-
-  @override
-  String get demoTooltip =>
-      'ទិន្នន័យគំរូសម្រាប់ការសិក្សា មិនមែនជាការផ្តល់ជូនពិតប្រាកដទេ';
-
-  @override
   String get ratingNew => 'ថ្មី';
 
   @override
@@ -292,7 +285,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get statusDraft => 'សេចក្តីព្រាង';
 
   @override
-  String get statusPaidSimulated => 'បានបង់ (សាកល្បង)';
+  String get statusPaid => 'បានបង់';
 
   @override
   String get statusPaymentFailed => 'ការទូទាត់មិនបានសម្រេច';
@@ -863,6 +856,35 @@ class AppLocalizationsKm extends AppLocalizations {
   String get chooseARoom => 'ជ្រើសរើសបន្ទប់';
 
   @override
+  String get bookNow => 'កក់ឥឡូវនេះ';
+
+  @override
+  String get viewDetails => 'មើលព័ត៌មានលម្អិត';
+
+  @override
+  String get viewMyBookings => 'មើលការកក់របស់ខ្ញុំ';
+
+  @override
+  String get backToHome => 'ត្រឡប់ទៅទំព័រដើម';
+
+  @override
+  String get selectedLabel => 'បានជ្រើសរើស';
+
+  @override
+  String get selectARoomHint => 'ជ្រើសរើសបន្ទប់ដើម្បីបន្ត';
+
+  @override
+  String totalForStay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count យប់',
+      one: '1 យប់',
+    );
+    return 'សរុប · $_temp0';
+  }
+
+  @override
   String get chooseYourDates => 'ជ្រើសរើសកាលបរិច្ឆេទ';
 
   @override
@@ -934,9 +956,6 @@ class AppLocalizationsKm extends AppLocalizations {
   String get guestReviews => 'ការវាយតម្លៃពីភ្ញៀវ';
 
   @override
-  String get sampleDataDemo => 'ទិន្នន័យគំរូក្នុងកម្មវិធីសាកល្បងនេះ';
-
-  @override
   String get writeOne => 'សរសេរ';
 
   @override
@@ -944,9 +963,6 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get beFirstReview => 'ក្លាយជាអ្នកដំបូងដែលចែករំលែកបទពិសោធន៍ស្នាក់នៅ។';
-
-  @override
-  String get demoReview => 'ការវាយតម្លៃគំរូ';
 
   @override
   String get verifiedStay => 'បានស្នាក់នៅពិតប្រាកដ';
@@ -1028,7 +1044,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String paymentNotConfirmed(String status) {
-    return '$status (សាកល្បង)។ ការកក់របស់អ្នកមិនទាន់បានបញ្ជាក់ទេ — អ្នកអាចព្យាយាមម្តងទៀត មុនពេលផុតកំណត់រក្សាបន្ទប់។';
+    return '$status។ ការកក់របស់អ្នកមិនទាន់បានបញ្ជាក់ទេ — អ្នកអាចព្យាយាមម្តងទៀត មុនពេលផុតកំណត់រក្សាបន្ទប់។';
   }
 
   @override
@@ -1094,10 +1110,6 @@ class AppLocalizationsKm extends AppLocalizations {
   }
 
   @override
-  String get simulatedPaymentNotice =>
-      'ការទូទាត់សាកល្បង។ កម្មវិធីនេះប្រើប្រព័ន្ធទូទាត់គំរូ៖ គ្មានការកាត់ប្រាក់ពីកាត ហើយគ្មានការផ្ទេរប្រាក់ពិតប្រាកដទេ។ សូមជ្រើសលទ្ធផល ដើម្បីសាកល្បងមើលប្រតិកម្មនៃការកក់។';
-
-  @override
   String referenceValue(String ref) {
     return 'លេខយោង $ref';
   }
@@ -1106,10 +1118,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get amountDue => 'ចំនួនទឹកប្រាក់ត្រូវបង់';
 
   @override
-  String get payNowSimulate => 'បង់ឥឡូវ (សាកល្បងជោគជ័យ)';
-
-  @override
-  String get simulateDeclined => 'សាកល្បងកាតត្រូវបានបដិសេធ';
+  String get payNow => 'បង់ឥឡូវ';
 
   @override
   String get payLater => 'បង់ពេលក្រោយពី ការកក់របស់ខ្ញុំ';
@@ -1161,7 +1170,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get cancelFreePaidBody =>
-      'អ្នកនៅក្នុងរយៈពេលលុបចោលឥតគិតថ្លៃ។ ការសងប្រាក់វិញ (សាកល្បង) នឹងត្រូវបានកត់ត្រា។ បន្ទប់នឹងត្រូវបានដោះលែង។';
+      'អ្នកនៅក្នុងរយៈពេលលុបចោលឥតគិតថ្លៃ។ ប្រាក់របស់អ្នកនឹងត្រូវបានសងវិញ ហើយបន្ទប់នឹងត្រូវបានដោះលែង។';
 
   @override
   String get cancelNonRefundBody =>
@@ -1214,14 +1223,10 @@ class AppLocalizationsKm extends AppLocalizations {
   String get payments => 'ការទូទាត់';
 
   @override
-  String get simulatedSuffix => ' (សាកល្បង)';
-
-  @override
   String get youreBooked => 'កក់បានសម្រេច!';
 
   @override
-  String get paymentVerified =>
-      'ម៉ាស៊ីនមេបានផ្ទៀងផ្ទាត់ការទូទាត់។ ការទូទាត់សាកល្បង៖ គ្មានការផ្ទេរប្រាក់ពិតប្រាកដទេ។';
+  String get paymentVerified => 'ការទូទាត់ត្រូវបានបញ្ជាក់។';
 
   @override
   String get tripsEyebrowCaps => 'ដំណើរ';
@@ -1453,7 +1458,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get somethingWentWrong => 'មានបញ្ហាបន្តិចបន្តួច។';
 
   @override
-  String get guideName => 'មគ្គុទ្ទេសក៍ Wayfarer';
+  String get guideName => 'មគ្គុទ្ទេសក៍ Travel';
 
   @override
   String get guideModeLlm => 'ជំនួយការធ្វើដំណើរ AI · ប្រើការណែនាំរបស់យើង';
@@ -1469,7 +1474,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get askIntro =>
-      'សួរតាមរបៀបរបស់អ្នក។ ខ្ញុំប្រើការណែនាំរបស់ WAYFARER នៅពេលដែលវាមានប្រយោជន៍ និងចំណេះដឹងទូទៅអំពីការធ្វើដំណើរនៅពេលផ្សេង ហើយខ្ញុំបង្ហាញប្រភពជានិច្ច។ ចម្លើយអាចជាភាសាអង់គ្លេស។';
+      'សួរតាមរបៀបរបស់អ្នក។ ខ្ញុំប្រើការណែនាំរបស់ Travel នៅពេលដែលវាមានប្រយោជន៍ និងចំណេះដឹងទូទៅអំពីការធ្វើដំណើរនៅពេលផ្សេង ហើយខ្ញុំបង្ហាញប្រភពជានិច្ច។ ចម្លើយអាចជាភាសាអង់គ្លេស។';
 
   @override
   String get generalKnowledge => 'ចំណេះដឹងទូទៅអំពីការធ្វើដំណើរ';
@@ -1486,9 +1491,6 @@ class AppLocalizationsKm extends AppLocalizations {
   String sourcesCount(int count) {
     return 'ប្រភព $count';
   }
-
-  @override
-  String get demoContentSuffix => ' (ខ្លឹមសារគំរូ)';
 
   @override
   String get cardStay => 'ស្នាក់នៅ';
@@ -1574,7 +1576,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get termsNotice =>
-      'ការបង្កើតគណនី មានន័យថាអ្នកយល់ព្រមលើលក្ខខណ្ឌប្រើប្រាស់ និងគោលការណ៍ឯកជនភាពរបស់ WAYFARER។';
+      'ការបង្កើតគណនី មានន័យថាអ្នកយល់ព្រមលើលក្ខខណ្ឌប្រើប្រាស់ និងគោលការណ៍ឯកជនភាពរបស់ Travel។';
 
   @override
   String get haveAccount => 'មានគណនីរួចហើយ? ';
@@ -1646,7 +1648,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get currencyNote =>
-      'តម្លៃត្រូវបានរក្សាទុកជាដុល្លារអាមេរិក ហើយប្តូរតាមអត្រាគំរូ មិនមែនអត្រាទីផ្សារបច្ចុប្បន្នទេ។';
+      'តម្លៃត្រូវបានបង្ហាញជាដុល្លារអាមេរិក ហើយប្តូរតាមអត្រាប្តូរប្រាក់ប្រហាក់ប្រហែល។';
 
   @override
   String get accountHero => 'ការធ្វើដំណើររបស់អ្នក\nនៅកន្លែងតែមួយ។';
@@ -1805,7 +1807,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get nextPage => 'ទំព័របន្ទាប់';
 
   @override
-  String get simulatedNetRevenue => 'ចំណូលសុទ្ធ (សាកល្បង)';
+  String get simulatedNetRevenue => 'ចំណូលសុទ្ធ';
 
   @override
   String get bookingsByStatus => 'ការកក់តាមស្ថានភាព';
@@ -1823,9 +1825,6 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get searchBookingsHint => 'លេខយោង ភ្ញៀវ អ៊ីមែល';
-
-  @override
-  String get demoSuffix => ' · គំរូ';
 
   @override
   String get actions => 'សកម្មភាព';
@@ -1853,9 +1852,6 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get nameOrEmail => 'ឈ្មោះ ឬអ៊ីមែល';
-
-  @override
-  String get demoAccountSuffix => ' · គណនីគំរូ';
 
   @override
   String get changeRoleQ => 'ប្តូរតួនាទី?';
@@ -2002,7 +1998,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get pdfFailed => 'មិនអាចបង្កើត PDF បានទេ។ សូមព្យាយាមម្តងទៀត។';
 
   @override
-  String get pdfBrandLine => 'WAYFARER · កម្មវិធីដំណើរ';
+  String get pdfBrandLine => 'Travel · កម្មវិធីដំណើរ';
 
   @override
   String pdfCreatedOn(String date) {
@@ -2056,4 +2052,171 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get exTwoCities => 'កំពត + សៀមរាប';
+
+  @override
+  String get sponsored => 'ឧបត្ថម្ភ';
+
+  @override
+  String get adsFeaturedEyebrow => 'អាជីវកម្មក្នុងស្រុក';
+
+  @override
+  String get adsFeaturedTitle => 'កន្លែងឧបត្ថម្ភសម្រាប់ស្វែងយល់';
+
+  @override
+  String get adsFestivalEyebrow => 'ការផ្សព្វផ្សាយពិសេស';
+
+  @override
+  String get adsFestivalTitle => 'ការផ្តល់ជូនពិធីបុណ្យ និងថ្ងៃឈប់សម្រាក';
+
+  @override
+  String get adsStoriesEyebrow => 'កំណត់ត្រាធ្វើដំណើរ';
+
+  @override
+  String get adsStoriesTitle => 'រឿងរ៉ាវឧបត្ថម្ភ';
+
+  @override
+  String get adsCall => 'ទូរស័ព្ទ';
+
+  @override
+  String get adsVisit => 'ចូលមើលគេហទំព័រ';
+
+  @override
+  String get adsViewStay => 'មើលកន្លែងស្នាក់';
+
+  @override
+  String get adsPromotedBy => 'ផ្សព្វផ្សាយដោយ';
+
+  @override
+  String get adsPaidNote => 'ការផ្សព្វផ្សាយបង់ប្រាក់ពីអាជីវកម្មក្នុងស្រុក។';
+
+  @override
+  String get adsReadMore => 'អានរឿងនេះ';
+
+  @override
+  String get adsSearchTitle => 'លទ្ធផលឧបត្ថម្ភ';
+
+  @override
+  String get accountSectionActivity => 'សកម្មភាពរបស់ខ្ញុំ';
+
+  @override
+  String get accountSectionManage => 'គ្រប់គ្រង';
+
+  @override
+  String get accountSectionPreferences => 'ចំណូលចិត្ត';
+
+  @override
+  String get accountSectionGeneral => 'ទូទៅ';
+
+  @override
+  String get accountSectionAccount => 'គណនី';
+
+  @override
+  String get editProfile => 'កែប្រែព័ត៌មានផ្ទាល់ខ្លួន';
+
+  @override
+  String get editProfileHint =>
+      'នេះជាឈ្មោះ និងលេខទូរស័ព្ទដែលយើងប្រើលើការកក់របស់អ្នក។';
+
+  @override
+  String get profileName => 'ឈ្មោះពេញ';
+
+  @override
+  String get profilePhone => 'លេខទូរស័ព្ទ';
+
+  @override
+  String get profileEmail => 'អ៊ីមែល';
+
+  @override
+  String get profileEmailNote =>
+      'អ៊ីមែលរបស់អ្នកគឺសម្រាប់ចូលគណនី ហើយមិនអាចប្តូរនៅទីនេះបានទេ។';
+
+  @override
+  String get saveChanges => 'រក្សាទុកការផ្លាស់ប្តូរ';
+
+  @override
+  String get profileSaved => 'បានធ្វើបច្ចុប្បន្នភាពព័ត៌មាន';
+
+  @override
+  String get nameTooShort => 'បញ្ចូលយ៉ាងហោចណាស់ ២ តួអក្សរ';
+
+  @override
+  String get deleteAccountTitle => 'លុបគណនី';
+
+  @override
+  String get deleteIntro =>
+      'ការលុបគណនីគឺអចិន្ត្រៃយ៍។ សូមអានអ្វីដែលនឹងកើតឡើងជាមុនសិន។';
+
+  @override
+  String get deleteRemovedHeading => 'នឹងត្រូវលុបជារៀងរហូត';
+
+  @override
+  String get deleteRemoved1 => 'ឈ្មោះ លេខទូរស័ព្ទ និងអាសយដ្ឋានអ៊ីមែលរបស់អ្នក';
+
+  @override
+  String get deleteRemoved2 =>
+      'បញ្ជីចូលចិត្ត ដំណើរកម្សាន្តដែលបានរក្សាទុក ការជូនដំណឹង និងការជជែកជាមួយជំនួយការ';
+
+  @override
+  String get deleteRemoved3 => 'ការចូលគណនីរបស់អ្នកនៅគ្រប់ឧបករណ៍';
+
+  @override
+  String get deleteKeptHeading => 'រក្សាទុកដោយគ្មានឈ្មោះរបស់អ្នក';
+
+  @override
+  String get deleteKept1 =>
+      'ការកក់ និងការទូទាត់ពីមុន ដូចដែលកំណត់ត្រាហិរញ្ញវត្ថុតម្រូវ។ ពួកវាលែងភ្ជាប់ទៅអ្នកទៀតហើយ។';
+
+  @override
+  String get deleteActiveNote =>
+      'ប្រសិនបើអ្នកមានការកក់ដែលកំពុងដំណើរការ សូមលុបចោលជាមុន។ យើងមិនអាចលុបគណនីបានទេ លុះត្រាតែវាបានបញ្ចប់។';
+
+  @override
+  String get deleteTypeLabel => 'វាយ DELETE ដើម្បីបញ្ជាក់';
+
+  @override
+  String get deleteTypeHint => 'DELETE';
+
+  @override
+  String get deletePasswordLabel => 'ពាក្យសម្ងាត់របស់អ្នក';
+
+  @override
+  String get deleteForever => 'លុបគណនីរបស់ខ្ញុំ';
+
+  @override
+  String get deleteCancel => 'រក្សាគណនីរបស់ខ្ញុំ';
+
+  @override
+  String get accountDeleted => 'គណនីរបស់អ្នកត្រូវបានលុបហើយ';
+
+  @override
+  String get browseDestinations => 'រកមើលទិសដៅ';
+
+  @override
+  String get signOutConfirm =>
+      'តើអ្នកប្រាកដថាចង់ចាកចេញពីគណនី Travel របស់អ្នកទេ?';
+
+  @override
+  String get notificationsEmptyHint =>
+      'ព័ត៌មានថ្មីអំពីការកក់ និងការទូទាត់នឹងបង្ហាញនៅទីនេះ។';
+
+  @override
+  String get changePhoto => 'ប្តូររូបភាពប្រវត្តិរូប';
+
+  @override
+  String get chooseFromLibrary => 'ជ្រើសរើសពីបណ្ណាល័យរូបភាព';
+
+  @override
+  String get takePhoto => 'ថតរូប';
+
+  @override
+  String get removePhoto => 'លុបរូបភាព';
+
+  @override
+  String get photoUpdated => 'បានធ្វើបច្ចុប្បន្នភាពរូបភាពប្រវត្តិរូប';
+
+  @override
+  String get photoRemoved => 'បានលុបរូបភាពប្រវត្តិរូប';
+
+  @override
+  String get photoFailed => 'មិនអាចប្រើរូបភាពនោះបានទេ។ សូមសាកល្បងរូបផ្សេង។';
 }

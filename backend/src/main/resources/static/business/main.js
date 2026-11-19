@@ -8,8 +8,6 @@ createDashboard({
   name: 'Business advertising',
   roleLabel: 'Business owners',
   allowedRoles: ['business', 'partner'],
-  demoEmail: 'business.demo@demo.wayfarer.test',
-  demoLabel: 'Try demo business account',
   hint: 'Sign in with your business account to run advertising campaigns.',
   register: registerBusinessModal,
   nav: [

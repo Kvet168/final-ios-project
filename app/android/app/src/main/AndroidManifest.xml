@@ -9,7 +9,7 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="true"/>
 
     <application
-        android:label="WAYFARER"
+        android:label="Travel"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"

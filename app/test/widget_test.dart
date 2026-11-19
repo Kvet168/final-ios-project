@@ -152,11 +152,6 @@ void main() {
       expect(find.text('Confirmed'), findsOneWidget);
       expect(find.text('Refunded'), findsOneWidget);
     });
-
-    testWidgets('DemoBadge is visible for sample data', (tester) async {
-      await tester.pumpWidget(host(const DemoBadge()));
-      expect(find.text('Demo listing'), findsOneWidget);
-    });
   });
 
   group('money formatting', () {

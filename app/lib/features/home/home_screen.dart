@@ -9,7 +9,10 @@ import '../../core/data/providers.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/theme.dart';
 import '../../core/widgets/cards.dart';
+import '../../core/widgets/save.dart';
+import '../../core/widgets/settings_ui.dart';
 import '../../core/widgets/widgets.dart';
+import '../ads/ads.dart';
 import '../auth/auth_controller.dart';
 import '../stays/search_panel.dart';
 
@@ -25,11 +28,38 @@ String _greeting(AppLocalizations l) {
   return l.greetingEvening;
 }
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  /// The floating header shows once the hero has scrolled away and the reader keeps scrolling down, and closes again
+  /// as soon as they scroll back up.
+  bool _showBar = false;
+
+  bool _onScroll(ScrollNotification n) {
+    if (n.depth != 0 ||
+        n.metrics.axis != Axis.vertical ||
+        n is! ScrollUpdateNotification) {
+      return false;
+    }
+    final y = n.metrics.pixels, dy = n.scrollDelta ?? 0;
+    var next = _showBar;
+    if (y < 220) {
+      next = false;
+    } else if (dy > 2) {
+      next = true;
+    } else if (dy < -2) {
+      next = false;
+    }
+    if (next != _showBar) setState(() => _showBar = next);
+    return false;
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final home = ref.watch(homeProvider);
     final recent = ref.watch(recentProvider);
     final auth = ref.watch(authProvider);
@@ -37,7 +67,7 @@ class HomeScreen extends ConsumerWidget {
         ? (auth.user!['name'] as String).split(' ').first
         : null;
 
-    return RefreshIndicator(
+    final scroll = RefreshIndicator(
       color: Tokens.primary,
       edgeOffset: MediaQuery.paddingOf(context).top + 8,
       onRefresh: () async {
@@ -77,6 +107,165 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: dockClearance(context))),
+        ],
+      ),
+    );
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: _onScroll,
+          child: scroll,
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(
+            ignoring: !_showBar,
+            child: AnimatedSlide(
+              offset: _showBar ? Offset.zero : const Offset(0, -1.4),
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeOutCubic,
+              child: AnimatedOpacity(
+                opacity: _showBar ? 1 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: const _FloatingBar(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Bell (with unread count) and profile button. [dark] is for use on the light floating bar.
+class _HeaderActions extends ConsumerWidget {
+  const _HeaderActions({this.dark = false});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
+    final unread = auth.signedIn
+        ? (ref.watch(notificationsProvider).value?['unread'] as int? ?? 0)
+        : 0;
+    final initial = auth.signedIn
+        ? ((auth.user!['name'] as String).trim().isEmpty
+              ? '?'
+              : (auth.user!['name'] as String).trim()[0].toUpperCase())
+        : null;
+    final fg = dark ? Tokens.ink : Colors.white;
+    final bg = dark ? Tokens.neutralTint : const Color(0x400F172A);
+
+    Widget circle(Widget child, VoidCallback onTap, String label) => Pressable(
+      onTap: onTap,
+      radius: 99,
+      semanticLabel: label,
+      child: dark
+          ? Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+              child: Center(child: child),
+            )
+          : Glass(
+              radius: 99,
+              tint: bg,
+              child: SizedBox(
+                width: 44,
+                height: 44,
+                child: Center(child: child),
+              ),
+            ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            circle(
+              Icon(Icons.notifications_none_rounded, color: fg, size: 22),
+              () => context.push('/notifications'),
+              context.l10n.notifications,
+            ),
+            if (unread > 0)
+              Positioned(
+                right: -2,
+                top: -2,
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 18),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Tokens.primary,
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: Text(
+                    unread > 99 ? '99+' : '$unread',
+                    textAlign: TextAlign.center,
+                    style: Type.body(
+                      10,
+                      color: Colors.white,
+                      weight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(width: 10),
+        circle(
+          initial == null
+              ? Icon(Icons.person_outline_rounded, color: fg, size: 22)
+              : ((auth.user!['avatarUrl'] as String?)?.isNotEmpty ?? false)
+              ? ProfileAvatar(
+                  name: auth.user!['name'] as String,
+                  url: auth.user!['avatarUrl'] as String?,
+                  size: 40,
+                )
+              : Text(
+                  initial,
+                  style: Type.body(15, color: fg, weight: FontWeight.w700),
+                ),
+          () => context.go('/account'),
+          context.l10n.tabMe,
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact header docked to the top edge (under the status bar) while the reader scrolls down.
+class _FloatingBar extends StatelessWidget {
+  const _FloatingBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, top + 6, 12, 8),
+      decoration: const BoxDecoration(
+        color: Tokens.surface,
+        border: Border(bottom: BorderSide(color: Tokens.border)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 12,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Image.asset('assets/logo.png', height: 28),
+          const Spacer(),
+          const _HeaderActions(dark: true),
         ],
       ),
     );
@@ -125,13 +314,9 @@ class _HeroState extends ConsumerState<_Hero> {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
-    final h = (MediaQuery.sizeOf(context).height * 0.6).clamp(440.0, 600.0);
+    final h = (MediaQuery.sizeOf(context).height * 0.42).clamp(320.0, 420.0);
     final f = widget.featured;
     final current = f.isEmpty ? null : f[_i % f.length];
-    final unread = widget.signedIn
-        ? (ref.watch(notificationsProvider).value?['unread'] as int? ?? 0)
-        : 0;
-
     return SizedBox(
       height: h + 56,
       child: Stack(
@@ -167,74 +352,9 @@ class _HeroState extends ConsumerState<_Hero> {
                     right: 20,
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.explore_rounded,
-                          color: Tokens.onDarkAccent,
-                          size: 26,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'WAYFARER',
-                          style: Type.display(
-                            17,
-                            color: Colors.white,
-                            spacing: 3.2,
-                            weight: FontWeight.w600,
-                          ),
-                        ),
-                        const Spacer(),
-                        if (widget.signedIn)
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              GlassIconButton(
-                                icon: Icons.notifications_none_rounded,
-                                tooltip: 'Notifications',
-                                onTap: () => context.push('/notifications'),
-                              ),
-                              if (unread > 0)
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: const BoxDecoration(
-                                      color: Tokens.primaryText,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '$unread',
-                                      style: Type.body(
-                                        10,
-                                        color: Colors.white,
-                                        weight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          )
-                        else
-                          Pressable(
-                            onTap: () => context.push('/login'),
-                            radius: 99,
-                            child: Glass(
-                              radius: 99,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              tint: const Color(0x400F172A),
-                              child: Text(
-                                context.l10n.signIn,
-                                style: Type.body(
-                                  13,
-                                  color: Colors.white,
-                                  weight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
+                        Image.asset('assets/logo.png', height: 30),
+ const Spacer(),
+                        const _HeaderActions(),
                       ],
                     ),
                   ),
@@ -423,16 +543,16 @@ class _Body extends ConsumerWidget {
       children: [
         const SizedBox(height: 22),
         _QuickActions(),
-        _Stats(counts: counts),
         if (recent.isNotEmpty) ...[
           SectionTitle(
             context.l10n.pickUpWhereLeft,
             eyebrow: context.l10n.recentlyViewed,
           ),
           SizedBox(
-            height: 52,
+            height: 60,
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               scrollDirection: Axis.horizontal,
               itemCount: recent.length,
               separatorBuilder: (_, _) => const SizedBox(width: 10),
@@ -453,18 +573,21 @@ class _Body extends ConsumerWidget {
             ),
           ),
         ],
+        const AdBannerCarousel(),
+        const FestivalStrip(),
         SectionTitle(
           context.l10n.destinationsWeLove,
           eyebrow: context.l10n.featured,
           action: context.l10n.seeAll,
           onAction: () => context.push('/destinations'),
         ),
-        _DestinationPager(items: featured),
+        _DestinationRow(items: featured),
         SectionTitle(context.l10n.browseByMood, eyebrow: context.l10n.explore),
         SizedBox(
-          height: 52,
+          height: 60,
           child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            clipBehavior: Clip.none,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             scrollDirection: Axis.horizontal,
             itemCount: cats.length,
             separatorBuilder: (_, _) => const SizedBox(width: 10),
@@ -512,15 +635,17 @@ class _Body extends ConsumerWidget {
           onAction: () => context.go('/trips'),
         ),
         SizedBox(
-          height: 280,
+          height: 296,
           child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            clipBehavior: Clip.none,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             scrollDirection: Axis.horizontal,
             itemCount: trips.length,
             separatorBuilder: (_, _) => const SizedBox(width: 14),
             itemBuilder: (_, i) => _TripCard(trip: trips[i], money: money),
           ),
         ),
+        const SponsoredStories(),
         SectionTitle(context.l10n.trendingNow, eyebrow: context.l10n.thisWeek),
         for (final (i, d) in trending.take(5).indexed)
           Padding(
@@ -531,6 +656,8 @@ class _Body extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: 28),
+        _Stats(counts: counts),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -567,12 +694,13 @@ class _QuickActions extends StatelessWidget {
     ];
     return SizedBox(
       // Khmer lines are taller (stacked vowels), so the cards grow instead of overflowing.
-      height: context.isKhmer ? 140 : 124,
+      height: context.isKhmer ? 128 : 112,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        clipBehavior: Clip.none,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final (icon, title, sub, onTap) = items[i];
           return Reveal(
@@ -580,25 +708,25 @@ class _QuickActions extends StatelessWidget {
             child: Pressable(
               onTap: onTap,
               child: Container(
-                width: 132,
-                padding: const EdgeInsets.all(14),
+                width: 124,
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 decoration: BoxDecoration(
                   color: Tokens.surface,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: Tokens.border),
                   boxShadow: Tokens.softShadow(0.08),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon3D(icon, size: 40),
+                    Icon3D(icon, size: 32),
                     const Spacer(),
                     Text(
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Type.body(
-                        14.5,
+                        13.5,
                         color: Tokens.ink,
                         weight: FontWeight.w800,
                       ),
@@ -607,7 +735,7 @@ class _QuickActions extends StatelessWidget {
                       sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Type.body(12, color: Tokens.inkMuted),
+                      style: Type.body(11.5, color: Tokens.inkMuted),
                     ),
                   ],
                 ),
@@ -665,52 +793,98 @@ class _Stats extends StatelessWidget {
 }
 
 /// Snapping carousel whose centred card is full size and whose neighbours recede.
-class _DestinationPager extends StatefulWidget {
-  const _DestinationPager({required this.items});
+/// "Destinations we love": a plain horizontal row of compact photo tiles (name and daily budget over the photo).
+class _DestinationRow extends ConsumerWidget {
+  const _DestinationRow({required this.items});
   final List<Json> items;
-  @override
-  State<_DestinationPager> createState() => _DestinationPagerState();
-}
-
-class _DestinationPagerState extends State<_DestinationPager> {
-  final _c = PageController(viewportFraction: 0.76);
 
   @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 380,
-    child: PageView.builder(
-      controller: _c,
-      padEnds: true,
-      clipBehavior: Clip.none,
-      itemCount: widget.items.length,
-      itemBuilder: (_, i) => AnimatedBuilder(
-        animation: _c,
-        builder: (_, child) {
-          final p = _c.hasClients && _c.position.haveDimensions
-              ? (_c.page ?? 0) - i
-              : (i == 0 ? 0.0 : 1.0);
-          final s = (1 - p.abs() * 0.1).clamp(0.88, 1.0);
-          return Transform.scale(
-            scale: s,
-            child: Opacity(
-              opacity: (1 - p.abs() * 0.35).clamp(0.55, 1.0),
-              child: child,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final money = ref.watch(moneyProvider);
+    return SizedBox(
+      height: 214,
+      child: ListView.separated(
+        clipBehavior: Clip.none,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, i) {
+          final d = items[i];
+          final budget = d['daily_budget_usd'] as num?;
+          return Pressable(
+            onTap: () => context.push('/destinations/${d['slug']}'),
+            radius: 22,
+            scale: 0.97,
+            semanticLabel: '${d['name']}, ${d['country']}',
+            child: SizedBox(
+              width: 156,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    WImage(
+                      d['cover_image'] as String?,
+                      full: true,
+                      width: double.infinity,
+                      height: double.infinity,
+                      label: 'Photo of ${d['name']}',
+                    ),
+                    const Scrim(strength: 0.8),
+                    if (d['id'] != null)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: SaveHeart(
+                          kind: 'destination',
+                          id: d['id'] as String,
+                          size: 32,
+                        ),
+                      ),
+                    Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 12,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            d['name'] as String,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Type.display(
+                              17,
+                              color: Colors.white,
+                              height: 1.15,
+                            ),
+                          ),
+                          if (budget != null) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              context.l10n.fromPerDay(money(budget)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Type.body(
+                                11.5,
+                                color: Colors.white70,
+                                weight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: DestinationCard(widget.items[i], aspect: 0.72),
-        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _TripCard extends StatelessWidget {
