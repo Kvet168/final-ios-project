@@ -783,11 +783,11 @@ td .cselect {
 
 /* ---------- Sortable Tables ---------- */
 /* Tables keep their natural column widths and scroll sideways inside their card, instead of squeezing text into tall narrow cells. */
-.table-wrap { display: block; width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; border-radius: var(--radius); scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
-.table-wrap::-webkit-scrollbar { height: 10px; }
+.table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; border-radius: var(--radius); }
+.table-wrap::-webkit-scrollbar { height: 12px; background: var(--surface-2, #f1f1f3); }
 .table-wrap::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; border: 2px solid transparent; background-clip: padding-box; }
 .table-wrap::-webkit-scrollbar-thumb:hover { background: var(--muted, #9aa0a6); background-clip: padding-box; }
-table { width: 100%; min-width: max-content; border-collapse: collapse; }
+table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
 /* Column spacing: the first data column (the name) takes all the free space and every other column hugs its content,
    so numbers and badges sit next to each other instead of floating far apart on wide screens. */
