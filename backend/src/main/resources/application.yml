@@ -2,7 +2,7 @@ server:
   port: ${PORT:8080}
   shutdown: graceful
   max-http-request-header-size: 64KB
-  # Hosts like Render terminate HTTPS at a proxy; trust its X-Forwarded-* headers so links and redirects use https.
+  # Hosts like Easypanel terminate HTTPS at a proxy; trust its X-Forwarded-* headers so links and redirects use https.
   forward-headers-strategy: framework
   compression:
     enabled: true

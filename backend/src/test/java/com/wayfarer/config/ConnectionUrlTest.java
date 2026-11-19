@@ -10,8 +10,8 @@ class ConnectionUrlTest {
 
     @Test
     void convertsProviderUrlWithCredentials() {
-        Map<String, Object> p = ConnectionUrlEnvironmentPostProcessor.datasource("postgres://wayfarer:s3cr%40t@dpg-abc123-a.singapore-postgres.render.com:5432/wayfarer_db?sslmode=require");
-        assertEquals("jdbc:postgresql://dpg-abc123-a.singapore-postgres.render.com:5432/wayfarer_db?sslmode=require", p.get("spring.datasource.url"));
+        Map<String, Object> p = ConnectionUrlEnvironmentPostProcessor.datasource("postgres://wayfarer:s3cr%40t@db.example.com:5432/wayfarer_db?sslmode=require");
+        assertEquals("jdbc:postgresql://db.example.com:5432/wayfarer_db?sslmode=require", p.get("spring.datasource.url"));
         assertEquals("wayfarer", p.get("spring.datasource.username"));
         assertEquals("s3cr@t", p.get("spring.datasource.password"));
     }

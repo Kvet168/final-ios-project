@@ -14,7 +14,7 @@ import org.springframework.core.env.MapPropertySource;
 /**
  * Accepts the connection strings hosting providers hand out, so they can be pasted as-is.
  *
- * <p>Render, Neon, Supabase and Heroku give {@code postgres://user:pass@host:5432/db}; Spring needs
+ * <p>Easypanel, Neon, Supabase and Heroku give {@code postgres://user:pass@host:5432/db}; Spring needs
  * {@code jdbc:postgresql://host:5432/db} with the user and password as separate properties. When {@code DATABASE_URL}
  * uses the provider form it is converted here; a {@code jdbc:} URL is left untouched. {@code REDIS_URL}
  * ({@code redis://} or {@code rediss://}) is mapped to {@code spring.data.redis.url} the same way.

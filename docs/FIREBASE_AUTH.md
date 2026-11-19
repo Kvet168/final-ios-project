@@ -39,9 +39,9 @@ Paste the values as the defaults in `app/lib/core/config/firebase_config.dart`, 
 </array>
 ```
 
-## 3. The server (Render)
+## 3. The server (Easypanel)
 
-Add one environment variable and redeploy:
+In Easypanel, add one environment variable to the API service and redeploy:
 
 | Key | Value |
 |---|---|

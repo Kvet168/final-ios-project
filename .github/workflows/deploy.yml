@@ -1,0 +1,53 @@
+name: Deploy to VPS (Easypanel)
+
+# Every push to main: run the backend tests, and only if they pass ask Easypanel to rebuild and redeploy the API.
+# One-time setup (see docs/DEPLOYMENT.md): add the repository secret EASYPANEL_DEPLOY_URL (the API service's deploy webhook URL).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # lets you redeploy by hand from the Actions tab
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false  # never cut a running deploy short; the next one waits its turn
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21, cache: maven }
+      - run: mvn -B verify
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask Easypanel to deploy
+        env:
+          EASYPANEL_DEPLOY_URL: ${{ secrets.EASYPANEL_DEPLOY_URL }}
+        run: |
+          if [ -z "$EASYPANEL_DEPLOY_URL" ]; then
+            echo "::error::The secret EASYPANEL_DEPLOY_URL is not set. Add the API service's deploy webhook URL (see docs/DEPLOYMENT.md)."
+            exit 1
+          fi
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 --max-time 60 -X POST "$EASYPANEL_DEPLOY_URL"
+          echo "Deploy requested for commit ${GITHUB_SHA::7}"
+
+      # The build on the VPS takes about 5 to 8 minutes (Maven build plus Flyway). Wait, then confirm the API answers.
+      # This is a health check of the live site, not proof that this exact commit is the one running.
+      - name: Check the live API is healthy
+        env:
+          HEALTH_URL: ${{ vars.HEALTH_URL || 'https://porseng-finalproject-api.b1exgs.easypanel.host/actuator/health' }}
+        run: |
+          sleep 360
+          for i in $(seq 1 40); do
+            body=$(curl --silent --max-time 15 "$HEALTH_URL" || true)
+            if echo "$body" | grep -q '"status":"UP"'; then echo "Healthy: $body"; exit 0; fi
+            echo "Attempt $i: not healthy yet (${body:0:120})"
+            sleep 15
+          done
+          echo "::error::The API did not become healthy within about 16 minutes. Check the service Logs in Easypanel."
+          exit 1
